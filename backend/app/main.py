@@ -1,4 +1,11 @@
 from fastapi import FastAPI
+from app.database.db import Base, engine
+
+# Import models
+from app.models.user import User
+
+# Create tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Crop Yield Prediction & Agricultural Productivity Forecasting System",
@@ -8,5 +15,5 @@ app = FastAPI(
 @app.get("/")
 def home():
     return {
-        "message": "Welcome to Crop Yield Prediction & Agricultural Productivity Forecasting System"
+        "message": "Backend Running Successfully"
     }
