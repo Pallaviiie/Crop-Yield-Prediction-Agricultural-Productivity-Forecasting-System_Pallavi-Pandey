@@ -1,16 +1,17 @@
 from fastapi import FastAPI
 from app.database.db import Base, engine
 
-# Import models
 from app.models.user import User
+from app.routers.users import router as user_router
 
-# Create tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Crop Yield Prediction & Agricultural Productivity Forecasting System",
     version="1.0.0"
 )
+
+app.include_router(user_router)
 
 @app.get("/")
 def home():
