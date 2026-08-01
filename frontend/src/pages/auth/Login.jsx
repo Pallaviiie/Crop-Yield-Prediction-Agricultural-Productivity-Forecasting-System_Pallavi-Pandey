@@ -1,12 +1,15 @@
+import { GoogleLogin } from "@react-oauth/google";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock } from "lucide-react";
-import api from "../services/api";
-import cropLogo from "../assets/crop-logo.png";
-import farmHero from "../assets/farm-hero.png";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import api from "../../services/api";
+import cropLogo from "../../assets/crop-logo.png";
+import farmHero from "../../assets/farm-hero.png";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [role, setRole] = useState("farmer");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -24,13 +27,22 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await api.post("/users/login", formData);
+      const response = await api.post("/users/login", {
+       ...formData,
+       role,
+     });
 
       localStorage.setItem("token", response.data.access_token);
 
       alert("Login Successful");
 
-      navigate("/dashboard");
+      if (role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (role === "consultant") {
+        navigate("/consultant-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       alert("Invalid Email or Password");
     }
@@ -99,16 +111,70 @@ export default function Login() {
          </div>
 
           <h2 className="text-3xl font-bold text-center text-green-800">
-
-            Welcome Back
-
+            {role === "farmer"
+              ? "Farmer Login"
+              : role === "consultant"
+              ? "Agri Consultant Login"
+              : "Administrator Login"}
           </h2>
 
-          <p className="text-center text-gray-500 mt-2 mb-8">
-
-            Sign in to continue your farming journey
-
+          <p className="text-center text-gray-500 mt-2 mb-6">
+           {role === "farmer"
+             ? "Sign in to continue your farming journey."
+             : role === "consultant"
+             ? "Access crop advisory and farmer insights."
+             : "Administrator access to manage the system."}
           </p>
+
+          {/* Role Selection */}
+
+         <div className="grid grid-cols-3 gap-3 mb-6">
+           <button
+             type="button"
+             onClick={() => setRole("farmer")}
+             className={`rounded-xl py-3 transition ${
+             role === "farmer"
+             ? "bg-green-600 text-white shadow-lg"
+             : "bg-green-100 text-green-800 hover:bg-green-200"
+            }`}
+           >
+            <div className="text-3xl">👨‍🌾</div>
+            <div className="text-sm font-semibold mt-1">
+              Farmer
+            </div>
+           </button>
+
+           <button
+             type="button"
+             onClick={() => setRole("consultant")}
+             className={`rounded-xl py-3 transition ${
+             role === "consultant"
+             ? "bg-green-600 text-white shadow-lg"
+             : "bg-green-100 text-green-800 hover:bg-green-200"
+            }`}
+           >
+            <div className="text-3xl">👨‍💼</div>
+            <div className="text-sm font-semibold mt-1">
+              Consultant
+            </div>
+           </button>
+
+           <button
+             type="button"
+             onClick={() => setRole("admin")}
+             className={`rounded-xl py-3 transition ${
+             role === "admin"
+             ? "bg-green-900 text-white shadow-lg"
+             : "bg-green-100 text-green-800 hover:bg-green-200"
+            }`}
+           >
+            <div className="text-3xl">⚙️</div>
+           <div className="text-sm font-semibold mt-1">
+              Admin
+           </div>
+           </button>
+
+          </div>
 
           <form onSubmit={handleSubmit}>
 
@@ -132,14 +198,20 @@ export default function Login() {
               <Lock className="text-green-700" size={20} />
 
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
                 onChange={handleChange}
                 className="ml-3 w-full outline-none"
                 required
               />
-
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-gray-500 hover:text-green-700 transition"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
             </div>
 
             <button className="w-full py-3 rounded-xl bg-gradient-to-r from-green-700 to-lime-600 hover:from-green-800 hover:to-green-700 text-white font-semibold transition">
@@ -149,7 +221,23 @@ export default function Login() {
             </button>
 
           </form>
+          <div className="my-6 flex items-center">
+            <div className="flex-grow border-t border-gray-300"></div>
+            <span className="mx-4 text-gray-500">OR</span>
+            <div className="flex-grow border-t border-gray-300"></div>
+          </div>
 
+          <GoogleLogin
+              onSuccess={(credentialResponse) => {
+              console.log("Google Login Success:", credentialResponse);
+            }}
+            onError={() => {
+              console.log("Google Login Failed");
+            }}
+            theme="filled_blue"
+            shape="pill"
+            size="large"
+          />
           <p className="text-center mt-8">
 
             Don't have an account?
