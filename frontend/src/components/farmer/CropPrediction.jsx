@@ -6,13 +6,13 @@ export default function CropPrediction() {
   const [prediction, setPrediction] = useState(null);
 
   const [formData, setFormData] = useState({
-    Area: "",
-    Item: "",
-    Year: "",
-    average_rain_fall_mm_per_year: "",
-    pesticides_tonnes: "",
-    avg_temp: "",
-  });
+  area: "",
+  item: "",
+  year: "",
+  average_rain_fall_mm_per_year: "",
+  pesticides_tonnes: "",
+  avg_temp: "",
+});
 
   const handleChange = (e) => {
     setFormData({
@@ -22,23 +22,23 @@ export default function CropPrediction() {
   };
 
   const handlePredict = async () => {
-    try {
-      const response = await predictYield({
-        ...formData,
-        Year: Number(formData.Year),
-        average_rain_fall_mm_per_year: Number(
-          formData.average_rain_fall_mm_per_year
-        ),
-        pesticides_tonnes: Number(formData.pesticides_tonnes),
-        avg_temp: Number(formData.avg_temp),
-      });
+  console.log("Sending Data:", formData);
 
-      setPrediction(response);
-    } catch (err) {
-      console.log(err);
-      alert("Prediction Failed");
-    }
-  };
+  try {
+    const response = await predictYield(formData);
+    console.log("Response:", response);
+    setPrediction(response);
+  } catch (err) {
+  console.log("Status:", err.response?.status);
+  console.log("Backend Error:");
+console.dir(err.response?.data, { depth: null });
+
+alert(JSON.stringify(err.response?.data, null, 2));
+  console.log("Full Error:", err);
+
+  alert("Prediction Failed");
+}
+};
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
@@ -52,8 +52,8 @@ export default function CropPrediction() {
         <Input
           icon={<MapPin size={18} />}
           label="Area"
-          name="Area"
-          value={formData.Area}
+          name="area"
+          value={formData.area}
           onChange={handleChange}
           placeholder="India"
         />
@@ -61,8 +61,8 @@ export default function CropPrediction() {
         <Input
           icon={<Wheat size={18} />}
           label="Crop"
-          name="Item"
-          value={formData.Item}
+          name="item"
+          value={formData.item}
           onChange={handleChange}
           placeholder="Rice, paddy"
         />
@@ -70,8 +70,8 @@ export default function CropPrediction() {
         <Input
           icon={<FlaskConical size={18} />}
           label="Year"
-          name="Year"
-          value={formData.Year}
+          name="year"
+          value={formData.year}
           onChange={handleChange}
           placeholder="2026"
         />
@@ -113,29 +113,95 @@ export default function CropPrediction() {
       </button>
 
       {prediction && (
-        <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-5">
+  <div className="mt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200 shadow-lg p-6">
 
-          <h3 className="text-lg font-bold text-green-700 mb-3">
-            Prediction Result
+    <h3 className="text-2xl font-bold text-green-700 mb-5">
+      🌾 Prediction Result
+    </h3>
+
+    <div className="grid md:grid-cols-2 gap-6">
+
+      <div>
+
+        <p className="text-gray-500">Predicted Yield</p>
+
+        <h2 className="text-4xl font-bold text-green-700">
+          {prediction.predicted_yield.toFixed(2)}
+        </h2>
+
+        <p className="text-gray-500">
+          hg/ha
+        </p>
+
+        <div className="mt-5">
+
+          <p className="text-gray-500">
+            Yield Quality
+          </p>
+
+          <h3 className="text-xl font-bold text-yellow-500">
+            {prediction.stars}
           </h3>
 
-          <p className="mb-2">
-            🌾 <b>Predicted Yield:</b>{" "}
-            {prediction.predicted_yield.toFixed(2)} hg/ha
-          </p>
-
-          <p className="mb-2">
-            📊 <b>Confidence:</b>{" "}
-            {prediction.confidence}%
-          </p>
-
-          <p>
-            💡 <b>Recommendation:</b>{" "}
-            {prediction.recommendation}
+          <p className="font-semibold">
+            {prediction.category}
           </p>
 
         </div>
-      )}
+
+        <div className="mt-5">
+
+          <p className="text-gray-500">
+            Confidence
+          </p>
+
+          <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
+
+            <div
+              className="bg-green-600 h-4 rounded-full"
+              style={{
+                width: `${prediction.confidence}%`,
+              }}
+            />
+
+          </div>
+
+          <p className="mt-2 font-semibold">
+            {prediction.confidence}%
+          </p>
+
+        </div>
+
+      </div>
+
+      <div>
+
+        <h4 className="font-bold text-lg text-green-700 mb-4">
+          🤖 AI Recommendation
+        </h4>
+
+        <ul className="space-y-3 text-gray-700">
+
+          <li>✅ {prediction.recommendation}</li>
+
+          <li>💧 {prediction.irrigation_tip}</li>
+
+          <li>🌱 {prediction.fertilizer_tip}</li>
+
+          <li>🌾 {prediction.soil_tip}</li>
+
+          <li>🐛 Pest Risk: {prediction.pest_risk}</li>
+
+          <li>📈 Expected Production: {prediction.production}</li>
+
+        </ul>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
     </div>
   );

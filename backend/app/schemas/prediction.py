@@ -1,8 +1,6 @@
 from pydantic import BaseModel
 
-
 class PredictionRequest(BaseModel):
-
     area: str
     item: str
     year: int
@@ -10,10 +8,14 @@ class PredictionRequest(BaseModel):
     pesticides_tonnes: float
     avg_temp: float
 
-
-
 class PredictionResponse(BaseModel):
-
     predicted_yield: float
     confidence: int
     recommendation: str
+    category: str
+    stars: str
+    production: str
+    soil_tip: str
+    fertilizer_tip: str
+    irrigation_tip: str
+    pest_risk: str
