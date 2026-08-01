@@ -1,24 +1,16 @@
 # Python
 __pycache__/
-*.py[cod]
 *.pyc
-*.pyo
-*.pyd
-*.sqlite3
-.env
-.venv/
+
+# Virtual Environment
 venv/
 
-# Node.js
-node_modules/
+# ML Models
+*.pkl
+*.joblib
 
-# Build folders
-dist/
-build/
+# Datasets
+datasets/*.csv
 
-# VS Code
-.vscode/
-
-# OS files
-.DS_Store
-Thumbs.db
+# Environment
+.env
