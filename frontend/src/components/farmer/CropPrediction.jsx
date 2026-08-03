@@ -1,18 +1,27 @@
 import { useState } from "react";
-import { Thermometer, CloudRain, FlaskConical, MapPin, Wheat } from "lucide-react";
+import {
+  Thermometer,
+  CloudRain,
+  FlaskConical,
+  MapPin,
+  Wheat,
+} from "lucide-react";
+
 import { predictYield } from "../../services/predictionApi";
+import { getWeather } from "../../services/weatherApi";
 
 export default function CropPrediction() {
   const [prediction, setPrediction] = useState(null);
+  const [weather, setWeather] = useState(null);
 
   const [formData, setFormData] = useState({
-  area: "",
-  item: "",
-  year: "",
-  average_rain_fall_mm_per_year: "",
-  pesticides_tonnes: "",
-  avg_temp: "",
-});
+    area: "",
+    item: "",
+    year: "",
+    average_rain_fall_mm_per_year: "",
+    pesticides_tonnes: "",
+    avg_temp: "",
+  });
 
   const handleChange = (e) => {
     setFormData({
@@ -22,23 +31,37 @@ export default function CropPrediction() {
   };
 
   const handlePredict = async () => {
-  console.log("Sending Data:", formData);
+    try {
+      console.log("Sending:", formData);
 
-  try {
-    const response = await predictYield(formData);
-    console.log("Response:", response);
-    setPrediction(response);
-  } catch (err) {
-  console.log("Status:", err.response?.status);
-  console.log("Backend Error:");
-console.dir(err.response?.data, { depth: null });
+      // Get Weather
+      const weatherData = await getWeather(formData.area);
 
-alert(JSON.stringify(err.response?.data, null, 2));
-  console.log("Full Error:", err);
+      console.log("Weather:", weatherData);
 
-  alert("Prediction Failed");
-}
-};
+      setWeather(weatherData);
+
+      // Predict Yield
+      const response = await predictYield({
+        ...formData,
+        average_rain_fall_mm_per_year:
+          weatherData.rainfall ||
+          formData.average_rain_fall_mm_per_year,
+
+        avg_temp: weatherData.temperature,
+      });
+
+      console.log("Prediction:", response);
+
+      setPrediction(response);
+    } catch (err) {
+      console.log("Status:", err.response?.status);
+      console.log("Backend Error:", err.response?.data);
+      console.log(err);
+
+      alert("Prediction Failed");
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
@@ -55,7 +78,7 @@ alert(JSON.stringify(err.response?.data, null, 2));
           name="area"
           value={formData.area}
           onChange={handleChange}
-          placeholder="India"
+          placeholder="Brazil"
         />
 
         <Input
@@ -112,96 +135,106 @@ alert(JSON.stringify(err.response?.data, null, 2));
         Predict Yield
       </button>
 
-      {prediction && (
-  <div className="mt-8 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200 shadow-lg p-6">
+      {/* WEATHER CARD */}
 
-    <h3 className="text-2xl font-bold text-green-700 mb-5">
-      🌾 Prediction Result
-    </h3>
+      {weather && (
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5">
 
-    <div className="grid md:grid-cols-2 gap-6">
-
-      <div>
-
-        <p className="text-gray-500">Predicted Yield</p>
-
-        <h2 className="text-4xl font-bold text-green-700">
-          {prediction.predicted_yield.toFixed(2)}
-        </h2>
-
-        <p className="text-gray-500">
-          hg/ha
-        </p>
-
-        <div className="mt-5">
-
-          <p className="text-gray-500">
-            Yield Quality
-          </p>
-
-          <h3 className="text-xl font-bold text-yellow-500">
-            {prediction.stars}
+          <h3 className="text-xl font-bold text-blue-700 mb-4">
+            🌤 Current Weather
           </h3>
 
-          <p className="font-semibold">
-            {prediction.category}
-          </p>
+          <div className="grid grid-cols-2 gap-4">
 
-        </div>
+            <p>
+              🌡 Temperature: <b>{weather.temperature} °C</b>
+            </p>
 
-        <div className="mt-5">
+            <p>
+              💧 Humidity: <b>{weather.humidity}%</b>
+            </p>
 
-          <p className="text-gray-500">
-            Confidence
-          </p>
+            <p>
+              🌧 Rainfall: <b>{weather.rainfall} mm</b>
+            </p>
 
-          <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
+            <p>
+              💨 Wind Speed: <b>{weather.wind_speed} m/s</b>
+            </p>
 
-            <div
-              className="bg-green-600 h-4 rounded-full"
-              style={{
-                width: `${prediction.confidence}%`,
-              }}
-            />
+            <p>
+              ☁ Condition: <b>{weather.condition}</b>
+            </p>
+
+            <p>
+              📍 City: <b>{weather.city}</b>
+            </p>
 
           </div>
 
-          <p className="mt-2 font-semibold">
-            {prediction.confidence}%
-          </p>
+        </div>
+      )}
+
+      {/* PREDICTION CARD */}
+
+      {prediction && (
+        <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-5">
+
+          <h3 className="text-xl font-bold text-green-700 mb-4">
+            🌾 Prediction Result
+          </h3>
+
+          <div className="space-y-3">
+
+            <p>
+              🌾 <b>Predicted Yield:</b>{" "}
+              {prediction.predicted_yield} hg/ha
+            </p>
+
+            <p>
+              📊 <b>Confidence:</b>{" "}
+              {prediction.confidence}%
+            </p>
+
+            <p>
+              ⭐ <b>Yield Quality:</b>{" "}
+              {prediction.stars} {prediction.category}
+            </p>
+
+            <p>
+              🤖 <b>Recommendation:</b>{" "}
+              {prediction.recommendation}
+            </p>
+
+            <p>
+              💧 <b>Irrigation Tip:</b>{" "}
+              {prediction.irrigation_tip}
+            </p>
+
+            <p>
+              🌱 <b>Fertilizer Tip:</b>{" "}
+              {prediction.fertilizer_tip}
+            </p>
+
+            <p>
+              🌾 <b>Soil Tip:</b>{" "}
+              {prediction.soil_tip}
+            </p>
+
+            <p>
+              🐛 <b>Pest Risk:</b>{" "}
+              {prediction.pest_risk}
+            </p>
+
+            <p>
+              📈 <b>Expected Production:</b>{" "}
+              {prediction.production}
+            </p>
+
+          </div>
 
         </div>
-
-      </div>
-
-      <div>
-
-        <h4 className="font-bold text-lg text-green-700 mb-4">
-          🤖 AI Recommendation
-        </h4>
-
-        <ul className="space-y-3 text-gray-700">
-
-          <li>✅ {prediction.recommendation}</li>
-
-          <li>💧 {prediction.irrigation_tip}</li>
-
-          <li>🌱 {prediction.fertilizer_tip}</li>
-
-          <li>🌾 {prediction.soil_tip}</li>
-
-          <li>🐛 Pest Risk: {prediction.pest_risk}</li>
-
-          <li>📈 Expected Production: {prediction.production}</li>
-
-        </ul>
-
-      </div>
-
-    </div>
-
-  </div>
-)}
+      )}
 
     </div>
   );

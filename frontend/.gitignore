@@ -7,6 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+backend/app/ml/model.pkl
+backend/app/ml/label_encoders.pkl
+*.pkl
+
 node_modules
 dist
 dist-ssr
