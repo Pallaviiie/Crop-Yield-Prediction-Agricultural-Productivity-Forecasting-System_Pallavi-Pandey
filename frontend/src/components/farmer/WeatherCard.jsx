@@ -13,8 +13,6 @@ export default function WeatherCard() {
   <h2 className="text-2xl font-bold text-green-700">
     Today's Weather
   </h2>
-
-  <SunMedium className="text-yellow-500 w-7 h-7" />
 </div>
 
 <div className="flex justify-center my-4">

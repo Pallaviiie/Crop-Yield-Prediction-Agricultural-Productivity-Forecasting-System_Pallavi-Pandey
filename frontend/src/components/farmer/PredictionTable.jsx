@@ -73,7 +73,7 @@ export default function PredictionTable() {
       >
 
         <td className="py-4 px-4 font-semibold whitespace-nowrap">
-          🌾 {item.crop}
+           {item.crop}
         </td>
 
         <td className="px-4 whitespace-nowrap">

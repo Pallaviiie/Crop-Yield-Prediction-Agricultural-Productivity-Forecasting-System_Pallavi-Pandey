@@ -8,7 +8,7 @@ export default function HeroBanner() {
       <div>
 
         <h1 className="text-4xl xl:text-5xl font-bold text-green-800">
-          Good Morning, Farmer! 🌱
+          Good Morning, Farmer! 
         </h1>
 
         <p className="mt-5 text-gray-600 text-lg max-w-md">

@@ -19,7 +19,7 @@ export default function ConsultantHero() {
               </span>{" "}
 
               <span className="text-black">
-                Consultant 👋
+                Agri Consultant 
               </span>
 
             </h1>

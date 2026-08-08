@@ -16,7 +16,7 @@ export default function HeroBanner() {
             </span>
 
             <span className="text-gray-900">
-              {" "}Admin! 👋
+              {" "}Admin! 
             </span>
           </h1>
 

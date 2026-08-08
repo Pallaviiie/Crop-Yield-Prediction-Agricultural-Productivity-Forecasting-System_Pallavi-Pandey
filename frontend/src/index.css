@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 body {
@@ -6,3 +7,413 @@ body {
   background-color: #f8fafc;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f5faf6;
+  color: #075b3a;
+}
+
+h1,
+h2,
+h3,
+.analytics-title {
+  font-family: 'DM Serif Display', serif;
+  font-weight: 400;
+}
+
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 64px;
+  line-height: 1.12;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+
+.navbar,
+.nav-link,
+.hero-description,
+button,
+.analytics-card,
+.analytics-badge,
+.stat-label,
+.footer {
+  font-family: 'Inter', sans-serif;
+}
+
+.analytics-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px;
+  font-weight: 400;
+  color: #075b3a;
+  letter-spacing: -0.5px;
+}
+
+.analytics-card h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+/* =========================================
+   ANALYTICS PREVIEW
+========================================= */
+
+.analytics-section {
+  background: #f5faf6;
+  padding: 110px 7% 120px;
+  position: relative;
+}
+
+
+/* HEADER */
+
+.analytics-header {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 55px;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  background: #dcfce7;
+  color: #16803c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+.analytics-header h2 {
+  margin: 20px 0 14px;
+  font-family: Georgia, serif;
+  font-size: clamp(38px, 4vw, 54px);
+  line-height: 1.1;
+  color: #07552e;
+}
+
+.analytics-header h2 span {
+  color: #65a30d;
+}
+
+.analytics-header p {
+  color: #557365;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+
+/* KPI CARDS */
+
+.analytics-stats {
+  max-width: 1200px;
+  margin: 0 auto 28px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.analytics-stat-card {
+  background: white;
+  border: 1px solid #dcefe1;
+  border-radius: 18px;
+  padding: 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  box-shadow: 0 8px 25px rgba(0, 70, 35, .05);
+
+  transition: transform .25s ease,
+              box-shadow .25s ease;
+}
+
+.analytics-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0, 70, 35, .09);
+}
+
+.stat-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: #ecfccb;
+  color: #65a30d;
+}
+
+.analytics-stat-card span {
+  display: block;
+  color: #6a8174;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.analytics-stat-card strong {
+  display: block;
+  color: #064e2a;
+  font-size: 23px;
+}
+
+.analytics-stat-card small {
+  color: #16a34a;
+  font-size: 11px;
+}
+
+
+/* CHART GRID */
+
+.analytics-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+
+/* CHART CARD */
+
+.analytics-card {
+  background: white;
+  border: 1px solid #dcefe1;
+  border-radius: 22px;
+  padding: 25px;
+
+  box-shadow: 0 10px 35px rgba(0, 70, 35, .06);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.chart-header h3 {
+  margin: 0;
+  color: #064e2a;
+  font-size: 18px;
+}
+
+.chart-header p {
+  margin: 6px 0 0;
+  color: #789083;
+  font-size: 13px;
+}
+
+.chart-header select {
+  border: 1px solid #d8eadc;
+  background: #f7fbf8;
+  padding: 8px 12px;
+  border-radius: 9px;
+  color: #245c3d;
+  outline: none;
+}
+
+.chart-pill {
+  background: #ecfccb;
+  color: #4d7c0f;
+  padding: 7px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+  margin-top: 20px;
+}
+
+
+/* CHART FOOTER */
+
+.chart-footer {
+  border-top: 1px solid #edf5ef;
+  padding-top: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  font-size: 12px;
+  color: #668071;
+}
+
+.chart-footer span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.green {
+  background: #22a06b;
+}
+
+.legend-dot.lime {
+  background: #84cc16;
+}
+
+.positive {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+
+/* AI INSIGHT */
+
+.analytics-insight {
+  max-width: 1200px;
+  margin: 28px auto 0;
+
+  padding: 24px 28px;
+
+  border-radius: 20px;
+
+  background: linear-gradient(
+    100deg,
+    #064e2a,
+    #08783c
+  );
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  box-shadow: 0 15px 35px rgba(0, 80, 40, .15);
+}
+
+.insight-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+
+  border-radius: 14px;
+
+  background: rgba(132, 204, 22, .18);
+  color: #a3e635;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.insight-content {
+  flex: 1;
+}
+
+.insight-content > span {
+  color: #a3e635;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.insight-content h3 {
+  margin: 4px 0;
+  font-size: 18px;
+}
+
+.insight-content p {
+  margin: 0;
+  color: #c7ead3;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.insight-content strong {
+  color: #bef264;
+}
+
+.insight-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 11px 17px;
+
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 10px;
+
+  color: white;
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: .2s;
+}
+
+.insight-button:hover {
+  background: rgba(255,255,255,.1);
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+  .analytics-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .analytics-section {
+    padding: 80px 20px;
+  }
+
+  .analytics-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-card {
+    padding: 18px;
+  }
+
+  .chart-header {
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .analytics-insight {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .insight-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+}

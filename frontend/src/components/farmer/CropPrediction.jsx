@@ -67,7 +67,7 @@ export default function CropPrediction() {
     <div className="bg-white rounded-2xl shadow-md p-6">
 
       <h2 className="text-2xl font-bold text-green-700 mb-6">
-        🌾 Crop Yield Prediction
+         Crop Yield Prediction
       </h2>
 
       <div className="grid grid-cols-2 gap-4">
@@ -141,33 +141,33 @@ export default function CropPrediction() {
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5">
 
           <h3 className="text-xl font-bold text-blue-700 mb-4">
-            🌤 Current Weather
+             Current Weather
           </h3>
 
           <div className="grid grid-cols-2 gap-4">
 
             <p>
-              🌡 Temperature: <b>{weather.temperature} °C</b>
+               Temperature: <b>{weather.temperature} °C</b>
             </p>
 
             <p>
-              💧 Humidity: <b>{weather.humidity}%</b>
+               Humidity: <b>{weather.humidity}%</b>
             </p>
 
             <p>
-              🌧 Rainfall: <b>{weather.rainfall} mm</b>
+               Rainfall: <b>{weather.rainfall} mm</b>
             </p>
 
             <p>
-              💨 Wind Speed: <b>{weather.wind_speed} m/s</b>
+               Wind Speed: <b>{weather.wind_speed} m/s</b>
             </p>
 
             <p>
-              ☁ Condition: <b>{weather.condition}</b>
+               Condition: <b>{weather.condition}</b>
             </p>
 
             <p>
-              📍 City: <b>{weather.city}</b>
+               City: <b>{weather.city}</b>
             </p>
 
           </div>
@@ -181,53 +181,53 @@ export default function CropPrediction() {
         <div className="mt-6 bg-green-50 border border-green-200 rounded-xl p-5">
 
           <h3 className="text-xl font-bold text-green-700 mb-4">
-            🌾 Prediction Result
+             Prediction Result
           </h3>
 
           <div className="space-y-3">
 
             <p>
-              🌾 <b>Predicted Yield:</b>{" "}
+               <b>Predicted Yield:</b>{" "}
               {prediction.predicted_yield} hg/ha
             </p>
 
             <p>
-              📊 <b>Confidence:</b>{" "}
+               <b>Confidence:</b>{" "}
               {prediction.confidence}%
             </p>
 
             <p>
-              ⭐ <b>Yield Quality:</b>{" "}
+               <b>Yield Quality:</b>{" "}
               {prediction.stars} {prediction.category}
             </p>
 
             <p>
-              🤖 <b>Recommendation:</b>{" "}
+               <b>Recommendation:</b>{" "}
               {prediction.recommendation}
             </p>
 
             <p>
-              💧 <b>Irrigation Tip:</b>{" "}
+               <b>Irrigation Tip:</b>{" "}
               {prediction.irrigation_tip}
             </p>
 
             <p>
-              🌱 <b>Fertilizer Tip:</b>{" "}
+               <b>Fertilizer Tip:</b>{" "}
               {prediction.fertilizer_tip}
             </p>
 
             <p>
-              🌾 <b>Soil Tip:</b>{" "}
+               <b>Soil Tip:</b>{" "}
               {prediction.soil_tip}
             </p>
 
             <p>
-              🐛 <b>Pest Risk:</b>{" "}
+               <b>Pest Risk:</b>{" "}
               {prediction.pest_risk}
             </p>
 
             <p>
-              📈 <b>Expected Production:</b>{" "}
+               <b>Expected Production:</b>{" "}
               {prediction.production}
             </p>
 

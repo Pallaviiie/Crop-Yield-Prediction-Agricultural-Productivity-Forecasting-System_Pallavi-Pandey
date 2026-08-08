@@ -20,7 +20,7 @@ export default function HistoryCard({
 
         <div>
           <h2 className="text-xl font-bold text-green-700">
-            🌾 {history.crop}
+             {history.crop}
           </h2>
 
           <p className="text-sm text-gray-500">
@@ -28,9 +28,7 @@ export default function HistoryCard({
           </p>
         </div>
 
-        <div className="text-4xl">
-          🌱
-        </div>
+       
 
       </div>
 

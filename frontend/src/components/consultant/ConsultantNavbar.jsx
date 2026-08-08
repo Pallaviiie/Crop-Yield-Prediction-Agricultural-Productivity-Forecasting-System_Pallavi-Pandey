@@ -11,7 +11,7 @@ export default function ConsultantNavbar() {
 
       {/* Dashboard Title */}
       <h1 className="text-3xl font-bold text-green-700">
-        Consultant Dashboard
+        Agri Consultant Dashboard
       </h1>
 
       {/* Right Section */}

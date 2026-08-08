@@ -1,352 +1,864 @@
-import { GoogleLogin } from "@react-oauth/google";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Mail, Lock, Phone, MapPinned, Map, Eye, EyeOff, Building2, BriefcaseBusiness} from "lucide-react";
-import api from "../../services/api";
-import cropLogo from "../../assets/crop-logo.png";
-import farmHero from "../../assets/farm-hero.png";
+import {
+  Leaf,
+  User,
+  Mail,
+  Phone,
+  Lock,
+  Eye,
+  EyeOff,
+  MapPin,
+  Sprout,
+  Award,
+  CheckCircle2,
+  ArrowRight,
+  ArrowLeft,
+  ShieldCheck,
+} from "lucide-react";
+import "./Register.css";
 
-export default function Register() {
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+function Register() {
   const navigate = useNavigate();
-  const [role, setRole] = useState("farmer");
+
+  const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
+    phone: "",
     password: "",
+    confirm_password: "",
 
     role: "farmer",
 
-    phone: "",
-    state: "",
+    city: "",
     district: "",
+    state: "",
+    country: "India",
+
+    // Farmer
+    farm_location: "",
+    farm_size: "",
+    soil_type: "",
+    primary_crop: "",
+
+    // Consultant
+    specialization: "",
+    experience: "",
+    qualification: "",
+    licenseNumber: "",
   });
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setError("");
+  };
+
+  const selectRole = (role) => {
+    setFormData((prev) => ({
+      ...prev,
+      role,
+    }));
+    setError("");
+  };
+
+  const validateStepOne = () => {
+    if (!formData.full_name.trim()) {
+      setError("Please enter your full name.");
+      return false;
+    }
+
+    if (!formData.email.trim()) {
+      setError("Please enter your email address.");
+      return false;
+    }
+
+    if (!formData.phone.trim()) {
+      setError("Please enter your phone number.");
+      return false;
+    }
+
+    if (!formData.password) {
+      setError("Please create a password.");
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must contain at least 8 characters.");
+      return false;
+    }
+
+    if (formData.password !== formData.confirm_password) {
+      setError("Passwords do not match.");
+      return false;
+    }
+
+    if (!formData.role) {
+      setError("Please select your role.");
+      return false;
+    }
+
+    if (!formData.state) {
+      setError("Please select your state.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const nextStep = () => {
+    if (!validateStepOne()) return;
+
+    setError("");
+    setStep(2);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const previousStep = () => {
+    setError("");
+    setStep(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const validateStepTwo = () => {
+    if (formData.role === "farmer") {
+      if (!formData.farm_location.trim()) {
+        setError("Please enter your farm location.");
+        return false;
+      }
+
+      if (!formData.farm_size) {
+        setError("Please enter your farm size.");
+        return false;
+      }
+
+      if (!formData.soil_type) {
+        setError("Please select your soil type.");
+        return false;
+      }
+
+      if (!formData.primary_crop) {
+        setError("Please select your primary crop.");
+        return false;
+      }
+    }
+
+    if (formData.role === "consultant") {
+      if (!formData.specialization.trim()) {
+        setError("Please enter your area of specialization.");
+        return false;
+      }
+
+      if (!formData.experience) {
+        setError("Please enter your experience.");
+        return false;
+      }
+
+      if (!formData.qualification.trim()) {
+        setError("Please enter your qualification.");
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await api.post("/users/register", formData);
+    if (!validateStepTwo()) return;
 
-      alert("Registration Successful!");
+    setLoading(true);
+    setError("");
+
+    try {
+      const payload = {
+        full_name: formData.full_name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        phone: formData.phone,
+        state: formData.state,
+        district: formData.district,
+      };
+
+      if (formData.role === "farmer") {
+        payload.farm_location = formData.farm_location;
+        payload.farm_size = formData.farm_size;
+        payload.soil_type = formData.soil_type;
+        payload.primary_crop = formData.primary_crop;
+      }
+
+      if (formData.role === "consultant") {
+        payload.specialization = formData.specialization;
+        payload.experience = formData.experience;
+        payload.qualification = formData.qualification;
+        payload.licenseNumber = formData.licenseNumber;
+      }
+
+      const response = await fetch(`${API_URL}/users/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            data.message ||
+            "Registration failed. Please check your information."
+        );
+      }
+
+      alert("Account created successfully!");
+
       navigate("/");
-    } catch (error) {
-      alert("Registration Failed!");
+    } catch (err) {
+      console.error("Registration error:", err);
+      setError(err.message || "Unable to connect to the server.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="register-page">
 
-      {/* Left Side */}
-      <div className="hidden lg:flex w-3/5 relative overflow-hidden">
+      {/* ================= LEFT PANEL ================= */}
+      <section className="register-left">
 
-        <img
-          src={farmHero}
-          alt="Agriculture"
-          className="w-full h-full object-cover"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-r from-green-950/70 to-green-700/20"></div>
-
-        <div className="absolute bottom-16 left-14 text-white max-w-xl">
-
-          <h1 className="text-6xl font-extrabold leading-tight">
-            Join Smart
-            <br />
-            Farming
-          </h1>
-
-          <p className="mt-6 text-xl text-green-100">
-            Create your account and start predicting crop yield using
-            Artificial Intelligence.
-          </p>
-
-          <div className="mt-10 flex gap-4">
-
-            <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3">
-              🌾 AI Prediction
-            </div>
-
-            <div className="bg-white/20 backdrop-blur-md rounded-xl px-5 py-3">
-              🌱 Better Harvest
-            </div>
-
+        <div className="brand">
+          <div className="brand-logo">
+            <Leaf size={22} strokeWidth={2.2} />
           </div>
 
+          <div className="brand-name">
+            YieldSense <span>AI</span>
+          </div>
         </div>
 
-      </div>
+        <div className="left-content">
 
-      {/* Right Side */}
-
-      <div className="w-full lg:w-2/5 bg-gradient-to-br from-green-50 via-lime-50 to-yellow-100 flex justify-center items-center">
-
-        <div className="bg-white rounded-3xl shadow-2xl w-[430px] p-10">
-
-          {/* Logo */}
-
-          <div className="flex justify-center mb-6">
-            <div className="w-28 h-28 rounded-full bg-green-50 shadow-xl flex items-center justify-center border-4 border-green-100">
-              <img
-                src={cropLogo}
-                alt="Crop Yield Logo"
-                className="w-20 h-20 object-contain"
-              />
-            </div>
+          <div className="progress-lines">
+            <div className={`progress-line ${step >= 1 ? "active" : ""}`} />
+            <div className={`progress-line ${step >= 2 ? "active" : ""}`} />
           </div>
 
-          {/* Heading */}
+          {step === 1 ? (
+            <>
+              <h1>Create your account</h1>
 
-          <h2 className="text-3xl font-bold text-center text-green-800">
-            Create Account
-          </h2>
+              <p className="left-description">
+                Join thousands of farmers and consultants using AI-powered
+                agriculture.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1>Tell us about your role</h1>
 
-          <p className="text-center text-gray-500 mt-2 mb-8">
-            Start your smart farming journey today
-          </p>
+              <p className="left-description">
+                Provide role-specific details for personalized
+                recommendations.
+              </p>
+            </>
+          )}
 
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="benefits-list">
 
-           <button
-             type="button"
-             onClick={() => {
-             setRole("farmer");
-             setFormData({ ...formData, role: "farmer" });
-            }}
-            className={`rounded-xl p-3 ${
-              role === "farmer"
-               ? "bg-green-600 text-white"
-               : "bg-green-100 text-green-800"
-              }`}
-            >
-           <div className="text-3xl">👨‍🌾</div>
-           <div className="text-sm font-semibold mt-2">
-             Farmer
-           </div>
-           </button>
-
-           <button
-             type="button"
-             onClick={() => {
-             setRole("consultant");
-             setFormData({ ...formData, role: "consultant" });
-            }}
-            className={`rounded-xl p-3 ${
-              role === "consultant"
-               ? "bg-green-600 text-white"
-               : "bg-green-100 text-green-800"
-              }`}
-            >
-            <div className="text-3xl">👨‍💼</div>
-            <div className="text-sm font-semibold mt-2">
-             Consultant
+            <div className="benefit">
+              <CheckCircle2 size={18} />
+              <span>Free AI-powered yield predictions</span>
             </div>
-           </button>
 
-           <button
-             type="button"
-             onClick={() => {
-             setRole("admin");
-             setFormData({ ...formData, role: "admin" });
-           }}
-           className={`rounded-xl p-3 ${
-             role === "admin"
-               ? "bg-green-900 text-white"
-               : "bg-green-100 text-green-800"
-             }`}
-            >
-            <div className="text-3xl">⚙️</div>
-            <div className="text-sm font-semibold mt-2">
-             Admin
+            <div className="benefit">
+              <CheckCircle2 size={18} />
+              <span>Real-time weather integration</span>
             </div>
-            </button>
+
+            <div className="benefit">
+              <CheckCircle2 size={18} />
+              <span>Expert consultant network</span>
+            </div>
+
+            <div className="benefit">
+              <CheckCircle2 size={18} />
+              <span>Soil & crop health monitoring</span>
+            </div>
 
           </div>
-          {/* Register Form */}
+        </div>
 
-          <form onSubmit={handleSubmit}>
+        <div className="left-footer">
+          © 2024 YieldSense AI · Privacy · Terms
+        </div>
+      </section>
 
-            <div className="flex items-center border rounded-xl px-4 py-2 mb-4">
-              <User className="text-green-700" size={20} />
-              <input
-                type="text"
-                name="full_name"
-                placeholder="Full Name"
-                className="ml-3 w-full outline-none"
-                onChange={handleChange}
-                required
-              />
-            </div>
+      {/* ================= RIGHT PANEL ================= */}
+      <section className="register-right">
 
-            <div className="flex items-center border rounded-xl px-4 py-2 mb-4">
-              <Mail className="text-green-700" size={20} />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                className="ml-3 w-full outline-none"
-                onChange={handleChange}
-                required
-              />
-            </div>
-            
-            {role === "farmer" && (
-             <>
-             <div className="flex items-center border rounded-xl px-4 py-2 mb-4">
-              <Phone className="text-green-700" size={20} />
-               <input
-                 type="tel"
-                 name="phone"
-                 placeholder="Phone Number"
-                 className="ml-3 w-full outline-none"
-                 onChange={handleChange}
-               />
-             </div>
+        <div className="register-container">
 
-             <div className="flex items-center border rounded-xl px-4 py-2 mb-4">
-              <MapPinned className="text-green-700" size={20} />
-
-               <input
-                  type="text"
-                  name="state"
-                  placeholder="State"
-                  className="ml-3 w-full outline-none"
-                  onChange={handleChange}
-                />
-             </div>
-
-             <div className="flex items-center border rounded-xl px-4 py-2 mb-4">
-              <MapPinned className="text-green-700" size={20} />
-
-               <input
-                 type="text"
-                 name="district"
-                 placeholder="District"
-                 className="ml-3 w-full outline-none"
-                 onChange={handleChange}
-                />
+          {step === 1 ? (
+            /* ================= STEP 1 ================= */
+            <>
+              <div className="form-heading">
+                <h2>Create your account</h2>
+                <p>Step 1 of 2 · Basic information</p>
               </div>
-             </>
-            )}
 
-            {role === "consultant" && (
-              <>
-               <div className="flex items-center border rounded-xl px-4 py-2 mb-4">
-                <Building2 className="text-green-700" size={20} />
-                 <input
-                   type="text"
-                   name="organization"
-                   placeholder="Organization Name"
-                   className="ml-3 w-full outline-none"
-                   onChange={handleChange}
-                 />
-               </div>
+              <form onSubmit={(e) => e.preventDefault()}>
 
-               <div className="flex items-center border rounded-xl px-4 py-2 mb-4">
-                <BriefcaseBusiness className="text-green-700" size={20} />
-                 <input
-                   type="text"
-                   name="specialization"
-                   placeholder="Area of Specialization"
-                   className="ml-3 w-full outline-none"
-                   onChange={handleChange}
+                {/* Full Name */}
+                <div className="form-group">
+                  <label>
+                    Full Name <span>*</span>
+                  </label>
+
+                  <div className="input-wrapper">
+                    <User size={18} />
+                    <input
+                      type="text"
+                      name="full_name"
+                      value={formData.full_name}
+                      onChange={handleChange}
+                      placeholder="Rajesh Kumar"
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="form-group">
+                  <label>
+                    Email Address <span>*</span>
+                  </label>
+
+                  <div className="input-wrapper">
+                    <Mail size={18} />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="rajesh@example.com"
+                    />
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="form-group">
+                  <label>
+                    Phone Number <span>*</span>
+                  </label>
+
+                  <div className="input-wrapper">
+                    <Phone size={18} />
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+91 98765 43210"
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="two-column">
+
+                  <div className="form-group">
+                    <label>
+                      Password <span>*</span>
+                    </label>
+
+                    <div className="input-wrapper">
+                      <Lock size={18} />
+
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="8+ characters"
+                      />
+
+                      <button
+                        type="button"
+                        className="eye-button"
+                        onClick={() =>
+                          setShowPassword(!showPassword)
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={17} />
+                        ) : (
+                          <Eye size={17} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password */}
+                  <div className="form-group">
+                    <label>
+                      Confirm Password <span>*</span>
+                    </label>
+
+                    <div className="input-wrapper">
+                      <Lock size={18} />
+
+                      <input
+                        type={
+                          showConfirmPassword
+                            ? "text"
+                            : "password"
+                        }
+                        name="confirm_password"
+                        value={formData.confirm_password}
+                        onChange={handleChange}
+                        placeholder="Repeat password"
+                      />
+
+                      <button
+                        type="button"
+                        className="eye-button"
+                        onClick={() =>
+                          setShowConfirmPassword(
+                            !showConfirmPassword
+                          )
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={17} />
+                        ) : (
+                          <Eye size={17} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Role */}
+                <div className="form-group">
+
+                  <label>
+                    Register as <span>*</span>
+                  </label>
+
+                  <div className="role-options">
+
+                    <button
+                      type="button"
+                      className={`role-card ${
+                        formData.role === "farmer"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => selectRole("farmer")}
+                    >
+                      <Sprout size={20} />
+
+                      <div>
+                        <strong>Farmer</strong>
+                        <small>Manage your farm</small>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`role-card ${
+                        formData.role === "consultant"
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        selectRole("consultant")
+                      }
+                    >
+                      <Award size={20} />
+
+                      <div>
+                        <strong>
+                          Agricultural Consultant
+                        </strong>
+                        <small>Advise farmers</small>
+                      </div>
+                    </button>
+
+                  </div>
+
+                  <div className="admin-note">
+                    <ShieldCheck size={14} />
+                    Admin registration is restricted.
+                  </div>
+
+                </div>
+
+                {/* City + State */}
+                <div className="two-column">
+
+                  <div className="form-group">
+                    <label>City / District</label>
+
+                    <div className="input-wrapper">
+                      <MapPin size={18} />
+
+                      <input
+                        type="text"
+                        name="district"
+                        value={formData.district}
+                        onChange={handleChange}
+                        placeholder="Ludhiana"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>
+                      State <span>*</span>
+                    </label>
+
+                    <select
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                    >
+                      <option value="">
+                        Select State
+                      </option>
+                      <option>Andhra Pradesh</option>
+                      <option>Assam</option>
+                      <option>Bihar</option>
+                      <option>Chhattisgarh</option>
+                      <option>Gujarat</option>
+                      <option>Haryana</option>
+                      <option>Himachal Pradesh</option>
+                      <option>Jharkhand</option>
+                      <option>Karnataka</option>
+                      <option>Kerala</option>
+                      <option>Madhya Pradesh</option>
+                      <option>Maharashtra</option>
+                      <option>Odisha</option>
+                      <option>Punjab</option>
+                      <option>Rajasthan</option>
+                      <option>Tamil Nadu</option>
+                      <option>Telangana</option>
+                      <option>Uttar Pradesh</option>
+                      <option>Uttarakhand</option>
+                      <option>West Bengal</option>
+                      <option>Delhi</option>
+                    </select>
+                  </div>
+
+                </div>
+
+                {/* Country */}
+                <div className="form-group">
+                  <label>Country</label>
+
+                  <input
+                    className="plain-input"
+                    type="text"
+                    name="country"
+                    value="India"
+                    readOnly
                   />
-               </div>
-             </>
-            )}
+                </div>
 
+                {error && (
+                  <div className="error-message">
+                    {error}
+                  </div>
+                )}
 
-            <div className="flex items-center border rounded-xl px-4 py-2 mb-6">
-              <Lock className="text-green-700" size={20} />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Create Password"
-                className="ml-3 w-full outline-none"
-                onChange={handleChange}
-                required
-              />
-            
-             <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-gray-500 hover:text-green-700"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-            <button
-              type="submit"
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-green-600 hover:from-yellow-600 hover:to-green-700 text-white font-semibold transition duration-300 shadow-lg"
-            >
-              Create Account
-            </button>
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={nextStep}
+                >
+                  Next: Role Details
+                  <ArrowRight size={18} />
+                </button>
 
-          </form>
+                <div className="login-link">
+                  Already have an account?{" "}
+                  <Link to="/">
+                    Sign in
+                  </Link>
+                </div>
 
-          {/* Divider */}
+              </form>
+            </>
+          ) : (
+            /* ================= STEP 2 ================= */
+            <>
+              <div className="form-heading">
+                <h2>Role-specific information</h2>
+                <p>Step 2 of 2 · Professional details</p>
+              </div>
 
-          <div className="flex items-center my-6">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-500 text-sm">OR</span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
+              <form onSubmit={handleSubmit}>
 
-          {/* Google Login */}
+                {/* Farmer */}
+                {formData.role === "farmer" && (
+                  <>
+                    <div className="role-info">
+                      <Sprout size={20} />
 
-          <div className="flex justify-center">
+                      <div>
+                        <strong>Farmer Details</strong>
+                        <p>
+                          Provide your farm information for
+                          accurate yield predictions.
+                        </p>
+                      </div>
+                    </div>
 
-            <GoogleLogin
-              theme="outline"
-              shape="pill"
-              size="large"
-              text="continue_with"
-              width="350"
-              onSuccess={(credentialResponse) => {
-                console.log("Google Login Success:", credentialResponse);
+                    <div className="form-group">
+                      <label>
+                        Farm Location / Village <span>*</span>
+                      </label>
 
-                // TODO:
-                // Send credentialResponse.credential
-                // to FastAPI backend
+                      <div className="input-wrapper">
+                        <MapPin size={18} />
 
-                alert("Google Login Successful");
+                        <input
+                          type="text"
+                          name="farm_location"
+                          value={formData.farm_location}
+                          onChange={handleChange}
+                          placeholder="Village Bhai Rupa, Ludhiana"
+                        />
+                      </div>
+                    </div>
 
-                navigate("/dashboard");
-              }}
-              onError={() => {
-                alert("Google Login Failed");
-              }}
-            />
+                    <div className="two-column">
 
-          </div>
+                      <div className="form-group">
+                        <label>
+                          Farm Size (in acres) <span>*</span>
+                        </label>
 
-          {/* Login Link */}
+                        <div className="input-wrapper">
+                          <Sprout size={18} />
 
-          <p className="text-center mt-8 text-gray-600">
-            Already have an account?
+                          <input
+                            type="number"
+                            name="farm_size"
+                            value={formData.farm_size}
+                            onChange={handleChange}
+                            placeholder="12.5"
+                            min="0"
+                            step="0.1"
+                          />
+                        </div>
+                      </div>
 
-            <Link
-              to="/"
-              className="text-green-700 font-semibold ml-2 hover:underline"
-            >
-              Login
-            </Link>
+                      <div className="form-group">
+                        <label>
+                          Soil Type <span>*</span>
+                        </label>
 
-          </p>
+                        <select
+                          name="soil_type"
+                          value={formData.soil_type}
+                          onChange={handleChange}
+                        >
+                          <option value="">
+                            Select Soil Type
+                          </option>
+                          <option>Alluvial Soil</option>
+                          <option>Black Soil</option>
+                          <option>Red Soil</option>
+                          <option>Laterite Soil</option>
+                          <option>Desert Soil</option>
+                          <option>Mountain Soil</option>
+                        </select>
+                      </div>
 
-        </div>
+                    </div>
 
+                    <div className="form-group">
+                      <label>
+                        Primary Crop <span>*</span>
+                      </label>
+
+                      <select
+                        name="primary_crop"
+                        value={formData.primary_crop}
+                        onChange={handleChange}
+                      >
+                        <option value="">
+                          Select Primary Crop
+                        </option>
+                        <option>Wheat</option>
+                        <option>Rice</option>
+                        <option>Maize</option>
+                        <option>Cotton</option>
+                        <option>Sugarcane</option>
+                        <option>Potato</option>
+                        <option>Tomato</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+        {/* Consultant */}
+{formData.role === "consultant" && (
+  <>
+    {/* Consultant Details Card */}
+    <div className="role-details-card consultant-details-card">
+      <div>
+        <strong>Agricultural Consultant Details</strong>
+
+        <p>
+          Tell us about your professional
+          experience and expertise.
+        </p>
+      </div>
+    </div>
+
+    {/* Highest Qualification */}
+    <div className="form-group">
+      <label>
+        Highest Qualification <span>*</span>
+      </label>
+
+      <input
+        className="plain-input"
+        type="text"
+        name="qualification"
+        value={formData.qualification}
+        onChange={handleChange}
+        placeholder="M.Sc Agriculture / Ph.D"
+      />
+    </div>
+
+    {/* Area of Specialization */}
+    <div className="form-group">
+      <label>
+        Area of Specialization <span>*</span>
+      </label>
+
+      <input
+        className="plain-input"
+        type="text"
+        name="specialization"
+        value={formData.specialization}
+        onChange={handleChange}
+        placeholder="Soil Science, Crop Protection..."
+      />
+    </div>
+
+    {/* Experience and License */}
+    <div className="two-column">
+      <div className="form-group">
+        <label>
+          Years of Experience <span>*</span>
+        </label>
+
+        <select
+          name="experience"
+          value={formData.experience}
+          onChange={handleChange}
+        >
+          <option value="">
+            Select Experience
+          </option>
+          <option value="0–2 years">0–2 years</option>
+          <option value="3–5 years">3–5 years</option>
+          <option value="6–10 years">6–10 years</option>
+          <option value="10+ years">10+ years</option>
+        </select>
       </div>
 
+      {/* License / Registration Number */}
+      <div className="form-group">
+        <label>
+          License / Registration Number <span>*</span>
+        </label>
+
+        <input
+          className="plain-input"
+          type="text"
+          name="licenseNumber"
+          value={formData.licenseNumber}
+          onChange={handleChange}
+          placeholder="AGR/KA/2019/1234"
+        />
+      </div>
+    </div>
+  </>
+)}
+
+                {error && (
+                  <div className="error-message">
+                    {error}
+                  </div>
+                )}
+
+                <div className="button-row">
+
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={previousStep}
+                  >
+                    <ArrowLeft size={17} />
+                    Back
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="primary-button"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      "Creating Account..."
+                    ) : (
+                      <>
+                        <CheckCircle2 size={18} />
+                        Create Account
+                      </>
+                    )}
+                  </button>
+
+                </div>
+
+                <div className="login-link">
+                  Already have an account?{" "}
+                  <Link to="/">
+                    Sign in
+                  </Link>
+                </div>
+
+              </form>
+            </>
+          )}
+
+        </div>
+      </section>
     </div>
   );
 }
+
+export default Register;

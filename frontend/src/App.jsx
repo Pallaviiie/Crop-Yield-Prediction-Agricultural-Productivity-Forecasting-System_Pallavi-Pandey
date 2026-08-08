@@ -1,7 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Authentication
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+
+// Home
+import Home from "./pages/Home";
 
 // Farmer
 import FarmerLayout from "./layouts/FarmerLayout";
@@ -12,76 +16,78 @@ import History from "./pages/farmer/History";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
-//Consultant
+// Consultant
 import ConsultantLayout from "./layouts/ConsultantLayout";
 import ConsultantDashboard from "./pages/consultant/ConsultantDashboard";
 
-
 function App() {
-
   return (
-
     <BrowserRouter>
-
       <Routes>
 
+        {/* ================= HOME ================= */}
 
-        {/* Authentication */}
-
-        <Route 
-          path="/" 
-          element={<Login />} 
+        <Route
+          path="/"
+          element={<Home />}
         />
 
-        <Route 
-          path="/register" 
-          element={<Register />} 
+        {/* ================= AUTHENTICATION ================= */}
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
         />
 
 
-
-        {/* Farmer Dashboard */}
+        {/* ================= FARMER ================= */}
 
         <Route element={<FarmerLayout />}>
 
-          <Route 
-            path="/dashboard" 
-            element={<Dashboard />} 
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
           />
 
-          <Route 
-            path="/history" 
-            element={<History />} 
+          <Route
+            path="/history"
+            element={<History />}
           />
 
         </Route>
 
 
-
-
-        {/* Admin Dashboard */}
+        {/* ================= ADMIN ================= */}
 
         <Route element={<AdminLayout />}>
-  <Route
-    path="/admin-dashboard"
-    element={<AdminDashboard />}
-  />
-</Route>
 
-<Route element={<ConsultantLayout />}>
-  <Route
-    path="/consultant-dashboard"
-    element={<ConsultantDashboard />}
-  />
-</Route>
+          <Route
+            path="/admin-dashboard"
+            element={<AdminDashboard />}
+          />
+
+        </Route>
+
+
+        {/* ================= CONSULTANT ================= */}
+
+        <Route element={<ConsultantLayout />}>
+
+          <Route
+            path="/consultant-dashboard"
+            element={<ConsultantDashboard />}
+          />
+
+        </Route>
 
       </Routes>
-
     </BrowserRouter>
-
   );
-
 }
-
 
 export default App;
