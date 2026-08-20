@@ -1,0 +1,527 @@
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.consultant-dashboard {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   WELCOME
+========================================================= */
+
+.consultant-welcome {
+  margin-bottom: 23px;
+}
+
+.consultant-welcome h1 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  color: #07552d;
+
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.consultant-welcome p {
+  margin: 6px 0 0;
+
+  color: #00a64f;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   METRICS
+========================================================= */
+
+.metrics-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 15px;
+
+  margin-bottom: 23px;
+}
+
+.consultant-metric-card {
+  position: relative;
+
+  min-height: 172px;
+
+  background: #ffffff;
+
+  border: 1px solid #d9eee0;
+
+  border-radius: 16px;
+
+  padding: 19px 20px;
+
+  box-shadow:
+    0 2px 7px rgba(0, 100, 50, 0.08);
+}
+
+
+/* Icons */
+
+.metric-icon {
+  width: 43px;
+  height: 43px;
+
+  border-radius: 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+
+  margin-bottom: 17px;
+}
+
+.metric-green {
+  background: #008d43;
+}
+
+.metric-blue {
+  background: #2563eb;
+}
+
+.metric-lime {
+  background: #5aaa00;
+}
+
+.metric-orange {
+  background: #ed7900;
+}
+
+
+/* Text */
+
+.metric-value {
+  color: #07552d;
+
+  font-size: 23px;
+
+  line-height: 1;
+
+  font-weight: 700;
+
+  margin-bottom: 9px;
+}
+
+.metric-title {
+  color: #008b43;
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+  margin-bottom: 5px;
+}
+
+.metric-subtitle {
+  color: #00a64f;
+
+  font-size: 12px;
+}
+
+
+/* Badge */
+
+.metric-badge {
+  position: absolute;
+
+  top: 19px;
+  right: 19px;
+
+  background: #eefaf2;
+
+  color: #008c43;
+
+  padding: 5px 9px;
+
+  border-radius: 12px;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   MAIN GRID
+========================================================= */
+
+.dashboard-main-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(350px, 0.98fr);
+
+  gap: 22px;
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.chart-card {
+  background: #ffffff;
+
+  border: 1px solid #d9eee0;
+
+  border-radius: 16px;
+
+  padding: 21px 20px 20px;
+
+  box-shadow:
+    0 2px 7px rgba(0, 100, 50, 0.07);
+
+  min-height: 276px;
+}
+
+.chart-card h2,
+.pending-section h2 {
+  color: #07552d;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  margin: 0 0 21px;
+}
+
+.chart-wrapper {
+  display: flex;
+
+  height: 190px;
+}
+
+.y-axis {
+  width: 40px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding-bottom: 28px;
+
+  color: #49846a;
+
+  font-size: 10px;
+}
+
+.chart-area {
+  position: relative;
+
+  flex: 1;
+
+  height: 100%;
+}
+
+.chart-grid-lines {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  top: 0;
+  bottom: 28px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+}
+
+.chart-grid-lines span {
+  width: 100%;
+
+  border-top: 1px dashed #ccead6;
+}
+
+.bars {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  justify-content: space-around;
+
+  align-items: flex-end;
+
+  padding: 0 5px;
+}
+
+.bar-column {
+  position: relative;
+
+  width: 14%;
+
+  height: calc(100% - 28px);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  flex-direction: column;
+
+  cursor: pointer;
+}
+
+.bar {
+  position: relative;
+
+  width: 78%;
+
+  max-width: 80px;
+
+  min-width: 30px;
+
+  background: #176c3a;
+
+  border-radius: 4px 4px 0 0;
+
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.bar:hover {
+  opacity: 0.85;
+}
+
+.bar.selected {
+  background: #125f33;
+}
+
+.bar-label {
+  position: absolute;
+
+  bottom: -27px;
+
+  color: #497d65;
+
+  font-size: 10px;
+}
+
+
+/* Tooltip */
+
+.chart-tooltip {
+  position: absolute;
+
+  left: 50%;
+
+  bottom: calc(100% + 8px);
+
+  transform: translateX(-50%);
+
+  width: 91px;
+
+  background: #ffffff;
+
+  border: 1px solid #d9eee0;
+
+  border-radius: 12px;
+
+  padding: 11px;
+
+  box-shadow:
+    0 3px 10px rgba(0, 80, 40, 0.12);
+
+  z-index: 5;
+}
+
+.chart-tooltip strong {
+  display: block;
+
+  color: #07552d;
+
+  font-size: 11px;
+
+  margin-bottom: 6px;
+}
+
+.chart-tooltip span {
+  color: #08763b;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   PENDING CONSULTATIONS
+========================================================= */
+
+.pending-section {
+  min-width: 0;
+}
+
+.pending-section h2 {
+  margin-bottom: 12px;
+}
+
+.consultation-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 11px;
+}
+
+.consultation-card {
+  background: #ffffff;
+
+  border: 1px solid #d9eee0;
+
+  border-radius: 16px;
+
+  padding: 16px;
+
+  min-height: 103px;
+
+  box-shadow:
+    0 2px 7px rgba(0, 100, 50, 0.07);
+}
+
+.consultation-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.consultation-top strong {
+  color: #07552d;
+
+  font-size: 13px;
+}
+
+.consultation-card p {
+  margin: 5px 0 10px;
+
+  color: #008c43;
+
+  font-size: 11px;
+}
+
+
+/* Priority */
+
+.priority {
+  padding: 4px 9px;
+
+  border-radius: 12px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  text-transform: lowercase;
+}
+
+.priority.high {
+  color: #ef4444;
+  background: #ffe5e5;
+}
+
+.priority.medium {
+  color: #d97706;
+  background: #fff0c4;
+}
+
+.priority.low {
+  color: #059669;
+  background: #dcfce7;
+}
+
+
+/* Bottom */
+
+.consultation-bottom {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+}
+
+.consultation-bottom > span {
+  color: #00a64f;
+
+  font-size: 11px;
+}
+
+.respond-button {
+  border: none;
+
+  background: #effaf2;
+
+  color: #008c43;
+
+  border-radius: 15px;
+
+  padding: 6px 12px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+.respond-button:hover {
+  background: #dff5e6;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+  .metrics-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+}

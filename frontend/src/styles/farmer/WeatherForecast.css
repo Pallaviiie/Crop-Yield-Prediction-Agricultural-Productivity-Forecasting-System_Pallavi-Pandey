@@ -1,0 +1,1198 @@
+/* ============================================================
+   WEATHER PAGE
+============================================================ */
+
+.weather-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  font-family: "DM Sans", sans-serif;
+  color: #12452e;
+}
+
+
+/* ============================================================
+   LOADING / ERROR
+============================================================ */
+
+.weather-loading,
+.weather-error {
+  min-height: 430px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+  box-sizing: border-box;
+  color: #08763b;
+}
+
+.weather-loading svg,
+.weather-error > svg {
+  color: #08783b;
+}
+
+.weather-loading h3,
+.weather-error h3 {
+  margin: 15px 0 7px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.weather-loading p,
+.weather-error p {
+  max-width: 470px;
+  margin: 0 0 18px;
+  color: #5a806c;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.weather-spinner {
+  animation: weather-spin 1s linear infinite;
+}
+
+@keyframes weather-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ============================================================
+   LOCATION BUTTON
+============================================================ */
+
+.location-button {
+  border: none;
+  background: #08783b;
+  color: #ffffff;
+
+  padding: 11px 18px;
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.location-button:hover {
+  background: #056b34;
+  transform: translateY(-1px);
+}
+
+.location-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ============================================================
+   SECTION HEADER
+============================================================ */
+
+.weather-section-header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin: 4px 2px 14px;
+}
+
+.weather-section-header h2 {
+  margin: 0;
+
+  color: #145634;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.weather-section-header p {
+  margin: 4px 0 0;
+
+  color: #6c907c;
+
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   REFRESH BUTTON
+============================================================ */
+
+.refresh-weather-button {
+  flex-shrink: 0;
+
+  border: 1px solid #bce8cf;
+
+  background: #ffffff;
+  color: #08783b;
+
+  border-radius: 10px;
+
+  padding: 9px 13px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  cursor: pointer;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.refresh-weather-button:hover {
+  background: #effaf3;
+  border-color: #9ddbb8;
+  transform: translateY(-1px);
+}
+
+.refresh-weather-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.weather-spin {
+  animation: weather-spin 0.8s linear infinite;
+}
+
+
+/* ============================================================
+   CURRENT WEATHER CARD
+============================================================ */
+
+.current-weather-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  border-radius: 18px;
+
+  padding: 24px;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #0794e8 0%,
+      #0758e8 100%
+    );
+
+  box-shadow:
+    0 8px 24px rgba(0, 90, 220, 0.18);
+
+  margin-bottom: 18px;
+
+  overflow: hidden;
+
+  position: relative;
+}
+
+
+/* subtle background decoration */
+
+.current-weather-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 180px;
+  height: 180px;
+
+  right: -70px;
+  top: -80px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   CURRENT WEATHER TOP
+============================================================ */
+
+.current-weather-top {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+
+/* ============================================================
+   LOCATION
+============================================================ */
+
+.weather-location {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  font-size: 11px;
+
+  opacity: 0.95;
+
+  margin-bottom: 6px;
+
+  line-height: 1.4;
+}
+
+.weather-location svg {
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   CURRENT TEMPERATURE
+============================================================ */
+
+.current-temperature {
+  font-size: 48px;
+
+  font-weight: 800;
+
+  line-height: 1.05;
+
+  letter-spacing: -1px;
+}
+
+
+/* ============================================================
+   DESCRIPTION
+============================================================ */
+
+.current-description {
+  font-size: 13px;
+
+  margin-top: 5px;
+
+  opacity: 0.92;
+}
+
+
+/* ============================================================
+   WEATHER ICON
+============================================================ */
+
+.current-weather-icon {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffd84d;
+
+  margin-right: 5px;
+
+  padding-top: 5px;
+}
+
+
+/* ============================================================
+   CURRENT WEATHER STATS
+============================================================ */
+
+.current-weather-stats {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-top: 22px;
+}
+
+
+/* ============================================================
+   WEATHER STAT
+============================================================ */
+
+.weather-stat {
+  min-width: 0;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 13px;
+
+  padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+
+  backdrop-filter: blur(5px);
+}
+
+.weather-stat svg {
+  opacity: 0.9;
+
+  margin-bottom: 3px;
+}
+
+.weather-stat span {
+  font-size: 10px;
+
+  opacity: 0.8;
+}
+
+.weather-stat strong {
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+
+/* ============================================================
+   COMMON CARDS
+============================================================ */
+
+.forecast-card,
+.rainfall-card,
+.alerts-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #d4efdf;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 3px 12px rgba(24, 82, 51, 0.06);
+}
+
+
+/* ============================================================
+   7 DAY FORECAST CARD
+============================================================ */
+
+.forecast-card {
+  padding: 20px;
+
+  margin-bottom: 18px;
+}
+
+
+/* ============================================================
+   CARD HEADING
+============================================================ */
+
+.card-heading {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 16px;
+}
+
+.card-heading h3 {
+  margin: 0;
+
+  color: #145634;
+
+  font-size: 14px;
+
+  font-weight: 800;
+}
+
+.card-heading p {
+  margin: 4px 0 0;
+
+  color: #71907f;
+
+  font-size: 10px;
+
+  line-height: 1.4;
+}
+
+.card-heading > svg {
+  flex-shrink: 0;
+
+  color: #1598df;
+}
+
+
+/* ============================================================
+   FORECAST GRID
+============================================================ */
+
+.forecast-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, minmax(0, 1fr));
+
+  gap: 8px;
+}
+
+
+/* ============================================================
+   FORECAST DAY
+============================================================ */
+
+.forecast-day {
+  min-width: 0;
+
+  background: #effaf3;
+
+  border: 1px solid transparent;
+
+  border-radius: 13px;
+
+  padding: 12px 7px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-start;
+
+  text-align: center;
+
+  min-height: 118px;
+
+  box-sizing: border-box;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.forecast-day:hover {
+  background: #e7f7ed;
+
+  border-color: #c7ead5;
+
+  transform: translateY(-2px);
+}
+
+
+/* ============================================================
+   FORECAST DAY NAME
+============================================================ */
+
+.forecast-day > strong {
+  color: #08783b;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  margin-bottom: 9px;
+}
+
+
+/* ============================================================
+   FORECAST ICON
+============================================================ */
+
+.forecast-icon {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin-bottom: 8px;
+}
+
+
+/* Weather icon colors */
+
+.forecast-icon.sunny {
+  color: #f4b900;
+}
+
+.forecast-icon.cloudy {
+  color: #91a6ae;
+}
+
+.forecast-icon.rain {
+  color: #168be4;
+}
+
+.forecast-icon.storm {
+  color: #756be6;
+}
+
+
+/* ============================================================
+   FORECAST TEMPERATURE
+============================================================ */
+
+.forecast-temperature {
+  display: flex;
+
+  align-items: baseline;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: 1px;
+}
+
+.forecast-temperature span {
+  font-size: 12px;
+
+  font-weight: 800;
+
+  color: #145634;
+}
+
+.forecast-temperature small {
+  font-size: 10px;
+
+  font-weight: 500;
+
+  color: #7b9588;
+}
+
+
+/* ============================================================
+   FORECAST RAIN PROBABILITY
+============================================================ */
+
+.forecast-rain {
+  margin-top: 7px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 3px;
+
+  color: #167bea;
+
+  font-size: 9px;
+
+  font-weight: 700;
+}
+
+.forecast-rain svg {
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   BOTTOM GRID
+============================================================ */
+
+.weather-bottom-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  align-items: stretch;
+}
+
+
+/* ============================================================
+   RAINFALL CARD
+============================================================ */
+
+.rainfall-card {
+  padding: 18px;
+
+  min-height: 290px;
+}
+
+
+/* ============================================================
+   ALERTS CARD
+============================================================ */
+
+.alerts-card {
+  padding: 18px;
+
+  min-height: 290px;
+}
+
+
+/* ============================================================
+   RAINFALL GRAPH
+============================================================ */
+
+.rainfall-chart {
+  height: 210px;
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 8px;
+}
+
+
+/* ============================================================
+   GRAPH Y AXIS
+============================================================ */
+
+.chart-y-axis {
+  width: 40px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  padding: 5px 0 29px;
+
+  color: #71907f;
+
+  font-size: 9px;
+
+  text-align: right;
+}
+
+
+/* ============================================================
+   GRAPH BARS AREA
+============================================================ */
+
+.chart-bars {
+  flex: 1;
+
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, minmax(0, 1fr));
+
+  align-items: end;
+
+  gap: 8px;
+
+  padding: 5px 4px 0;
+
+  border-bottom: 1px solid #d9f0e2;
+
+  background:
+    repeating-linear-gradient(
+      to top,
+      transparent 0,
+      transparent 49px,
+      #e4f5ea 50px
+    );
+}
+
+
+/* ============================================================
+   GRAPH COLUMN
+============================================================ */
+
+.chart-column {
+  height: 100%;
+
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  position: relative;
+}
+
+
+/* ============================================================
+   BAR VALUE
+============================================================ */
+
+.bar-value {
+  font-size: 8px;
+
+  color: #247b9e;
+
+  margin-bottom: 3px;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   RAIN BAR
+============================================================ */
+
+.rain-bar {
+  width: min(34px, 65%);
+
+  min-height: 3px;
+
+  border-radius: 5px 5px 0 0;
+
+  background:
+    linear-gradient(
+      to top,
+      #1397d6,
+      #22a8e8
+    );
+
+  box-shadow:
+    0 2px 5px rgba(19, 151, 214, 0.16);
+
+  transition:
+    height 0.3s ease,
+    opacity 0.2s ease;
+}
+
+.chart-column:hover .rain-bar {
+  opacity: 0.8;
+}
+
+
+/* ============================================================
+   GRAPH DAY LABEL
+============================================================ */
+
+.chart-column > span:last-child {
+  position: absolute;
+
+  bottom: -23px;
+
+  font-size: 9px;
+
+  color: #71907f;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   WEATHER ALERT LIST
+============================================================ */
+
+.weather-alert-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-top: 4px;
+}
+
+
+/* ============================================================
+   WEATHER ALERT
+============================================================ */
+
+.weather-alert {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  padding: 11px;
+
+  border-radius: 11px;
+
+  border: 1px solid;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   ALERT ICON
+============================================================ */
+
+.alert-icon {
+  width: 31px;
+
+  height: 31px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 9px;
+}
+
+
+/* ============================================================
+   ALERT TEXT
+============================================================ */
+
+.weather-alert strong {
+  display: block;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  margin-bottom: 3px;
+}
+
+.weather-alert p {
+  margin: 0;
+
+  font-size: 9.5px;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   RAIN ALERT
+============================================================ */
+
+.weather-alert.rain {
+  background: #eff7ff;
+
+  border-color: #b9dbff;
+
+  color: #0864a7;
+}
+
+.weather-alert.rain .alert-icon {
+  background: #d9efff;
+
+  color: #0785d1;
+}
+
+
+/* ============================================================
+   WARNING ALERT
+============================================================ */
+
+.weather-alert.warning {
+  background: #fffaf0;
+
+  border-color: #f0dda0;
+
+  color: #896500;
+}
+
+.weather-alert.warning .alert-icon {
+  background: #fff0c7;
+
+  color: #d29300;
+}
+
+
+/* ============================================================
+   GOOD ALERT
+============================================================ */
+
+.weather-alert.good {
+  background: #effaf3;
+
+  border-color: #bde8ce;
+
+  color: #17643b;
+}
+
+.weather-alert.good .alert-icon {
+  background: #d9f4e3;
+
+  color: #07914a;
+}
+
+
+/* ============================================================
+   SOURCE / LOCATION FOOTER
+============================================================ */
+
+.weather-source {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+
+  gap: 4px;
+
+  margin-top: 12px;
+
+  padding: 0 3px;
+
+  font-size: 9px;
+
+  color: #8aa294;
+
+  line-height: 1.5;
+}
+
+.weather-source svg {
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 1000px) {
+
+  .forecast-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+  }
+
+  .weather-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rainfall-card,
+  .alerts-card {
+    min-height: auto;
+  }
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .weather-page {
+    padding: 5px;
+  }
+
+  .weather-section-header {
+    align-items: flex-start;
+  }
+
+  .current-weather-card {
+    padding: 19px;
+  }
+
+  .current-temperature {
+    font-size: 42px;
+  }
+
+  .current-weather-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .forecast-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .forecast-day {
+    min-height: 115px;
+  }
+
+  .weather-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rainfall-card,
+  .alerts-card {
+    padding: 15px;
+  }
+
+  .weather-source {
+    justify-content: center;
+
+    text-align: center;
+  }
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+============================================================ */
+
+@media (max-width: 450px) {
+
+  .weather-page {
+    padding: 3px;
+  }
+
+  .weather-section-header {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 10px;
+  }
+
+  .refresh-weather-button {
+    width: 100%;
+  }
+
+  .current-weather-card {
+    padding: 17px;
+
+    border-radius: 15px;
+  }
+
+  .current-weather-top {
+    gap: 10px;
+  }
+
+  .current-temperature {
+    font-size: 38px;
+  }
+
+  .current-description {
+    font-size: 11px;
+  }
+
+  .current-weather-icon svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .current-weather-stats {
+    gap: 8px;
+
+    margin-top: 18px;
+  }
+
+  .weather-stat {
+    padding: 10px;
+  }
+
+  .weather-stat span {
+    font-size: 9px;
+  }
+
+  .weather-stat strong {
+    font-size: 11px;
+  }
+
+  .forecast-card {
+    padding: 13px;
+  }
+
+  .forecast-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .forecast-day {
+    min-height: 110px;
+
+    padding: 10px 6px;
+  }
+
+  .rainfall-card,
+  .alerts-card {
+    padding: 13px;
+  }
+
+  .rainfall-chart {
+    height: 190px;
+
+    gap: 5px;
+  }
+
+  .chart-y-axis {
+    width: 32px;
+
+    font-size: 8px;
+  }
+
+  .chart-bars {
+    gap: 4px;
+  }
+
+  .rain-bar {
+    width: 65%;
+  }
+
+  .bar-value {
+    font-size: 7px;
+  }
+
+  .chart-column > span:last-child {
+    font-size: 8px;
+  }
+
+  .weather-alert {
+    padding: 9px;
+
+    gap: 8px;
+  }
+
+  .weather-alert strong {
+    font-size: 10px;
+  }
+
+  .weather-alert p {
+    font-size: 9px;
+  }
+}

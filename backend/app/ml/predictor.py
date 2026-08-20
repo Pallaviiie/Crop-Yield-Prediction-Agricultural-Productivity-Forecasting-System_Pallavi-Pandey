@@ -1,96 +1,254 @@
-import joblib
-import pandas as pd
+import pickle
 from pathlib import Path
-import traceback
 
-BASE_DIR = Path(__file__).resolve().parent
-
-# Load model
-model = joblib.load(BASE_DIR / "model.pkl")
-
-# Load encoders
-encoders = joblib.load(BASE_DIR / "label_encoders.pkl")
+import pandas as pd
 
 
-def predict_crop(data):
-    try:
-        # Encode categorical values
-        area_encoded = encoders["area"].transform([data.area])[0]
-        item_encoded = encoders["item"].transform([data.item])[0]
+# ============================================================
+# PATHS
+# ============================================================
 
-        # Prepare input
-        input_data = pd.DataFrame([
-            {
-                "area": area_encoded,
-                "item": item_encoded,
-                "year": data.year,
-                "average_rain_fall_mm_per_year": data.average_rain_fall_mm_per_year,
-                "pesticides_tonnes": data.pesticides_tonnes,
-                "avg_temp": data.avg_temp,
-            }
-        ])
+# Current directory:
+# backend/app/ml/
 
-        
-        # Predict using the trained model
-        prediction = model.predict(input_data)[0]
+ML_DIR = Path(__file__).resolve().parent
 
-        # Convert to float and round
-        prediction = round(float(prediction), 2)
+MODEL_PATH = ML_DIR / "model.pkl"
 
-        if prediction < 15000:
-            category = "Poor"
-            stars = "⭐"
-            recommendation = "Yield is low. Improve irrigation and fertilizer management."
-            production = "Low"
-
-        elif prediction < 25000:
-            category = "Average"
-            stars = "⭐⭐"
-            recommendation = "Average yield expected. Better nutrient management can improve production."
-            production = "Medium"
-
-        elif prediction < 35000:
-            category = "Good"
-            stars = "⭐⭐⭐"
-            recommendation = "Good growing conditions. Continue balanced fertilizer application."
-            production = "High"
-
-        else:
-            category = "Excellent"
-            stars = "⭐⭐⭐⭐"
-            recommendation = "Excellent conditions for cultivation."
-            production = "Very High"
+ENCODER_PATH = ML_DIR / "label_encoders.pkl"
 
 
-        return {
-            "predicted_yield": prediction,
-            "confidence": 98,
-            "recommendation": recommendation,
-            "category": category,
-            "stars": stars,
-            "production": production,
-            "soil_tip": "Maintain soil pH between 6.0 and 7.0",
-            "fertilizer_tip": "Apply Nitrogen fertilizer in two equal splits.",
-            "irrigation_tip": "Provide medium irrigation depending on rainfall.",
-            "pest_risk": "Low"
-        }
+# ============================================================
+# LOAD MODEL AND METADATA
+# ============================================================
 
-    except Exception as e:
-        traceback.print_exc()
+if not MODEL_PATH.exists():
+    raise FileNotFoundError(
+        f"ML model not found at:\n{MODEL_PATH}\n\n"
+        "Please train the model first using:\n"
+        "python -m app.ml.train_model"
+    )
 
-        print("\n========== INPUT RECEIVED ==========")
-        print("Area:", repr(data.area))
-        print("Item:", repr(data.item))
-        print("Year:", data.year)
-        print("Rainfall:", data.average_rain_fall_mm_per_year)
-        print("Pesticides:", data.pesticides_tonnes)
-        print("Temperature:", data.avg_temp)
 
-        print("\n========== AVAILABLE VALUES ==========")
-        print("First 20 Areas:")
-        print(encoders["area"].classes_[:20])
+if not ENCODER_PATH.exists():
+    raise FileNotFoundError(
+        f"Label encoder file not found at:\n{ENCODER_PATH}\n\n"
+        "Please train the model first using:\n"
+        "python -m app.ml.train_model"
+    )
 
-        print("\nFirst 20 Items:")
-        print(encoders["item"].classes_[:20])
 
-        raise ValueError(str(e))
+# Load Random Forest model
+with open(MODEL_PATH, "rb") as file:
+    model = pickle.load(file)
+
+
+# Load encoders and metadata
+with open(ENCODER_PATH, "rb") as file:
+    model_metadata = pickle.load(file)
+
+
+# ============================================================
+# GET ENCODERS
+# ============================================================
+
+encoders = model_metadata.get("encoders", {})
+
+if "Area" not in encoders:
+    raise ValueError(
+        "Area encoder is missing from label_encoders.pkl"
+    )
+
+if "Item" not in encoders:
+    raise ValueError(
+        "Item encoder is missing from label_encoders.pkl"
+    )
+
+
+area_encoder = encoders["Area"]
+
+item_encoder = encoders["Item"]
+
+
+# ============================================================
+# FEATURE ORDER
+# ============================================================
+
+feature_columns = model_metadata.get(
+    "feature_columns",
+    [
+        "Area",
+        "Item",
+        "Year",
+        "average_rain_fall_mm_per_year",
+        "pesticides_tonnes",
+        "avg_temp",
+    ],
+)
+
+
+# ============================================================
+# MODEL INFORMATION
+# ============================================================
+
+MODEL_TYPE = model_metadata.get(
+    "model_type",
+    "RandomForestRegressor"
+)
+
+R2_SCORE = model_metadata.get(
+    "r2_score",
+    None
+)
+
+
+# ============================================================
+# PREDICT CROP YIELD
+# ============================================================
+
+def predict_crop(
+    area: str,
+    item: str,
+    year: int,
+    average_rain_fall_mm_per_year: float,
+    pesticides_tonnes: float,
+    avg_temp: float,
+):
+    """
+    Predict crop yield using the trained
+    Random Forest Regression model.
+    """
+
+    # --------------------------------------------------------
+    # CLEAN INPUT
+    # --------------------------------------------------------
+
+    area = str(area).strip()
+    item = str(item).strip()
+
+    # --------------------------------------------------------
+    # VALIDATE AREA
+    # --------------------------------------------------------
+
+    if area not in area_encoder.classes_:
+
+        raise ValueError(
+            f"Area '{area}' is not available in "
+            "the trained dataset."
+        )
+
+    # --------------------------------------------------------
+    # VALIDATE CROP
+    # --------------------------------------------------------
+
+    if item not in item_encoder.classes_:
+
+        raise ValueError(
+            f"Crop '{item}' is not available in "
+            "the trained dataset."
+        )
+
+    # --------------------------------------------------------
+    # ENCODE AREA
+    # --------------------------------------------------------
+
+    area_encoded = area_encoder.transform(
+        [area]
+    )[0]
+
+    # --------------------------------------------------------
+    # ENCODE CROP
+    # --------------------------------------------------------
+
+    item_encoded = item_encoder.transform(
+        [item]
+    )[0]
+
+    # --------------------------------------------------------
+    # CREATE INPUT DATAFRAME
+    # --------------------------------------------------------
+
+    input_data = pd.DataFrame(
+        [
+            [
+                area_encoded,
+                item_encoded,
+                year,
+                average_rain_fall_mm_per_year,
+                pesticides_tonnes,
+                avg_temp,
+            ]
+        ],
+        columns=feature_columns,
+    )
+
+    # --------------------------------------------------------
+    # MAKE PREDICTION
+    # --------------------------------------------------------
+
+    prediction = model.predict(
+        input_data
+    )[0]
+
+    # --------------------------------------------------------
+    # PREVENT NEGATIVE YIELD
+    # --------------------------------------------------------
+
+    prediction = max(
+        0.0,
+        float(prediction)
+    )
+
+    return prediction
+
+
+# ============================================================
+# GET MODEL INFORMATION
+# ============================================================
+
+def get_model_info():
+    """
+    Returns information about the trained ML model.
+    """
+
+    return {
+        "model_type": MODEL_TYPE,
+        "r2_score": R2_SCORE,
+        "feature_columns": feature_columns,
+    }
+
+
+# ============================================================
+# GET AVAILABLE AREAS
+# ============================================================
+
+def get_available_areas():
+    """
+    Returns all areas/countries available
+    in the training dataset.
+    """
+
+    return sorted(
+        [
+            str(value)
+            for value in area_encoder.classes_
+        ]
+    )
+
+
+# ============================================================
+# GET AVAILABLE CROPS
+# ============================================================
+
+def get_available_crops():
+    """
+    Returns all crops available
+    in the training dataset.
+    """
+
+    return sorted(
+        [
+            str(value)
+            for value in item_encoder.classes_
+        ]
+    )

@@ -290,7 +290,7 @@ useEffect(() => {
 
           <div>
             <div className="text-2xl font-bold">
-              97%
+              98.57%
             </div>
 
             <div className="text-sm text-green-300">
@@ -701,7 +701,7 @@ useEffect(() => {
 
               <BenefitCard
                 icon={<Target />}
-                value="97%"
+                value="98.57%"
                 label="Prediction Accuracy"
               />
 
@@ -1118,19 +1118,20 @@ useEffect(() => {
 
               <div className="flex items-center gap-3">
 
-                <div className="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center">
-                  <Leaf
-                    size={21}
-                    className="text-lime-300"
-                  />
-                </div>
+                <div className="w-10 h-10 rounded-full bg-green-700 flex items-center justify-center overflow-hidden">
+  <img
+    src={cropLogo}
+    alt="YieldSense Logo"
+    className="w-8 h-8 object-contain"
+  />
+</div>
 
-                <span className="text-xl font-bold">
-                  YieldSense{" "}
-                  <span className="text-lime-400">
-                    AI
-                  </span>
-                </span>
+<span className="text-xl font-bold">
+  YieldSense{" "}
+  <span className="text-lime-400">
+    AI
+  </span>
+</span>
 
               </div>
 

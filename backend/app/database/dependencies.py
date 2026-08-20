@@ -1,6 +1,10 @@
 from app.database.db import SessionLocal
 
 
+# ============================================================
+# DATABASE DEPENDENCY
+# ============================================================
+
 def get_db():
 
     db = SessionLocal()

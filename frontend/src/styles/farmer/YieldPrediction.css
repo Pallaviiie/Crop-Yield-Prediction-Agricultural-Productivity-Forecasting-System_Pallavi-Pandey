@@ -1,0 +1,717 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+.yield-page {
+  width: 100%;
+  min-height: 100%;
+  font-family: "DM Sans", sans-serif;
+  color: #183d2a;
+}
+
+.yield-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.prediction-form-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #cdebd9;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(24, 82, 51, 0.06);
+}
+
+.prediction-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.prediction-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: #08763b;
+}
+
+.prediction-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #174b32;
+}
+
+.prediction-heading p {
+  margin: 4px 0 0;
+  color: #15944c;
+  font-size: 11px;
+}
+
+.prediction-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 15px;
+}
+
+.form-group {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #28573f;
+}
+
+.form-group label span {
+  color: #ef4444;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  height: 42px;
+  border: 1px solid #b4e7ca;
+  background: #effaf3;
+  border-radius: 13px;
+  padding: 0 13px;
+  outline: none;
+  font-family: inherit;
+  font-size: 12px;
+  color: #315c47;
+  transition: 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #0b8a46;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(11, 139, 71, 0.08);
+}
+
+.form-group input::placeholder {
+  color: #7b9789;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.predict-button {
+  width: 100%;
+  height: 46px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 13px;
+  background: #08783b;
+  color: white;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  box-shadow: 0 6px 14px rgba(0, 100, 49, 0.15);
+  transition: 0.2s ease;
+}
+
+.predict-button:hover {
+  background: #076b35;
+  transform: translateY(-1px);
+}
+
+.predict-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spin {
+  animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================
+   RIGHT SIDE
+========================= */
+
+.prediction-right-section {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* =========================
+   READY
+========================= */
+
+.ready-card {
+  width: 100%;
+  min-height: 340px;
+
+  border-radius: 18px;
+  border: 1px dashed #a8dfbd;
+  background: rgba(255, 255, 255, 0.65);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+  text-align: center;
+}
+
+.ready-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #159c52;
+  background: #eaf8ef;
+
+  margin-bottom: 15px;
+}
+
+.ready-card h2 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  color: #174b32;
+}
+
+.ready-card p {
+  max-width: 390px;
+  margin: 0;
+  color: #4d8265;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ready-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.ready-features span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+
+  border-radius: 20px;
+  background: #edf8f1;
+  color: #28764b;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* =========================
+   RESULT CARD
+========================= */
+
+.prediction-result-card {
+  width: 100%;
+
+  background: linear-gradient(
+    135deg,
+    #007a38,
+    #075f32
+  );
+
+  color: white;
+  border-radius: 18px;
+  padding: 22px;
+
+  box-shadow: 0 8px 22px rgba(0, 100, 49, 0.18);
+}
+
+.prediction-result-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.prediction-small-title {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.prediction-number {
+  font-size: clamp(38px, 4vw, 52px);
+  line-height: 1;
+  font-weight: 700;
+  margin-top: 7px;
+}
+
+.prediction-unit {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b8f59b;
+}
+
+.prediction-success-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.12);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #b8f59b;
+}
+
+/* =========================
+   YIELD STATUS
+========================= */
+
+.yield-status {
+  margin-top: 18px;
+  padding: 11px 13px;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.yield-status svg {
+  flex-shrink: 0;
+}
+
+.yield-status div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.yield-status strong {
+  font-size: 11px;
+  color: white;
+}
+
+.yield-status span {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.yield-status.high {
+  color: #b8f59b;
+}
+
+.yield-status.medium {
+  color: #d9f8a6;
+}
+
+.yield-status.low {
+  color: #ffd58a;
+}
+
+/* =========================
+   DETAILS
+========================= */
+
+.prediction-details {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.prediction-details > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.11);
+  border-radius: 11px;
+
+  padding: 10px 7px;
+}
+
+.prediction-details svg {
+  margin-bottom: 5px;
+  color: #b8f59b;
+}
+
+.prediction-details span {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.prediction-details strong {
+  max-width: 100%;
+  margin-top: 3px;
+
+  font-size: 10.5px;
+  color: white;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================
+   KEY CONDITIONS
+========================= */
+
+.input-summary-card {
+  background: white;
+  border: 1px solid #cdebd9;
+  border-radius: 17px;
+  padding: 16px;
+
+  box-shadow: 0 3px 12px rgba(24, 82, 51, 0.06);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.section-title > svg {
+  color: #08763b;
+}
+
+.section-title h3 {
+  margin: 0;
+  font-size: 13px;
+  color: #173f2c;
+}
+
+.section-title p {
+  margin: 2px 0 0;
+  font-size: 9.5px;
+  color: #6b8c79;
+}
+
+.condition-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.condition-grid > div {
+  background: #f3faf5;
+  border: 1px solid #dcefe3;
+  border-radius: 11px;
+  padding: 9px;
+}
+
+.condition-grid span {
+  display: block;
+  font-size: 9px;
+  color: #6b8978;
+  margin-bottom: 3px;
+}
+
+.condition-grid strong {
+  display: block;
+  font-size: 11px;
+  color: #236340;
+}
+
+/* =====================================================
+   AI RECOMMENDATIONS
+===================================================== */
+
+.ai-recommendations-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid #bde4d1;
+  border-radius: 17px;
+  padding: 16px;
+  box-shadow: 0 3px 12px rgba(24, 82, 51, 0.08);
+}
+
+/* HEADER */
+
+.recommendations-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.recommendations-title-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #e2f7e9;
+  color: #08763b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommendations-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #173f2c;
+}
+
+.recommendations-header p {
+  margin: 2px 0 0;
+  font-size: 10px;
+  color: #4f8b68;
+}
+
+/* =====================================================
+   RECOMMENDATION GRID
+===================================================== */
+
+.ai-recommendations-card .recommendations-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 10px;
+
+  align-items: start;
+
+  /* IMPORTANT */
+  grid-auto-rows: max-content;
+}
+
+/* =====================================================
+   INDIVIDUAL RECOMMENDATION CARD
+===================================================== */
+
+/*
+   IMPORTANT:
+   Keep this selector scoped to YieldPrediction.
+   This prevents AIRecommendations.css from
+   affecting these cards.
+*/
+
+.ai-recommendations-card .recommendation-card {
+  width: 100%;
+  min-width: 0;
+
+  /* Remove unwanted stretching */
+  height: auto !important;
+  min-height: 0 !important;
+
+  align-self: start;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  padding: 11px;
+
+  border-radius: 13px;
+
+  background: #f5faf7;
+  border: 1px solid #d8eee1;
+
+  box-sizing: border-box;
+
+  transition: transform 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+.ai-recommendations-card .recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(31, 100, 61, 0.08);
+}
+
+/* =====================================================
+   ICON
+===================================================== */
+
+.ai-recommendations-card .recommendation-icon {
+  width: 32px;
+  height: 32px;
+
+  flex: 0 0 32px;
+
+  border-radius: 9px;
+
+  background: #e0f4e7;
+  color: #08763b;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.ai-recommendations-card .recommendation-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.ai-recommendations-card .recommendation-content strong {
+  display: block;
+
+  font-size: 11.5px;
+
+  line-height: 1.25;
+
+  color: #1b6340;
+
+  margin-bottom: 3px;
+}
+
+.ai-recommendations-card .recommendation-content p {
+  margin: 0;
+
+  font-size: 10px;
+
+  line-height: 1.4;
+
+  color: #5b7667;
+}
+
+/* =====================================================
+   WARNING
+===================================================== */
+
+.ai-recommendations-card .recommendation-card.warning {
+  background: #fffaf0;
+  border-color: #f0ddb0;
+}
+
+.ai-recommendations-card
+.recommendation-card.warning
+.recommendation-icon {
+  background: #fff1c9;
+  color: #c68a00;
+}
+
+.ai-recommendations-card
+.recommendation-card.warning
+.recommendation-content strong {
+  color: #8a6400;
+}
+
+/* =====================================================
+   GOOD
+===================================================== */
+
+.ai-recommendations-card .recommendation-card.good {
+  background: #f3faf5;
+  border-color: #d5ebdc;
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.prediction-error {
+  width: 100%;
+
+  padding: 12px 15px;
+
+  background: #fff0f0;
+  border: 1px solid #f0b7b7;
+
+  color: #bd3434;
+  border-radius: 12px;
+
+  font-size: 12px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1100px) {
+  .yield-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 850px) {
+  .prediction-details,
+  .condition-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .prediction-form-grid,
+  .recommendations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prediction-form-card,
+  .prediction-result-card,
+  .input-summary-card,
+  .ai-recommendations-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 430px) {
+  .prediction-details,
+  .condition-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .prediction-number {
+    font-size: 36px;
+  }
+}

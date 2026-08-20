@@ -1,16 +1,53 @@
+# =========================
 # Python
+# =========================
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
 # Virtual Environment
 venv/
+.venv/
+env/
 
+# =========================
 # ML Models
+# =========================
 *.pkl
 *.joblib
 
+# =========================
 # Datasets
+# =========================
 datasets/*.csv
 
-# Environment
+# =========================
+# Environment / Secrets
+# =========================
 .env
+*.env
+
+# =========================
+# Node.js Dependencies
+# =========================
+node_modules/
+**/node_modules/
+
+# =========================
+# User Uploads
+# =========================
+backend/uploads/
+uploads/
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db

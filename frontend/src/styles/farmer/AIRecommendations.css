@@ -1,0 +1,312 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+.ai-recommendations-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  font-family: "DM Sans", sans-serif;
+  color: #173f2c;
+}
+
+/* =====================================================
+   TOP BANNER
+===================================================== */
+
+.recommendation-banner {
+  width: 100%;
+  padding: 20px 24px;
+  border-radius: 17px;
+  background: linear-gradient(135deg, #07833d, #4f9f00);
+  color: white;
+  margin-bottom: 22px;
+  box-shadow: 0 5px 15px rgba(0, 100, 49, 0.12);
+}
+
+.banner-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.banner-title svg {
+  color: #d5ff62;
+  flex-shrink: 0;
+}
+
+.banner-title h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.recommendation-banner > p {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* =====================================================
+   CROP RECOMMENDATION GRID
+===================================================== */
+
+.recommendation-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 20px;
+
+  /* VERY IMPORTANT */
+  align-items: start;
+}
+
+/* =====================================================
+   CROP CARD
+===================================================== */
+
+.ai-recommendations-page .recommendation-card {
+  width: 100%;
+  min-width: 0;
+
+  /* Prevent giant stretched cards */
+  height: auto !important;
+  min-height: 300px;
+
+  align-self: start;
+
+  padding: 20px;
+
+  border-radius: 17px;
+
+  background: #fffdf5;
+
+  border: 1px solid #f0d76a;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 4px 12px rgba(60, 90, 40, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ai-recommendations-page .recommendation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(60, 90, 40, 0.1);
+}
+
+/* =====================================================
+   CARD TOP
+===================================================== */
+
+.recommendation-card-top {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 13px;
+}
+
+.crop-icon-box {
+  width: 40px;
+  height: 40px;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #00853f;
+  color: #caff63;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.match-badge {
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  background: #d9f5e7;
+  color: #087c45;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+/* =====================================================
+   CROP NAME
+===================================================== */
+
+.ai-recommendations-page .recommendation-card h3 {
+  margin: 0;
+
+  font-size: 17px;
+
+  line-height: 1.3;
+
+  font-weight: 700;
+
+  color: #075f37;
+
+  word-break: normal;
+}
+
+.ai-recommendations-page .recommendation-card h3 span {
+  font-weight: 600;
+  color: #075f37;
+}
+
+/* =====================================================
+   EXPECTED YIELD
+===================================================== */
+
+.expected-yield {
+  margin: 7px 0 15px;
+
+  font-size: 12px;
+
+  color: #19894b;
+
+  line-height: 1.4;
+}
+
+.expected-yield strong {
+  color: #08763b;
+  font-weight: 700;
+}
+
+/* =====================================================
+   DETAILS
+===================================================== */
+
+.recommendation-details {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+}
+
+.recommendation-detail {
+  width: 100%;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 8px;
+
+  font-size: 11px;
+
+  line-height: 1.4;
+
+  color: #39815b;
+}
+
+.recommendation-detail svg {
+  width: 15px;
+  height: 15px;
+
+  flex-shrink: 0;
+
+  color: #0a9850;
+
+  margin-top: 1px;
+}
+
+.recommendation-detail span {
+  min-width: 0;
+}
+
+/* =====================================================
+   WHY BOX
+===================================================== */
+
+.recommendation-reason {
+  width: 100%;
+
+  margin-top: auto;
+
+  padding: 11px 12px;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.8);
+
+  color: #4e6d5c;
+
+  font-size: 10.5px;
+
+  line-height: 1.5;
+}
+
+.recommendation-reason strong {
+  color: #075f37;
+}
+
+/* =====================================================
+   CARD VARIATIONS
+===================================================== */
+
+/* BEST - Wheat */
+
+.ai-recommendations-page .recommendation-best {
+  background: #fffbea;
+  border-color: #efd35c;
+}
+
+/* GOOD - Mustard */
+
+.ai-recommendations-page .recommendation-good {
+  background: #fffbea;
+  border-color: #efd35c;
+}
+
+/* MEDIUM - Barley */
+
+.ai-recommendations-page .recommendation-medium {
+  background: #fff8f0;
+  border-color: #f1c99d;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+  .recommendation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .recommendation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recommendation-banner {
+    padding: 18px;
+  }
+
+  .ai-recommendations-page .recommendation-card {
+    min-height: 0;
+    padding: 17px;
+  }
+}

@@ -1,0 +1,795 @@
+.history-page {
+  width: 100%;
+  min-height: 100%;
+  font-family: "DM Sans", sans-serif;
+  color: #174b32;
+}
+
+/* =====================================================
+   TOP BAR
+===================================================== */
+
+.history-top {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
+.history-top p {
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #009c4b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.history-top p svg {
+  color: #00a650;
+}
+
+/* =====================================================
+   EXPORT BUTTON
+===================================================== */
+
+.export-button {
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 16px;
+
+  border: 1px solid #b8ebce;
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  color: #008b43;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.export-button:hover {
+  background: #effaf3;
+  border-color: #8edbb0;
+}
+
+.export-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   TABLE CARD
+===================================================== */
+
+.history-table-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #d7eee1;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  box-shadow: 0 3px 10px rgba(24, 82, 51, 0.07);
+}
+
+.history-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.history-table {
+  width: 100%;
+
+  min-width: 1050px;
+
+  border-collapse: collapse;
+
+  table-layout: auto;
+}
+
+.history-table thead {
+  background: #f0fbf4;
+}
+
+.history-table th {
+  padding: 14px 16px;
+
+  text-align: left;
+
+  color: #008b43;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.2px;
+
+  white-space: nowrap;
+
+  border-bottom: 1px solid #d8eee1;
+}
+
+.history-table td {
+  padding: 15px 16px;
+
+  font-size: 12px;
+
+  color: #087c43;
+
+  white-space: nowrap;
+
+  border-bottom: 1px solid #edf5f0;
+}
+
+.history-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.history-table tbody tr:hover {
+  background: #f9fdfb;
+}
+
+.history-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =====================================================
+   NUMBER
+===================================================== */
+
+.history-number {
+  color: #00a650 !important;
+
+  font-size: 11px !important;
+}
+
+/* =====================================================
+   CROP
+===================================================== */
+
+.crop-name {
+  color: #064d2c !important;
+
+  font-weight: 700;
+
+  font-size: 13px !important;
+}
+
+/* =====================================================
+   PREDICTED YIELD
+===================================================== */
+
+.predicted-yield {
+  color: #075c34 !important;
+
+  font-weight: 700;
+}
+
+/* =====================================================
+   CONFIDENCE
+===================================================== */
+
+.confidence-cell {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.confidence-track {
+  width: 58px;
+  height: 6px;
+
+  background: #e2f4e9;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+
+  background: #64c900;
+
+  border-radius: inherit;
+
+  transition: width 0.3s ease;
+}
+
+.confidence-cell span {
+  color: #008c43;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+/* =====================================================
+   CATEGORY
+===================================================== */
+
+.category-badge {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 58px;
+
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+.category-badge.high {
+  background: #d6f8e4;
+  color: #008848;
+}
+
+.category-badge.medium {
+  background: #fff0bd;
+  color: #a16a00;
+}
+
+.category-badge.low {
+  background: #ffe0e0;
+  color: #b52b2b;
+}
+
+/* ============================================================
+   PREDICTION HISTORY - ACTIONS COLUMN
+   ============================================================ */
+
+.prediction-history-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Actions column */
+.prediction-history-table th:last-child,
+.prediction-history-table td:last-child {
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+  text-align: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Keep the eye completely inside the cell */
+.actions-cell {
+  position: relative;
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+  height: 100%;
+  padding: 0 !important;
+
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+
+  overflow: hidden;
+}
+
+/* Eye button */
+.view-prediction-btn {
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #00b85c;
+  cursor: pointer;
+
+  border-radius: 50%;
+
+  position: relative;
+  z-index: 1;
+
+  box-sizing: border-box;
+}
+
+/* Hover */
+.view-prediction-btn:hover {
+  background: rgba(0, 184, 92, 0.08);
+  color: #00994d;
+}
+
+/* Prevent SVG from overflowing */
+.view-prediction-btn svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.history-loading {
+  min-height: 300px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #15804a;
+
+  font-size: 13px;
+}
+
+.history-loading p {
+  margin: 0;
+}
+
+.history-loading-icon {
+  color: #00a650;
+
+  animation: historySpin 0.9s linear infinite;
+}
+
+@keyframes historySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.history-error {
+  width: 100%;
+
+  margin-bottom: 15px;
+
+  padding: 12px 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  border: 1px solid #f2c0c0;
+
+  border-radius: 12px;
+
+  background: #fff4f4;
+
+  color: #b83232;
+
+  font-size: 12px;
+}
+
+.history-error button {
+  margin-left: auto;
+
+  border: none;
+
+  background: transparent;
+
+  color: #008c43;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.history-empty {
+  min-height: 280px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 30px;
+
+  border: 1px dashed #bde4ce;
+
+  border-radius: 16px;
+
+  background: #fbfefc;
+}
+
+.history-empty-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 12px;
+
+  border-radius: 16px;
+
+  background: #e7f8ed;
+
+  color: #00a650;
+}
+
+.history-empty h3 {
+  margin: 0 0 6px;
+
+  color: #174b32;
+
+  font-size: 16px;
+}
+
+.history-empty p {
+  max-width: 350px;
+
+  margin: 0;
+
+  color: #639079;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+/* =====================================================
+   MODAL OVERLAY
+===================================================== */
+
+.prediction-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(20, 35, 28, 0.48);
+
+  backdrop-filter: blur(5px);
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.prediction-modal {
+  width: min(620px, 100%);
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 25px 70px rgba(0, 50, 25, 0.22),
+    0 5px 20px rgba(0, 0, 0, 0.08);
+
+  animation: predictionModalIn 0.2s ease-out;
+}
+
+@keyframes predictionModalIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(10px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+/* =====================================================
+   MODAL HEADER
+===================================================== */
+
+.prediction-modal-header {
+  height: 68px;
+
+  padding: 0 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-bottom: 1px solid #dff1e6;
+}
+
+.prediction-modal-header h2 {
+  margin: 0;
+
+  color: #174b32;
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 18px;
+
+  font-weight: 700;
+}
+
+.modal-close-button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  color: #00b85a;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.modal-close-button:hover {
+  background: #edf9f1;
+
+  color: #008f46;
+}
+
+/* =====================================================
+   MODAL CONTENT
+===================================================== */
+
+.prediction-modal-content {
+  padding: 20px;
+}
+
+/* =====================================================
+   PREDICTED YIELD BOX
+===================================================== */
+
+.predicted-yield-box {
+  width: 100%;
+
+  padding: 18px 16px;
+
+  border-radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #00883e,
+    #008f45
+  );
+
+  color: white;
+
+  margin-bottom: 17px;
+}
+
+.predicted-yield-box p {
+  margin: 0 0 3px;
+
+  font-size: 12px;
+
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.predicted-yield-box h1 {
+  margin: 0;
+
+  font-size: 30px;
+
+  line-height: 1.15;
+
+  font-weight: 700;
+
+  color: white;
+}
+
+.predicted-yield-box span {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 11px;
+
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* =====================================================
+   DETAILS GRID
+===================================================== */
+
+.prediction-details-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 11px;
+}
+
+.detail-box {
+  min-width: 0;
+
+  padding: 12px;
+
+  border-radius: 14px;
+
+  background: #effaf3;
+}
+
+.detail-box span {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-size: 10px;
+
+  color: #00a650;
+}
+
+.detail-box strong {
+  display: block;
+
+  color: #145b36;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+/* =====================================================
+   AI RECOMMENDATION
+===================================================== */
+
+.modal-recommendation {
+  margin-top: 12px;
+
+  padding: 13px 14px;
+
+  border-radius: 14px;
+
+  background: #f3faf5;
+
+  border: 1px solid #d7eee0;
+}
+
+.modal-recommendation span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #00883f;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+.modal-recommendation p {
+  margin: 0;
+
+  color: #547564;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 700px) {
+
+  .history-top {
+    align-items: flex-start;
+
+    gap: 10px;
+  }
+
+  .prediction-modal-overlay {
+    padding: 12px;
+  }
+
+  .prediction-modal {
+    max-height: 94vh;
+
+    border-radius: 16px;
+  }
+
+  .prediction-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prediction-modal-content {
+    padding: 15px;
+  }
+
+  .predicted-yield-box h1 {
+    font-size: 26px;
+  }
+}

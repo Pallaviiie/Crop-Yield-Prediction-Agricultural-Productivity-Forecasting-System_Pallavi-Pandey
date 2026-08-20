@@ -1,28 +1,22 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Authentication
+// ================= AUTHENTICATION =================
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
-// Home
+// ================= HOME =================
 import Home from "./pages/Home";
 
-// Farmer
-import FarmerLayout from "./layouts/FarmerLayout";
-import Dashboard from "./pages/farmer/Dashboard";
-import History from "./pages/farmer/History";
+// ================= FARMER =================
+import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 
-// Admin
-import AdminLayout from "./layouts/AdminLayout";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-
-// Consultant
-import ConsultantLayout from "./layouts/ConsultantLayout";
+// ================= CONSULTANT =================
 import ConsultantDashboard from "./pages/consultant/ConsultantDashboard";
 
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
         {/* ================= HOME ================= */}
@@ -31,6 +25,7 @@ function App() {
           path="/"
           element={<Home />}
         />
+
 
         {/* ================= AUTHENTICATION ================= */}
 
@@ -47,45 +42,21 @@ function App() {
 
         {/* ================= FARMER ================= */}
 
-        <Route element={<FarmerLayout />}>
-
-          <Route
-            path="/dashboard"
-            element={<Dashboard />}
-          />
-
-          <Route
-            path="/history"
-            element={<History />}
-          />
-
-        </Route>
-
-
-        {/* ================= ADMIN ================= */}
-
-        <Route element={<AdminLayout />}>
-
-          <Route
-            path="/admin-dashboard"
-            element={<AdminDashboard />}
-          />
-
-        </Route>
+        <Route
+          path="/dashboard"
+          element={<FarmerDashboard />}
+        />
 
 
         {/* ================= CONSULTANT ================= */}
 
-        <Route element={<ConsultantLayout />}>
-
-          <Route
-            path="/consultant-dashboard"
-            element={<ConsultantDashboard />}
-          />
-
-        </Route>
+        <Route
+          path="/consultant-dashboard"
+          element={<ConsultantDashboard />}
+        />
 
       </Routes>
+
     </BrowserRouter>
   );
 }

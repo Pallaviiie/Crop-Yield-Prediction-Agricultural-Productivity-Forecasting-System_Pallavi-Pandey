@@ -1,0 +1,170 @@
+.insights-page {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  padding: 22px 24px;
+  background: #f4f8f6;
+  box-sizing: border-box;
+}
+
+.insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.insight-card {
+  padding: 20px 22px;
+  border-radius: 18px;
+  border: 1px solid #cfe4d7;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(35, 91, 57, 0.06);
+}
+
+.insight-card.irrigation {
+  background: linear-gradient(
+    90deg,
+    #f1f7ff 0%,
+    #eef4ff 100%
+  );
+  border-color: #b8d2ef;
+}
+
+.insight-card.fertilizer {
+  background: linear-gradient(
+    90deg,
+    #f1fbf5 0%,
+    #f6fcf8 100%
+  );
+  border-color: #b9e2c8;
+}
+
+.insight-card.warning {
+  background: linear-gradient(
+    90deg,
+    #fff9ea 0%,
+    #fffdf6 100%
+  );
+  border-color: #efd18a;
+}
+
+.insight-card.improvement {
+  background: linear-gradient(
+    90deg,
+    #f8fce9 0%,
+    #fbfdf5 100%
+  );
+  border-color: #d2df9d;
+}
+
+.insight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.insight-title-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.insight-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+}
+
+.irrigation .insight-icon {
+  background: #e0ecfb;
+  color: #3773c9;
+}
+
+.fertilizer .insight-icon {
+  background: #e1f5e7;
+  color: #1c8447;
+}
+
+.warning .insight-icon {
+  background: #fff2d5;
+  color: #dc8a17;
+}
+
+.improvement .insight-icon {
+  background: #edf6cf;
+  color: #669c17;
+}
+
+.insight-title-section h2 {
+  margin: 0;
+  color: #2c4c3b;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.insight-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: #fff1cf;
+  color: #9c6820;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fertilizer .insight-badge {
+  background: #e4f4e9;
+  color: #397650;
+}
+
+.improvement .insight-badge {
+  background: #e4f3e9;
+  color: #397650;
+}
+
+.insight-points {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.insight-point {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #365c49;
+  font-size: 15px;
+}
+
+.insight-point svg {
+  min-width: 17px;
+  color: #26a05a;
+}
+
+@media (max-width: 768px) {
+  .insights-page {
+    padding: 16px;
+  }
+
+  .insight-card {
+    padding: 16px;
+  }
+
+  .insight-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .insight-title-section h2 {
+    font-size: 16px;
+  }
+
+  .insight-point {
+    align-items: flex-start;
+    font-size: 14px;
+  }
+}

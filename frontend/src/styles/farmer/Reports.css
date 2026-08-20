@@ -1,0 +1,456 @@
+@import url(
+  "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+);
+
+
+.reports-page {
+
+  width: 100%;
+
+  min-height: 100%;
+
+  padding: 24px;
+
+  font-family: "DM Sans", sans-serif;
+
+  color: #183d2a;
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.reports-header {
+
+  margin-bottom: 24px;
+
+}
+
+.reports-header h1 {
+
+  margin: 0;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  color: #174b32;
+
+}
+
+.reports-header p {
+
+  margin-top: 6px;
+
+  font-size: 13px;
+
+  color: #5b806c;
+
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.report-tabs {
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-bottom: 22px;
+
+  border-bottom: 1px solid #d9eee0;
+
+}
+
+
+.report-tab {
+
+  border: none;
+
+  background: transparent;
+
+  padding: 12px 18px;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #5b806c;
+
+  cursor: pointer;
+
+  border-bottom: 3px solid transparent;
+
+}
+
+
+.report-tab:hover {
+
+  color: #078b4b;
+
+}
+
+
+.report-tab.active {
+
+  color: #078b4b;
+
+  border-bottom-color: #078b4b;
+
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.report-summary-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-bottom: 20px;
+
+}
+
+
+.report-stat-card {
+
+  background: white;
+
+  border: 1px solid #cdebd9;
+
+  border-radius: 16px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 3px 12px rgba(24, 82, 51, 0.06);
+
+}
+
+
+.report-stat-card span {
+
+  display: block;
+
+  font-size: 12px;
+
+  color: #668976;
+
+  margin-bottom: 10px;
+
+}
+
+
+.report-stat-card strong {
+
+  display: block;
+
+  font-size: 24px;
+
+  color: #087b46;
+
+}
+
+
+.report-stat-card small {
+
+  font-size: 11px;
+
+  font-weight: 500;
+
+}
+
+
+.text-value {
+
+  font-size: 18px !important;
+
+}
+
+
+/* =========================================================
+   REPORT CARD
+========================================================= */
+
+.report-card {
+
+  background: white;
+
+  border: 1px solid #cdebd9;
+
+  border-radius: 16px;
+
+  padding: 20px;
+
+  margin-bottom: 20px;
+
+  box-shadow:
+    0 3px 12px rgba(24, 82, 51, 0.06);
+
+}
+
+
+.report-card h2 {
+
+  margin: 0;
+
+  font-size: 16px;
+
+  color: #174b32;
+
+}
+
+
+.report-card p {
+
+  margin: 5px 0 15px;
+
+  font-size: 12px;
+
+  color: #6b8c78;
+
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.report-chart {
+
+  width: 100%;
+
+  height: 300px;
+
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.report-table {
+
+  width: 100%;
+
+}
+
+
+.table-header,
+.table-row {
+
+  display: grid;
+
+  grid-template-columns:
+    2fr 1fr 1fr;
+
+  align-items: center;
+
+  padding: 13px 10px;
+
+}
+
+
+.table-header {
+
+  background: #f0f9f3;
+
+  border-radius: 8px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  color: #397158;
+
+}
+
+
+.table-row {
+
+  border-bottom: 1px solid #edf5ef;
+
+  font-size: 13px;
+
+  color: #315d45;
+
+}
+
+
+.table-row:last-child {
+
+  border-bottom: none;
+
+}
+
+
+/* =========================================================
+   SEASONAL
+========================================================= */
+
+.seasonal-section {
+
+  width: 100%;
+
+}
+
+
+.best-season-card {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  background: #eaf8ee;
+
+  border: 1px solid #c8ead4;
+
+  border-radius: 16px;
+
+  padding: 20px;
+
+}
+
+
+.best-season-card span {
+
+  font-size: 12px;
+
+  color: #54806a;
+
+}
+
+
+.best-season-card strong {
+
+  font-size: 24px;
+
+  color: #078b4b;
+
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-report {
+
+  background: white;
+
+  border: 1px solid #cdebd9;
+
+  border-radius: 16px;
+
+  padding: 50px 30px;
+
+  text-align: center;
+
+}
+
+
+.empty-report h2 {
+
+  margin: 0 0 8px;
+
+  color: #174b32;
+
+}
+
+
+.empty-report p {
+
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #668976;
+
+}
+
+
+/* =========================================================
+   LOADING / ERROR
+========================================================= */
+
+.reports-loading,
+.reports-error {
+
+  padding: 50px;
+
+  text-align: center;
+
+  font-size: 14px;
+
+}
+
+
+.reports-error {
+
+  color: #c0392b;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .report-summary-grid {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .reports-page {
+
+    padding: 15px;
+
+  }
+
+  .report-summary-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  .report-tabs {
+
+    overflow-x: auto;
+
+  }
+
+  .table-header,
+  .table-row {
+
+    grid-template-columns:
+      1.5fr 1fr 1fr;
+
+    font-size: 11px;
+
+  }
+
+}

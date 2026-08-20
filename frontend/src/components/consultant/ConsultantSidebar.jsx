@@ -1,99 +1,77 @@
+import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Users,
-  Sprout,
-  CloudSun,
-  FlaskConical,
-  Wheat,
-  Lightbulb,
-  FileBarChart2,
-  History,
+  BarChart3,
+  FileText,
+  Home,
   MessageSquare,
-  Settings,
+  Users,
   LogOut,
+  Sprout,
 } from "lucide-react";
 
-const menu = [
-  { icon: LayoutDashboard, label: "Dashboard" },
-  { icon: Users, label: "My Farmers" },
-  { icon: Sprout, label: "Field Monitoring" },
-  { icon: Wheat, label: "Crop Analysis" },
-  { icon: CloudSun, label: "Weather Insights" },
-  { icon: FlaskConical, label: "Soil Analysis" },
-  { icon: Wheat, label: "Fertilizer Advisory" },
-  { icon: Lightbulb, label: "Recommendations" },
-  { icon: FileBarChart2, label: "Reports" },
-  { icon: History, label: "Consultation History" },
-  { icon: MessageSquare, label: "Messages" },
-  { icon: Settings, label: "Settings" },
+const items = [
+  { label: "Dashboard", path: "/consultant-dashboard", icon: Home },
+  { label: "Farmer Management", path: "/consultant/farmers", icon: Users },
+  { label: "Consultations", path: "/consultant/consultations", icon: MessageSquare },
+  { label: "Analytics", path: "/consultant/analytics", icon: BarChart3 },
+  { label: "My Notes", path: "/consultant/notes", icon: FileText },
 ];
 
-export default function ConsultantSidebar() {
+export default function ConsultantSidebar({ collapsed }) {
+  const navigate = useNavigate();
+  const userName = localStorage.getItem("user_name") || "Shivam Dagar";
+  const initial = userName.charAt(0).toUpperCase();
+
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("user_role");
+    navigate("/login");
+  };
+
   return (
-    <aside className="w-72 bg-white border-r min-h-screen flex flex-col justify-between">
-
-      {/* Logo */}
-      <div>
-
-        <div className="p-8 border-b">
-
-          <h1 className="text-4xl font-bold text-green-700">
-            YieldSense AI
-          </h1>
-
-          <p className="text-gray-500 mt-2">
-            Smart Farming, Better Future
-          </p>
-
+    <aside className={`ys-sidebar ${collapsed ? "collapsed" : ""}`}>
+      <div className="ys-brand">
+        <div className="ys-brand-logo">
+          <Sprout size={18} />
         </div>
-
-        {/* Menu */}
-
-        <div className="p-4 space-y-2">
-
-          {menu.map((item, index) => {
-
-            const Icon = item.icon;
-
-            return (
-
-              <button
-                key={index}
-                className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all
-                ${
-                  index === 0
-                    ? "bg-green-600 text-white shadow-lg"
-                    : "hover:bg-green-50 text-gray-700"
-                }`}
-              >
-                <Icon size={22} />
-
-                <span className="font-medium">
-                  {item.label}
-                </span>
-
-              </button>
-
-            );
-          })}
+        <div className="ys-brand-copy">
+          <strong>YieldSense</strong>
+          <span>AI</span>
         </div>
-
       </div>
 
-      {/* Logout */}
+      <nav className="ys-sidebar-nav">
+        {items.map(({ label, path, icon: Icon }) => (
+          <NavLink
+            key={path}
+            to={path}
+            title={collapsed ? label : undefined}
+            className={({ isActive }) =>
+              `ys-nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <Icon size={19} strokeWidth={1.9} />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+      </nav>
 
-      <div className="p-5 border-t">
+      <div className="ys-sidebar-bottom">
+        <div className="ys-side-user">
+          <div className="ys-avatar">{initial}</div>
+          <div className="ys-side-user-copy">
+            <strong>{userName}</strong>
+            <span>Consultant</span>
+          </div>
+        </div>
 
-        <button className="w-full flex items-center justify-center gap-3 py-4 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition">
-
-          <LogOut size={20} />
-
-          Logout
-
+        <button className="ys-logout" onClick={logout} title={collapsed ? "Logout" : undefined}>
+          <LogOut size={18} />
+          <span>Logout</span>
         </button>
-
       </div>
-
     </aside>
   );
 }
