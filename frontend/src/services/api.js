@@ -324,6 +324,25 @@ export const predictCropYield = async (predictionData) => {
   return data;
 };
 
+export const assessFarmRisk = async (riskData) => {
+  const response = await fetch(
+    "http://127.0.0.1:8000/risk-assessment/",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(riskData),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Unable to assess farm risk.");
+  }
+
+  return response.json();
+};
+
 // ==========================================
 // PREDICTION HISTORY
 // ==========================================

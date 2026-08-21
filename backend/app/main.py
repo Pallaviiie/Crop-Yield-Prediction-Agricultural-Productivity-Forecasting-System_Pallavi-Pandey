@@ -30,6 +30,7 @@ from app.routers.chat import router as chat_router
 from app.routers.analytics import router as analytics_router
 from app.routers.recommendation import router as recommendation_router
 from app.routers.reports import router as reports_router
+from app.routers import risk_assessment
 
 
 # ============================================================
@@ -98,7 +99,7 @@ app.include_router(chat_router)
 app.include_router(analytics_router)
 app.include_router(recommendation_router)
 app.include_router(reports_router)
-
+app.include_router(risk_assessment.router)
 
 
 # ============================================================

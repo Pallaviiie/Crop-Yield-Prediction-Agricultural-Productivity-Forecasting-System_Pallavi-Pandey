@@ -14,7 +14,7 @@
 .yield-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: 20px;
   align-items: start;
 }
@@ -363,7 +363,7 @@
 
 .prediction-details {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
   margin-top: 13px;
 }
@@ -511,6 +511,427 @@
   color: #4f8b68;
 }
 
+/* =====================================================
+   FARM OPTIMIZATION
+===================================================== */
+
+.optimization-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #bde4d1;
+  border-radius: 17px;
+  padding: 17px;
+  box-shadow: 0 4px 14px rgba(24, 82, 51, 0.07);
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.optimization-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.optimization-title-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e2f7e9;
+  color: #08763b;
+}
+
+.optimization-header h3 {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color: #173f2c;
+}
+
+.optimization-header p {
+  margin: 3px 0 0;
+
+  font-size: 10px;
+  color: #5d866f;
+}
+
+/* =========================
+   SCORE
+========================= */
+
+.optimization-score-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #f2fbf5,
+    #e9f8ef
+  );
+
+  border: 1px solid #d2ebdb;
+
+  margin-bottom: 12px;
+}
+
+.optimization-score-circle {
+  width: 78px;
+  height: 78px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: white;
+
+  border: 6px solid #0b8a46;
+
+  box-shadow: 0 3px 10px rgba(11, 138, 70, 0.08);
+}
+
+.optimization-score-number {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #08783b;
+}
+
+.optimization-score-circle span {
+  margin-top: 2px;
+
+  font-size: 8px;
+  color: #6a8978;
+}
+
+.optimization-score-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.optimization-score-content strong {
+  display: block;
+
+  font-size: 13px;
+  color: #1c613f;
+
+  margin-bottom: 4px;
+}
+
+.optimization-score-content p {
+  margin: 0 0 9px;
+
+  font-size: 9.5px;
+  line-height: 1.45;
+
+  color: #63806f;
+}
+
+/* =========================
+   SCORE BAR
+========================= */
+
+.optimization-score-bar {
+  width: 100%;
+  height: 7px;
+
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background: #d8ebdf;
+}
+
+.optimization-score-fill {
+  height: 100%;
+
+  border-radius: 20px;
+
+  background: #0b8a46;
+
+  transition: width 0.5s ease;
+}
+
+.optimization-score-fill.moderate {
+  background: #d69a18;
+}
+
+.optimization-score-fill.poor {
+  background: #d94c4c;
+}
+
+.optimization-score-fill.good {
+  background: #0b8a46;
+}
+
+.optimization-score-fill.excellent {
+  background: #08783b;
+}
+
+/* =========================
+   PRIORITY SUMMARY
+========================= */
+
+.priority-summary {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: 8px;
+
+  margin-bottom: 13px;
+}
+
+.priority-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 9px;
+
+  border-radius: 10px;
+
+  font-size: 9px;
+}
+
+.priority-item span {
+  flex: 1;
+}
+
+.priority-item strong {
+  font-size: 12px;
+}
+
+.priority-item.high {
+  background: #fff2f2;
+  color: #b93636;
+  border: 1px solid #f0cccc;
+}
+
+.priority-item.medium {
+  background: #fff9eb;
+  color: #a87300;
+  border: 1px solid #f0ddb0;
+}
+
+.priority-item.low {
+  background: #eff9f2;
+  color: #267347;
+  border: 1px solid #d1ead8;
+}
+
+/* =========================
+   OPTIMIZATION GRID
+========================= */
+
+.optimization-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+/* =========================
+   ADVICE CARD
+========================= */
+
+.optimization-advice-card {
+  min-width: 0;
+
+  padding: 12px;
+
+  border-radius: 13px;
+
+  border: 1px solid #dcefe3;
+
+  background: #f7fbf8;
+}
+
+.optimization-advice-card.high {
+  background: #fff9f9;
+  border-color: #efd0d0;
+}
+
+.optimization-advice-card.medium {
+  background: #fffdf5;
+  border-color: #f0e1b8;
+}
+
+.optimization-advice-card.good {
+  background: #f4faf6;
+  border-color: #d5ebdc;
+}
+
+/* =========================
+   ADVICE TOP
+========================= */
+
+.optimization-advice-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 10px;
+}
+
+.optimization-advice-icon {
+  width: 32px;
+  height: 32px;
+
+  flex: 0 0 32px;
+
+  border-radius: 9px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e0f4e7;
+  color: #08763b;
+}
+
+.optimization-advice-card.high
+.optimization-advice-icon {
+  background: #ffe4e4;
+  color: #bd3b3b;
+}
+
+.optimization-advice-card.medium
+.optimization-advice-icon {
+  background: #fff0c9;
+  color: #b57a00;
+}
+
+.optimization-advice-heading {
+  min-width: 0;
+  flex: 1;
+}
+
+.optimization-advice-heading strong {
+  display: block;
+
+  font-size: 11px;
+  line-height: 1.25;
+
+  color: #1b6340;
+}
+
+.optimization-advice-heading span {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 8.5px;
+
+  color: #789383;
+}
+
+/* =========================
+   PRIORITY BADGE
+========================= */
+
+.priority-badge {
+  flex-shrink: 0;
+
+  padding: 4px 7px;
+
+  border-radius: 20px;
+
+  font-size: 7.5px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+}
+
+.priority-badge.high {
+  background: #ffe1e1;
+  color: #b52f2f;
+}
+
+.priority-badge.medium {
+  background: #ffefc4;
+  color: #9c6a00;
+}
+
+.priority-badge.low {
+  background: #dff2e5;
+  color: #267347;
+}
+
+/* =========================
+   RECOMMENDED ACTION
+========================= */
+
+.optimization-action {
+  padding: 9px;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.8);
+
+  margin-bottom: 7px;
+}
+
+.optimization-action span,
+.optimization-reason span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  color: #5b806c;
+}
+
+.optimization-action p,
+.optimization-reason p {
+  margin: 0;
+
+  font-size: 9.5px;
+  line-height: 1.45;
+
+  color: #466957;
+}
+
+/* =========================
+   WHY THIS MATTERS
+========================= */
+
+.optimization-reason {
+  padding: 8px 9px;
+
+  border-top: 1px solid rgba(130, 170, 145, 0.18);
+}
+
+.optimization-reason p {
+  color: #698073;
+}
 /* =====================================================
    RECOMMENDATION GRID
 ===================================================== */
@@ -675,14 +1096,162 @@
 }
 
 /* =========================
-   RESPONSIVE
+   RISK ASSESSMENT
 ========================= */
 
-@media (max-width: 1100px) {
-  .yield-grid {
-    grid-template-columns: 1fr;
-  }
+.risk-assessment-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #cdebd9;
+  border-radius: 17px;
+  padding: 16px;
+  box-shadow: 0 3px 12px rgba(24, 82, 51, 0.06);
 }
+
+.risk-assessment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.risk-assessment-header h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #173f2c;
+}
+
+.risk-assessment-header p {
+  margin: 3px 0 0;
+  font-size: 10px;
+  color: #5b7c69;
+}
+
+.overall-risk-badge {
+  min-width: 75px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.overall-risk-badge strong {
+  font-size: 15px;
+}
+
+.overall-risk-badge span {
+  margin-top: 2px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.overall-risk-badge.low {
+  background: #e9f8ee;
+  color: #08763b;
+}
+
+.overall-risk-badge.moderate {
+  background: #fff5dd;
+  color: #b87900;
+}
+
+.overall-risk-badge.high {
+  background: #fff0f0;
+  color: #c43434;
+}
+
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.risk-item {
+  min-width: 0;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #dcefe3;
+  background: #f7fbf8;
+}
+
+.risk-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.risk-item-header strong {
+  font-size: 11px;
+  color: #234c36;
+}
+
+.risk-item-header span {
+  padding: 4px 7px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.risk-item p {
+  margin: 8px 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: #607c6d;
+}
+
+.risk-score {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.risk-item.low {
+  border-color: #ccebd7;
+  background: #f3fbf6;
+}
+
+.risk-item.low .risk-item-header span {
+  background: #e2f7e9;
+  color: #08763b;
+}
+
+.risk-item.low .risk-score {
+  color: #08763b;
+}
+
+.risk-item.moderate {
+  border-color: #f0ddb0;
+  background: #fffaf0;
+}
+
+.risk-item.moderate .risk-item-header span {
+  background: #fff1c9;
+  color: #a56f00;
+}
+
+.risk-item.moderate .risk-score {
+  color: #a56f00;
+}
+
+.risk-item.high {
+  border-color: #f1c4c4;
+  background: #fff7f7;
+}
+
+.risk-item.high .risk-item-header span {
+  background: #ffe1e1;
+  color: #c43434;
+}
+
+.risk-item.high .risk-score {
+  color: #c43434;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 850px) {
   .prediction-details,
@@ -692,8 +1261,10 @@
 }
 
 @media (max-width: 650px) {
+
   .prediction-form-grid,
-  .recommendations-grid {
+  .recommendations-grid,
+  .risk-grid {
     grid-template-columns: 1fr;
   }
 
@@ -703,6 +1274,7 @@
   .ai-recommendations-card {
     padding: 15px;
   }
+
 }
 
 @media (max-width: 430px) {
