@@ -12,6 +12,7 @@ import {
   Menu,
   LogOut,
   UserCircle,
+  MessageCircle,
   FileText,
 } from "lucide-react";
 
@@ -96,14 +97,15 @@ const FarmerSidebar = ({
 
   const menuItems = [
     { name: "Dashboard", icon: Home },
-    { name: "Yield Prediction", icon: Target },
     { name: "Weather Forecast", icon: Cloud },
+    { name: "Yield Prediction", icon: Target },
     { name: "AI Recommendations", icon: Zap },
+    { name: "AI Insights", icon: Activity },
     { name: "Soil Health", icon: Gauge },
     { name: "Analytics", icon: BarChart3 },
     { name: "Reports", icon: FileText },
     { name: "Prediction History", icon: History },
-    { name: "AI Insights", icon: Activity },
+    {name: "Chat Expert", icon: MessageCircle },
     { name: "Profile", icon: UserCircle },
   ];
 

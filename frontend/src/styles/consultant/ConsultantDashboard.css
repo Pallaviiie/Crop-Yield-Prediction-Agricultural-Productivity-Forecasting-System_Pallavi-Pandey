@@ -525,3 +525,754 @@
   }
 
 }
+
+/* =========================================================
+   CONSULTANT PAGES - SHARED
+========================================================= */
+
+.ys-page-row {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 18px;
+}
+
+.ys-count {
+  color: #4b8065;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   COMMON CARD
+========================================================= */
+
+.ys-card {
+  background: #ffffff;
+
+  border: 1px solid #d9eee0;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 2px 7px rgba(0, 100, 50, 0.07);
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.ys-primary {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: none;
+
+  background: #008d43;
+
+  color: #ffffff;
+
+  border-radius: 10px;
+
+  padding: 9px 15px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ys-primary:hover {
+  background: #007638;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px rgba(0, 141, 67, 0.18);
+}
+
+.ys-primary:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   FARMER MANAGEMENT
+========================================================= */
+
+.ys-table-card {
+  width: 100%;
+
+  overflow-x: auto;
+
+  padding: 0;
+}
+
+.ys-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 900px;
+}
+
+
+/* Table Header */
+
+.ys-table thead {
+  background: #f5fbf7;
+}
+
+.ys-table th {
+  padding: 14px 17px;
+
+  text-align: left;
+
+  color: #5a826d;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.5px;
+
+  border-bottom: 1px solid #d9eee0;
+
+  white-space: nowrap;
+}
+
+
+/* Table Body */
+
+.ys-table td {
+  padding: 15px 17px;
+
+  color: #3f6853;
+
+  font-size: 12px;
+
+  border-bottom: 1px solid #edf6f0;
+
+  vertical-align: middle;
+}
+
+.ys-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.ys-table tbody tr:hover {
+  background: #f8fcf9;
+}
+
+.ys-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* =========================================================
+   FARMER CELL
+========================================================= */
+
+.ys-farmer {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  min-width: 190px;
+}
+
+.ys-avatar {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e4f5e9;
+
+  color: #08733c;
+
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+.ys-farmer div:last-child {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.ys-farmer strong {
+  color: #07552d;
+
+  font-size: 12px;
+
+  font-weight: 650;
+}
+
+.ys-farmer small {
+  color: #78a08a;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.ys-status {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 57px;
+
+  padding: 5px 9px;
+
+  border-radius: 12px;
+
+  background: #dcfce7;
+
+  color: #168347;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  text-transform: capitalize;
+}
+
+.ys-status.inactive {
+  background: #f3f4f6;
+
+  color: #7b8086;
+}
+
+
+/* =========================================================
+   TABLE ACTIONS
+========================================================= */
+
+.ys-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.ys-action {
+  width: 31px;
+  height: 31px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #dceee3;
+
+  background: #f8fcf9;
+
+  color: #08763d;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.ys-action:hover {
+  background: #e7f7ec;
+
+  border-color: #bfe3cb;
+
+  color: #07552d;
+}
+
+
+/* =========================================================
+   EMPTY / PLACEHOLDER PAGES
+========================================================= */
+
+.ys-empty-card {
+  min-height: 350px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 40px;
+}
+
+.ys-empty-card > div {
+  max-width: 430px;
+}
+
+.ys-empty-icon {
+  width: 62px;
+  height: 62px;
+
+  margin: 0 auto 17px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 18px;
+
+  background: #e8f7ed;
+
+  color: #008d43;
+}
+
+.ys-empty-card h2 {
+  margin: 0 0 8px;
+
+  color: #07552d;
+
+  font-size: 19px;
+
+  font-weight: 650;
+}
+
+.ys-empty-card p {
+  margin: 0;
+
+  color: #69927b;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   ANALYTICS
+========================================================= */
+
+.ys-analytics-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
+
+  gap: 20px;
+
+  width: 100%;
+}
+
+.ys-analytics-card {
+  min-height: 330px;
+
+  padding: 21px;
+}
+
+.ys-card-title {
+  margin: 0 0 22px;
+
+  color: #07552d;
+
+  font-size: 14px;
+
+  font-weight: 650;
+}
+
+
+/* =========================================================
+   PIE CHART
+========================================================= */
+
+.ys-pie-wrap {
+  min-height: 240px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 35px;
+}
+
+.ys-pie {
+  width: 175px;
+  height: 175px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background:
+    conic-gradient(
+      #d6a62a 0% 32%,
+      #278b51 32% 60%,
+      #6eb52c 60% 78%,
+      #e48b24 78% 90%,
+      #a8c9b3 90% 100%
+    );
+
+  box-shadow:
+    inset 0 0 0 8px #ffffff;
+}
+
+
+/* Pie Legend */
+
+.ys-pie-legend {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.ys-pie-label {
+  position: relative;
+
+  padding-left: 16px;
+
+  color: #547866;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+.ys-pie-label::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  transform: translateY(-50%);
+
+  border-radius: 50%;
+}
+
+.ys-pie-label.wheat::before {
+  background: #d6a62a;
+}
+
+.ys-pie-label.rice::before {
+  background: #278b51;
+}
+
+.ys-pie-label.maize::before {
+  background: #6eb52c;
+}
+
+.ys-pie-label.cotton::before {
+  background: #e48b24;
+}
+
+.ys-pie-label.other::before {
+  background: #a8c9b3;
+}
+
+
+/* =========================================================
+   LINE CHART
+========================================================= */
+
+.ys-line-chart {
+  width: 100%;
+
+  height: 235px;
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.ys-line-chart svg {
+  width: 100%;
+
+  height: 100%;
+
+  display: block;
+}
+
+.ys-grid-line {
+  stroke: #dceee3;
+
+  stroke-width: 1;
+
+  stroke-dasharray: 4 4;
+}
+
+.ys-line {
+  fill: none;
+
+  stroke: #008d43;
+
+  stroke-width: 3;
+
+  stroke-linecap: round;
+
+  stroke-linejoin: round;
+}
+
+
+/* Chart Legend */
+
+.ys-line-legend {
+  margin-top: 3px;
+
+  color: #6b927d;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   CONSULTATION PAGE
+========================================================= */
+
+.ys-consultations {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 15px;
+}
+
+.ys-consultation-item {
+  padding: 17px;
+
+  border: 1px solid #d9eee0;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 7px rgba(0, 100, 50, 0.05);
+}
+
+.ys-consultation-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 15px;
+}
+
+.ys-consultation-header strong {
+  color: #07552d;
+
+  font-size: 13px;
+}
+
+.ys-consultation-meta {
+  margin-top: 6px;
+
+  color: #729681;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   NOTES
+========================================================= */
+
+.ys-notes-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 17px;
+}
+
+.ys-note-card {
+  padding: 18px;
+
+  border: 1px solid #d9eee0;
+
+  border-radius: 15px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 7px rgba(0, 100, 50, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ys-note-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 5px 14px rgba(0, 100, 50, 0.10);
+}
+
+.ys-note-card h3 {
+  margin: 0 0 8px;
+
+  color: #07552d;
+
+  font-size: 14px;
+}
+
+.ys-note-card p {
+  margin: 0;
+
+  color: #668b76;
+
+  font-size: 11px;
+
+  line-height: 1.6;
+}
+
+.ys-note-date {
+  display: block;
+
+  margin-top: 12px;
+
+  color: #91ad9d;
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+.ys-table-card::-webkit-scrollbar {
+  height: 7px;
+}
+
+.ys-table-card::-webkit-scrollbar-track {
+  background: #f2f8f4;
+}
+
+.ys-table-card::-webkit-scrollbar-thumb {
+  background: #b9d9c4;
+
+  border-radius: 10px;
+}
+
+.ys-table-card::-webkit-scrollbar-thumb:hover {
+  background: #8fbea0;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .ys-analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ys-notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .ys-page-row {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .ys-primary {
+    width: 100%;
+  }
+
+  .ys-analytics-card {
+    padding: 16px;
+  }
+
+  .ys-pie-wrap {
+    flex-direction: column;
+
+    gap: 20px;
+  }
+
+  .ys-pie {
+    width: 145px;
+    height: 145px;
+  }
+
+  .ys-empty-card {
+    min-height: 280px;
+
+    padding: 25px 18px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL SCREEN TABLE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .ys-table-card {
+    border-radius: 12px;
+  }
+
+  .ys-table {
+    min-width: 820px;
+  }
+
+}

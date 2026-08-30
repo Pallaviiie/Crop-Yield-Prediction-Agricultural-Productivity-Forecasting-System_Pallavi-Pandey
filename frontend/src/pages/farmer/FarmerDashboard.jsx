@@ -3,14 +3,15 @@ import { useState } from "react";
 import FarmerLayout from "../../components/farmer/FarmerLayout";
 
 import Dashboard from "./Dashboard";
-import YieldPrediction from "./YieldPrediction";
 import WeatherForecast from "./WeatherForecast";
+import YieldPrediction from "./YieldPrediction";
 import AIRecommendations from "./AIRecommendations";
+import AIInsights from "./AIInsights";
 import SoilHealth from "./SoilHealth";
 import Analytics from "./Analytics";
 import Reports from "./Reports";
 import PredictionHistory from "./PredictionHistory";
-import AIInsights from "./AIInsights";
+import ChatExpert from "./ChatExpert";
 import Profile from "./Profile";
 
 const FarmerDashboard = () => {
@@ -21,14 +22,17 @@ const FarmerDashboard = () => {
       case "Dashboard":
         return <Dashboard setActivePage={setActivePage} />;
 
+      case "Weather Forecast":
+        return <WeatherForecast />;
+      
       case "Yield Prediction":
         return <YieldPrediction />;
 
-      case "Weather Forecast":
-        return <WeatherForecast />;
-
       case "AI Recommendations":
         return <AIRecommendations />;
+      
+      case "AI Insights":
+        return <AIInsights />;
 
       case "Soil Health":
         return <SoilHealth />;
@@ -42,8 +46,8 @@ const FarmerDashboard = () => {
       case "Prediction History":
         return <PredictionHistory />;
 
-      case "AI Insights":
-        return <AIInsights />;
+      case "Chat Expert":
+        return <ChatExpert />;
 
       case "Profile":
         return <Profile />;

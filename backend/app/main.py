@@ -27,10 +27,12 @@ from app.routers.prediction import router as prediction_router
 from app.routers.dataset import router as dataset_router
 from app.routers.weather import router as weather_router
 from app.routers.chat import router as chat_router
+from app.routers import consultant
 from app.routers.analytics import router as analytics_router
-from app.routers.recommendation import router as recommendation_router
+from app.routers import recommendation
 from app.routers.reports import router as reports_router
 from app.routers import risk_assessment
+
 
 
 # ============================================================
@@ -96,8 +98,9 @@ app.include_router(dataset_router)
 app.include_router(weather_router)
 app.include_router(soil.router)
 app.include_router(chat_router)
+app.include_router(consultant.router)
 app.include_router(analytics_router)
-app.include_router(recommendation_router)
+app.include_router(recommendation.router)
 app.include_router(reports_router)
 app.include_router(risk_assessment.router)
 

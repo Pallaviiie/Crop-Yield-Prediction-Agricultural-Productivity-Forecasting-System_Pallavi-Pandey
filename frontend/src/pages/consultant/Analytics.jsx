@@ -1,43 +1,342 @@
-import React from "react";
-import ConsultantLayout from "../../components/consultant/ConsultantLayout";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  BarChart3,
+  TrendingUp,
+  Loader2,
+} from "lucide-react";
+
+import ConsultantLayout from
+  "../../components/consultant/ConsultantLayout";
+
+import {
+  getConsultantAnalytics,
+} from "../../services/api";
+
 
 export default function Analytics() {
+
+  const [analytics, setAnalytics] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+
+  useEffect(() => {
+
+    const loadAnalytics = async () => {
+
+      try {
+
+        setLoading(true);
+
+        const data =
+          await getConsultantAnalytics();
+
+        setAnalytics(data);
+
+      } catch (error) {
+
+        console.error(
+          "CONSULTANT ANALYTICS ERROR:",
+          error
+        );
+
+        setError(
+          error.message ||
+          "Unable to load analytics."
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    loadAnalytics();
+
+  }, []);
+
+
+  const cropDistribution =
+    analytics?.crop_distribution || [];
+
+  const yieldTrends =
+    analytics?.yield_trends || [];
+
+
+  const totalCropCount =
+    cropDistribution.reduce(
+      (total, item) =>
+        total + item.count,
+      0
+    );
+
+
+  const maxYield =
+    Math.max(
+      ...yieldTrends.map(
+        (item) =>
+          item.average_yield
+      ),
+      1
+    );
+
+
   return (
-    <ConsultantLayout title="Analytics">
-      <div className="ys-analytics-grid">
-        <div className="ys-card ys-analytics-card">
-          <h3 className="ys-card-title">Crop Distribution Among Farmers</h3>
 
-          <div className="ys-pie-wrap">
-            <div className="ys-pie" />
-            <div className="ys-pie-legend">
-              <span className="ys-pie-label wheat">Wheat 32%</span>
-              <span className="ys-pie-label rice">Rice 28%</span>
-              <span className="ys-pie-label maize">Maize 18%</span>
-              <span className="ys-pie-label cotton">Cotton 12%</span>
-              <span className="ys-pie-label other">Others 10%</span>
-            </div>
-          </div>
+    <ConsultantLayout
+      title="Analytics"
+    >
+
+      {loading ? (
+
+        <div className="ys-empty-card">
+
+          <Loader2
+            size={32}
+            className="ys-loading-icon"
+          />
+
+          <p>
+            Loading analytics...
+          </p>
+
         </div>
 
-        <div className="ys-card ys-analytics-card">
-          <h3 className="ys-card-title">Yield Trends — Managed Farms</h3>
+      ) : error ? (
 
-          <div className="ys-line-chart">
-            <svg viewBox="0 0 700 230" preserveAspectRatio="none">
-              {[30, 75, 120, 165, 210].map((y) => (
-                <line key={y} x1="35" y1={y} x2="680" y2={y} className="ys-grid-line" />
-              ))}
-              <polyline
-                className="ys-line"
-                points="35,135 140,128 245,145 350,119 455,105 560,110 680,94"
-              />
-            </svg>
+        <div className="ys-empty-card">
+
+          <p>
+            {error}
+          </p>
+
+        </div>
+
+      ) : (
+
+        <div
+          className="ys-analytics-grid"
+        >
+
+
+          {/* CROP DISTRIBUTION */}
+
+          <div
+            className="ys-card ys-analytics-card"
+          >
+
+            <h3
+              className="ys-card-title"
+            >
+
+              Crop Distribution Among Farmers
+
+            </h3>
+
+
+            {cropDistribution.length === 0 ? (
+
+              <div
+                className="ys-no-data"
+              >
+
+                <BarChart3 size={32} />
+
+                <p>
+
+                  No farmer crop data
+                  available yet.
+
+                </p>
+
+              </div>
+
+            ) : (
+
+              <div
+                className="ys-analytics-bars"
+              >
+
+                {cropDistribution.map(
+                  (item) => {
+
+                    const percentage =
+                      totalCropCount > 0
+                        ? (
+                            item.count /
+                            totalCropCount
+                          ) * 100
+                        : 0;
+
+                    return (
+
+                      <div
+                        className="ys-analytics-bar-row"
+                        key={item.crop}
+                      >
+
+                        <div
+                          className="ys-analytics-bar-head"
+                        >
+
+                          <span>
+
+                            {item.crop}
+
+                          </span>
+
+                          <strong>
+
+                            {
+                              Math.round(
+                                percentage
+                              )
+                            }
+                            %
+
+                          </strong>
+
+                        </div>
+
+
+                        <div
+                          className="ys-progress-track"
+                        >
+
+                          <div
+                            className="ys-progress-fill"
+                            style={{
+                              width:
+                                `${percentage}%`,
+                            }}
+                          />
+
+                        </div>
+
+                      </div>
+
+                    );
+
+                  }
+                )}
+
+              </div>
+
+            )}
+
           </div>
 
-          <div className="ys-line-legend">— Avg Wheat &nbsp;&nbsp; — Avg Rice</div>
+
+          {/* YIELD TREND */}
+
+          <div
+            className="ys-card ys-analytics-card"
+          >
+
+            <h3
+              className="ys-card-title"
+            >
+
+              Yield Trends — Managed Farms
+
+            </h3>
+
+
+            {yieldTrends.length === 0 ? (
+
+              <div
+                className="ys-no-data"
+              >
+
+                <TrendingUp size={32} />
+
+                <p>
+
+                  No prediction data
+                  available for managed
+                  farmers.
+
+                </p>
+
+              </div>
+
+            ) : (
+
+              <div
+                className="ys-yield-trends"
+              >
+
+                {yieldTrends.map(
+                  (item) => (
+
+                    <div
+                      className="ys-yield-column"
+                      key={item.year}
+                    >
+
+                      <div
+                        className="ys-yield-value"
+                      >
+
+                        {
+                          item.average_yield
+                        }
+
+                      </div>
+
+
+                      <div
+                        className="ys-yield-bar-track"
+                      >
+
+                        <div
+                          className="ys-yield-bar"
+                          style={{
+                            height:
+                              `${(
+                                item.average_yield /
+                                maxYield
+                              ) * 100}%`,
+                          }}
+                        />
+
+                      </div>
+
+
+                      <span>
+
+                        {item.year}
+
+                      </span>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </div>
+
         </div>
-      </div>
+
+      )}
+
     </ConsultantLayout>
+
   );
+
 }

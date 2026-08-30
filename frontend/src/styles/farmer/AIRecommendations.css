@@ -1,112 +1,433 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
-
-* {
-  box-sizing: border-box;
-}
+/* =========================================================
+   AI RECOMMENDATIONS PAGE
+   ========================================================= */
 
 .ai-recommendations-page {
   width: 100%;
-  min-height: 100%;
-  padding: 0;
-  font-family: "DM Sans", sans-serif;
-  color: #173f2c;
+  min-height: 100vh;
+  padding: 28px;
+  box-sizing: border-box;
+
+  background: #f6f8f7;
+  color: #17231c;
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  overflow-x: hidden;
 }
 
-/* =====================================================
-   TOP BANNER
-===================================================== */
+.ai-recommendations-page *,
+.ai-recommendations-page *::before,
+.ai-recommendations-page *::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BANNER
+   ========================================================= */
 
 .recommendation-banner {
   width: 100%;
-  padding: 20px 24px;
-  border-radius: 17px;
-  background: linear-gradient(135deg, #07833d, #4f9f00);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+
+  border-radius: 20px;
+
+  background: linear-gradient(
+    135deg,
+    #166534 0%,
+    #16a34a 100%
+  );
+
   color: white;
-  margin-bottom: 22px;
-  box-shadow: 0 5px 15px rgba(0, 100, 49, 0.12);
+
+  box-shadow:
+    0 8px 24px rgba(22, 101, 52, 0.15);
 }
 
 .banner-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .banner-title svg {
-  color: #d5ff62;
   flex-shrink: 0;
 }
 
 .banner-title h2 {
   margin: 0;
-  font-size: 18px;
+
+  font-size: 25px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
-.recommendation-banner > p {
-  margin: 8px 0 0;
-  font-size: 12px;
-  line-height: 1.5;
+.recommendation-banner p {
+  margin: 10px 0 0 37px;
+
+  font-size: 14px;
+  line-height: 1.6;
+
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* =====================================================
-   CROP RECOMMENDATION GRID
-===================================================== */
+
+/* =========================================================
+   PREDICTION SUMMARY
+   ========================================================= */
+
+.recommendation-summary-card {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 18px;
+
+  padding: 22px;
+
+  margin-bottom: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e1e8e3;
+  border-radius: 18px;
+
+  box-shadow:
+    0 4px 16px rgba(20, 40, 28, 0.06);
+}
+
+.recommendation-summary-card > div {
+  min-width: 0;
+
+  padding: 18px;
+
+  background: #f8faf9;
+
+  border: 1px solid #e7ece8;
+  border-radius: 14px;
+}
+
+.recommendation-summary-card span {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #66756c;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.recommendation-summary-card h2 {
+  margin: 0;
+
+  color: #18251d;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  line-height: 1.35;
+
+  word-break: break-word;
+}
+
+.recommendation-summary-card small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #718078;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   FARM CONDITIONS
+   ========================================================= */
+
+.recommendation-condition-card {
+  width: 100%;
+
+  padding: 24px;
+
+  margin-bottom: 28px;
+
+  background: #ffffff;
+
+  border: 1px solid #e1e8e3;
+  border-radius: 18px;
+
+  box-shadow:
+    0 4px 16px rgba(20, 40, 28, 0.06);
+}
+
+.recommendation-condition-card h3 {
+  margin: 0 0 18px;
+
+  color: #18251d;
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.recommendation-condition-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+.recommendation-condition-grid > div {
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+
+  column-gap: 9px;
+
+  padding: 15px;
+
+  background: #f8faf9;
+
+  border: 1px solid #e7ece8;
+  border-radius: 12px;
+}
+
+.recommendation-condition-grid svg {
+  grid-row: 1 / 3;
+
+  align-self: center;
+
+  color: #15803d;
+
+  flex-shrink: 0;
+}
+
+.recommendation-condition-grid span {
+  color: #758078;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.recommendation-condition-grid strong {
+  margin-top: 3px;
+
+  color: #1d2a22;
+
+  font-size: 14px;
+  font-weight: 650;
+
+  line-height: 1.4;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.recommendation-loading {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  padding: 28px;
+
+  margin-bottom: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e1e8e3;
+  border-radius: 16px;
+}
+
+.recommendation-loading p {
+  margin: 0;
+
+  color: #5e6d64;
+
+  font-size: 14px;
+}
+
+.recommendation-spinner {
+  width: 25px;
+  height: 25px;
+
+  border: 3px solid #d9f3e2;
+  border-top-color: #16a34a;
+
+  border-radius: 50%;
+
+  animation: recommendation-spin 0.8s linear infinite;
+}
+
+@keyframes recommendation-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.recommendation-error {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 15px 18px;
+
+  margin-bottom: 22px;
+
+  background: #fff7ed;
+
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+
+  color: #c2410c;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.recommendation-error svg {
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   RESULTS HEADER
+   ========================================================= */
+
+.recommendation-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.recommendation-results-header h2 {
+  margin: 0;
+
+  color: #17231c;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.recommendation-results-header p {
+  margin: 5px 0 0;
+
+  color: #718078;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   RECOMMENDATION GRID
+   ========================================================= */
 
 .recommendation-grid {
   width: 100%;
 
   display: grid;
 
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
 
   gap: 20px;
 
-  /* VERY IMPORTANT */
-  align-items: start;
+  align-items: stretch;
 }
 
-/* =====================================================
-   CROP CARD
-===================================================== */
 
-.ai-recommendations-page .recommendation-card {
-  width: 100%;
+/* =========================================================
+   RECOMMENDATION CARD
+   ========================================================= */
+
+.recommendation-card {
+  position: relative;
+
   min-width: 0;
-
-  /* Prevent giant stretched cards */
-  height: auto !important;
-  min-height: 300px;
-
-  align-self: start;
-
-  padding: 20px;
-
-  border-radius: 17px;
-
-  background: #fffdf5;
-
-  border: 1px solid #f0d76a;
 
   display: flex;
   flex-direction: column;
 
-  box-shadow: 0 4px 12px rgba(60, 90, 40, 0.06);
+  padding: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e0e7e2;
+  border-radius: 18px;
+
+  box-shadow:
+    0 5px 18px rgba(20, 40, 28, 0.06);
 
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.ai-recommendations-page .recommendation-card:hover {
+.recommendation-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 18px rgba(60, 90, 40, 0.1);
+
+  box-shadow:
+    0 10px 28px rgba(20, 40, 28, 0.1);
 }
 
-/* =====================================================
+
+/* =========================================================
+   CARD TYPES
+   ========================================================= */
+
+.recommendation-best {
+  border-color: #86efac;
+}
+
+.recommendation-good {
+  border-color: #bfdbfe;
+}
+
+.recommendation-medium {
+  border-color: #e2e8f0;
+}
+
+
+/* =========================================================
    CARD TOP
-===================================================== */
+   ========================================================= */
 
 .recommendation-card-top {
   width: 100%;
@@ -115,198 +436,438 @@
   align-items: center;
   justify-content: space-between;
 
-  margin-bottom: 13px;
+  gap: 12px;
+
+  margin-bottom: 18px;
 }
 
 .crop-icon-box {
-  width: 40px;
-  height: 40px;
-
-  flex-shrink: 0;
-
-  border-radius: 12px;
-
-  background: #00853f;
-  color: #caff63;
+  width: 44px;
+  height: 44px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #dcfce7;
+
+  border-radius: 11px;
+
+  color: #15803d;
 }
 
+.crop-icon-box svg {
+  stroke-width: 2;
+}
+
+
+/* =========================================================
+   MATCH BADGE
+   ========================================================= */
+
 .match-badge {
-  padding: 5px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  border-radius: 20px;
+  min-width: 80px;
 
-  background: #d9f5e7;
-  color: #087c45;
+  padding: 7px 11px;
 
-  font-size: 11px;
+  background: #f0fdf4;
+
+  border: 1px solid #bbf7d0;
+
+  border-radius: 999px;
+
+  color: #15803d;
+
+  font-size: 12px;
   font-weight: 700;
 
   white-space: nowrap;
 }
 
-/* =====================================================
+
+/* =========================================================
    CROP NAME
-===================================================== */
+   ========================================================= */
 
-.ai-recommendations-page .recommendation-card h3 {
-  margin: 0;
+.recommendation-card h3 {
+  margin: 0 0 10px;
 
-  font-size: 17px;
+  color: #18251d;
 
-  line-height: 1.3;
-
+  font-size: 20px;
   font-weight: 700;
 
-  color: #075f37;
-
-  word-break: normal;
+  line-height: 1.35;
 }
 
-.ai-recommendations-page .recommendation-card h3 span {
-  font-weight: 600;
-  color: #075f37;
-}
-
-/* =====================================================
-   EXPECTED YIELD
-===================================================== */
-
-.expected-yield {
-  margin: 7px 0 15px;
+.recommendation-card h3 span {
+  color: #15803d;
 
   font-size: 12px;
+  font-weight: 600;
 
-  color: #19894b;
+  vertical-align: middle;
+}
 
-  line-height: 1.4;
+
+/* =========================================================
+   EXPECTED YIELD
+   ========================================================= */
+
+.expected-yield {
+  padding-bottom: 15px;
+
+  margin: 0 0 15px;
+
+  border-bottom: 1px solid #edf1ee;
+
+  color: #65736b;
+
+  font-size: 13px;
+
+  line-height: 1.5;
 }
 
 .expected-yield strong {
-  color: #08763b;
-  font-weight: 700;
+  color: #15803d;
+
+  font-size: 15px;
 }
 
-/* =====================================================
+
+/* =========================================================
    DETAILS
-===================================================== */
+   ========================================================= */
 
 .recommendation-details {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
 
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.recommendation-detail {
+  min-width: 0;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  color: #58665e;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.recommendation-detail svg {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  color: #16a34a;
+}
+
+.recommendation-detail span {
+  min-width: 0;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   WHY THIS CROP
+   ========================================================= */
+
+.recommendation-reason {
+  padding: 15px;
+
+  margin-top: auto;
+  margin-bottom: 12px;
+
+  background: #f0fdf4;
+
+  border: 1px solid #dcfce7;
+  border-radius: 12px;
+}
+
+.recommendation-reason strong {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: #166534;
+
+  font-size: 14px;
+}
+
+.recommendation-reason ul {
   display: flex;
   flex-direction: column;
 
   gap: 8px;
 
-  margin-bottom: 16px;
+  padding: 0;
+  margin: 0;
+
+  list-style: none;
 }
 
-.recommendation-detail {
-  width: 100%;
-
+.recommendation-reason li {
   display: flex;
   align-items: flex-start;
 
-  gap: 8px;
+  gap: 7px;
 
-  font-size: 11px;
+  color: #4b6354;
 
-  line-height: 1.4;
-
-  color: #39815b;
-}
-
-.recommendation-detail svg {
-  width: 15px;
-  height: 15px;
-
-  flex-shrink: 0;
-
-  color: #0a9850;
-
-  margin-top: 1px;
-}
-
-.recommendation-detail span {
-  min-width: 0;
-}
-
-/* =====================================================
-   WHY BOX
-===================================================== */
-
-.recommendation-reason {
-  width: 100%;
-
-  margin-top: auto;
-
-  padding: 11px 12px;
-
-  border-radius: 13px;
-
-  background: rgba(255, 255, 255, 0.8);
-
-  color: #4e6d5c;
-
-  font-size: 10.5px;
+  font-size: 12.5px;
 
   line-height: 1.5;
 }
 
-.recommendation-reason strong {
-  color: #075f37;
+.recommendation-reason li svg {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  color: #16a34a;
 }
 
-/* =====================================================
-   CARD VARIATIONS
-===================================================== */
 
-/* BEST - Wheat */
+/* =========================================================
+   FARMING ADVICE
+   ========================================================= */
 
-.ai-recommendations-page .recommendation-best {
-  background: #fffbea;
-  border-color: #efd35c;
+.recommendation-advice {
+  padding: 15px;
+
+  margin-bottom: 12px;
+
+  background: #eff6ff;
+
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
 }
 
-/* GOOD - Mustard */
+.recommendation-advice strong {
+  display: block;
 
-.ai-recommendations-page .recommendation-good {
-  background: #fffbea;
-  border-color: #efd35c;
+  margin-bottom: 9px;
+
+  color: #1d4ed8;
+
+  font-size: 14px;
 }
 
-/* MEDIUM - Barley */
+.recommendation-advice ul {
+  padding-left: 18px;
 
-.ai-recommendations-page .recommendation-medium {
-  background: #fff8f0;
-  border-color: #f1c99d;
+  margin: 0;
 }
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+.recommendation-advice li {
+  margin-bottom: 6px;
 
-@media (max-width: 1100px) {
-  .recommendation-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  color: #4b5f72;
+
+  font-size: 12.5px;
+
+  line-height: 1.5;
+}
+
+.recommendation-advice li:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   RISKS
+   ========================================================= */
+
+.recommendation-risks {
+  padding: 15px;
+
+  background: #fff7ed;
+
+  border: 1px solid #fed7aa;
+  border-radius: 12px;
+}
+
+.recommendation-risks strong {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #c2410c;
+
+  font-size: 14px;
+}
+
+.recommendation-risks ul {
+  padding-left: 18px;
+
+  margin: 0;
+}
+
+.recommendation-risks li {
+  margin-bottom: 6px;
+
+  color: #7c4a2d;
+
+  font-size: 12.5px;
+
+  line-height: 1.5;
+}
+
+.recommendation-risks li:last-child {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   EMPTY / NO RESULTS
+   ========================================================= */
+
+.ai-recommendations-page
+.recommendation-grid:empty {
+  display: none;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+   ========================================================= */
+
+@media (max-width: 1200px) {
+
+  .recommendation-condition-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
   }
+
+  .recommendation-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
 }
 
-@media (max-width: 700px) {
+
+/* =========================================================
+   RESPONSIVE - SMALL TABLET
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+  .ai-recommendations-page {
+    padding: 20px;
+  }
+
+  .recommendation-summary-card {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .recommendation-condition-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
   .recommendation-grid {
     grid-template-columns: 1fr;
   }
 
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .ai-recommendations-page {
+    padding: 14px;
+  }
+
   .recommendation-banner {
+    padding: 22px 20px;
+
+    border-radius: 16px;
+  }
+
+  .banner-title h2 {
+    font-size: 20px;
+  }
+
+  .recommendation-banner p {
+    margin-left: 0;
+  }
+
+  .recommendation-summary-card {
+    grid-template-columns: 1fr;
+
+    padding: 15px;
+  }
+
+  .recommendation-condition-card {
     padding: 18px;
   }
 
-  .ai-recommendations-page .recommendation-card {
-    min-height: 0;
-    padding: 17px;
+  .recommendation-condition-grid {
+    grid-template-columns: 1fr;
   }
+
+  .recommendation-card {
+    padding: 18px;
+  }
+
+  .recommendation-results-header h2 {
+    font-size: 19px;
+  }
+
+}
+
+
+/* =========================================================
+   PREVENT GLOBAL CSS FROM BREAKING THIS PAGE
+   ========================================================= */
+
+.ai-recommendations-page h1,
+.ai-recommendations-page h2,
+.ai-recommendations-page h3,
+.ai-recommendations-page h4,
+.ai-recommendations-page p,
+.ai-recommendations-page span,
+.ai-recommendations-page strong,
+.ai-recommendations-page small {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+.ai-recommendations-page p {
+  line-height: 1.5;
+}
+
+.ai-recommendations-page button,
+.ai-recommendations-page input,
+.ai-recommendations-page select {
+  font-family: inherit;
 }

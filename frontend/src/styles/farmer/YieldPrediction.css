@@ -1287,3 +1287,63 @@
     font-size: 36px;
   }
 }
+
+/* =========================
+   PREDICTION BUTTONS
+========================= */
+
+.prediction-button-group {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.prediction-button-group .predict-button {
+  flex: 1;
+  margin-top: 0;
+}
+
+.clear-form-button {
+  width: 120px;
+  height: 46px;
+
+  border: 1px solid #cdebd9;
+  border-radius: 13px;
+
+  background: #f4faf6;
+  color: #28764b;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.clear-form-button:hover {
+  background: #e8f6ed;
+  border-color: #9dd5b4;
+}
+
+.clear-form-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 430px) {
+
+  .prediction-button-group {
+    flex-direction: column;
+  }
+
+  .clear-form-button {
+    width: 100%;
+  }
+
+}
