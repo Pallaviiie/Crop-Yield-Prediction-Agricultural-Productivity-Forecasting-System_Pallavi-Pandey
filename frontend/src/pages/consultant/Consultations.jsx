@@ -1,207 +1,885 @@
 import React, {
   useEffect,
+  useRef,
   useState,
 } from "react";
 
 import {
-  MessageSquare,
+  MessageCircle,
   Send,
+  RefreshCw,
   Loader2,
+  User,
+  Search,
+  Clock,
+  CheckCheck,
+  AlertCircle,
+  ArrowLeft,
 } from "lucide-react";
 
-import ConsultantLayout from
-  "../../components/consultant/ConsultantLayout";
-
 import {
-  getConsultantConsultations,
+  getChatConversations,
   getConversationMessages,
+  markConversationAsRead,
   sendChatMessage,
 } from "../../services/api";
 
-
-export default function Consultations() {
-
-  const [consultations, setConsultations] =
-    useState([]);
-
-  const [selectedConversation, setSelectedConversation] =
-    useState(null);
-
-  const [messages, setMessages] =
-    useState([]);
-
-  const [messageText, setMessageText] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [sending, setSending] =
-    useState(false);
+import "../../styles/consultant/consultations.css";
 
 
-  // ==========================================================
-  // LOAD CONSULTATIONS
-  // ==========================================================
+// =========================================================
+// HELPERS
+// =========================================================
 
-  useEffect(() => {
+const getConversationId = (conversation) => {
+  return (
+    conversation?.id ??
+    conversation?.conversation_id ??
+    conversation?.conversationId ??
+    null
+  );
+};
 
-    const loadConsultations = async () => {
 
-      try {
+const getFarmerName = (conversation) => {
+  return (
+    conversation?.other_user?.full_name ||
+    conversation?.other_user?.name ||
+    conversation?.farmer?.full_name ||
+    conversation?.farmer?.name ||
+    conversation?.farmer_name ||
+    conversation?.farmerName ||
+    conversation?.user?.full_name ||
+    conversation?.user?.name ||
+    conversation?.full_name ||
+    conversation?.name ||
+    "Farmer"
+  );
+};
 
+
+const getFarmerInitial = (conversation) => {
+  const name = getFarmerName(conversation);
+
+  return name
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+};
+
+
+const getLastMessage = (conversation) => {
+  return (
+    conversation?.last_message?.message ||
+    conversation?.last_message?.text ||
+    conversation?.lastMessage?.message ||
+    conversation?.lastMessage?.text ||
+    conversation?.last_message ||
+    conversation?.lastMessage ||
+    "No messages yet"
+  );
+};
+
+
+const getLastMessageTime = (conversation) => {
+  return (
+    conversation?.last_message?.created_at ||
+    conversation?.last_message?.createdAt ||
+    conversation?.lastMessage?.created_at ||
+    conversation?.lastMessage?.createdAt ||
+    conversation?.updated_at ||
+    conversation?.updatedAt ||
+    conversation?.created_at ||
+    conversation?.createdAt ||
+    null
+  );
+};
+
+
+const formatTime = (dateValue) => {
+  if (!dateValue) {
+    return "";
+  }
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const now = new Date();
+
+  const sameDay =
+    date.toDateString() === now.toDateString();
+
+  if (sameDay) {
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  return date.toLocaleDateString([], {
+    day: "2-digit",
+    month: "short",
+  });
+};
+
+
+const getMessageText = (message) => {
+  if (typeof message?.message === "string") {
+    return message.message;
+  }
+
+  if (typeof message?.text === "string") {
+    return message.text;
+  }
+
+  return "";
+};
+
+
+// =========================================================
+// COMPONENT
+// =========================================================
+
+const Consultations = () => {
+
+  // =======================================================
+  // CONVERSATIONS
+  // =======================================================
+
+  const [conversations, setConversations] = useState([]);
+
+  const [
+    selectedConversation,
+    setSelectedConversation,
+  ] = useState(null);
+
+
+  // =======================================================
+  // MESSAGES
+  // =======================================================
+
+  const [messages, setMessages] = useState([]);
+
+
+  // =======================================================
+  // INPUT
+  // =======================================================
+
+  const [input, setInput] = useState("");
+
+
+  // =======================================================
+  // SEARCH
+  // =======================================================
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+
+  // =======================================================
+  // LOADING
+  // =======================================================
+
+  const [loading, setLoading] = useState(true);
+
+  const [
+    messagesLoading,
+    setMessagesLoading,
+  ] = useState(false);
+
+  const [sending, setSending] = useState(false);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+
+  // =======================================================
+  // ERROR
+  // =======================================================
+
+  const [error, setError] = useState("");
+
+  const [
+    messageError,
+    setMessageError,
+  ] = useState("");
+
+
+  // =======================================================
+  // MOBILE
+  // =======================================================
+
+  const [
+    mobileShowChat,
+    setMobileShowChat,
+  ] = useState(false);
+
+
+  // =======================================================
+  // REFS
+  // =======================================================
+
+  const messagesEndRef = useRef(null);
+
+  const pollingRef = useRef(null);
+
+
+  // =======================================================
+  // LOAD CONVERSATIONS
+  // =======================================================
+
+  const loadConversations = async (
+    showRefreshLoader = false
+  ) => {
+
+    try {
+
+      if (showRefreshLoader) {
+        setRefreshing(true);
+      } else {
         setLoading(true);
+      }
 
-        const data =
-          await getConsultantConsultations();
+      setError("");
 
-        const consultationList =
-          data.consultations || [];
+      const data =
+        await getChatConversations();
 
-        setConsultations(
-          consultationList
-        );
+      console.log(
+        "Consultant conversations:",
+        data
+      );
 
-        if (
-          consultationList.length > 0
-        ) {
+      let conversationList = [];
 
-          const params =
-            new URLSearchParams(
-              window.location.search
-            );
+      if (Array.isArray(data)) {
 
-          const requestedId =
-            Number(
-              params.get("conversation")
-            );
+        conversationList = data;
 
-          const requestedConversation =
-            consultationList.find(
-              (item) =>
-                item.conversation_id
-                === requestedId
-            );
+      } else if (
+        Array.isArray(data?.conversations)
+      ) {
 
-          const conversation =
-            requestedConversation ||
-            consultationList[0];
+        conversationList =
+          data.conversations;
+
+      } else if (
+        Array.isArray(data?.data)
+      ) {
+
+        conversationList = data.data;
+      }
+
+      setConversations(
+        conversationList
+      );
+
+
+      // ---------------------------------------------------
+      // Keep selected conversation updated
+      // ---------------------------------------------------
+
+      if (selectedConversation) {
+
+        const selectedId =
+          getConversationId(
+            selectedConversation
+          );
+
+        const updatedConversation =
+          conversationList.find(
+            (conversation) =>
+              String(
+                getConversationId(
+                  conversation
+                )
+              ) ===
+              String(selectedId)
+          );
+
+        if (updatedConversation) {
 
           setSelectedConversation(
-            conversation
+            updatedConversation
           );
 
         }
-
-      } catch (error) {
-
-        console.error(
-          "CONSULTATIONS ERROR:",
-          error
-        );
-
-      } finally {
-
-        setLoading(false);
-
       }
 
-    };
+    } catch (err) {
 
-    loadConsultations();
+      console.error(
+        "Failed to load conversations:",
+        err
+      );
+
+      setError(
+        err?.message ||
+        "Unable to load consultations."
+      );
+
+    } finally {
+
+      setLoading(false);
+      setRefreshing(false);
+
+    }
+  };
+
+
+  // =======================================================
+  // INITIAL LOAD
+  // =======================================================
+
+  useEffect(() => {
+
+    loadConversations();
 
   }, []);
 
 
-  // ==========================================================
+  // =======================================================
   // LOAD MESSAGES
-  // ==========================================================
+  // =======================================================
 
-  useEffect(() => {
+  const loadMessages = async (
+    conversation,
+    showLoader = true,
+    markRead = false
+  ) => {
 
-    if (
-      !selectedConversation
-    ) {
+    const conversationId =
+      getConversationId(
+        conversation
+      );
+
+
+    // ---------------------------------------------------
+    // Invalid conversation
+    // ---------------------------------------------------
+
+    if (!conversationId) {
+
+      setMessages([]);
+
       return;
     }
 
-    const loadMessages = async () => {
 
-      try {
+    try {
 
-        const data =
-          await getConversationMessages(
-            selectedConversation.conversation_id
+      if (showLoader) {
+
+        setMessagesLoading(true);
+
+      }
+
+      setMessageError("");
+
+
+      // -------------------------------------------------
+      // GET MESSAGES
+      // -------------------------------------------------
+
+      const data =
+        await getConversationMessages(
+          conversationId
+        );
+
+      console.log(
+        "Conversation messages:",
+        data
+      );
+
+
+      let messageList = [];
+
+
+      if (Array.isArray(data)) {
+
+        messageList = data;
+
+      } else if (
+        Array.isArray(data?.messages)
+      ) {
+
+        messageList =
+          data.messages;
+
+      } else if (
+        Array.isArray(data?.data)
+      ) {
+
+        messageList =
+          data.data;
+      }
+
+
+      setMessages(
+        messageList
+      );
+
+
+      // -------------------------------------------------
+      // MARK CONVERSATION AS READ
+      //
+      // This is only called when the consultant
+      // opens the conversation.
+      // It is NOT called during polling.
+      // -------------------------------------------------
+
+      if (markRead) {
+
+        try {
+
+          await markConversationAsRead(
+            conversationId
           );
 
-        setMessages(data || []);
+          console.log(
+            "Conversation marked as read:",
+            conversationId
+          );
 
-      } catch (error) {
 
-        console.error(
-          "MESSAGES ERROR:",
-          error
+          // ---------------------------------------------
+          // Remove unread badge immediately
+          // ---------------------------------------------
+
+          setConversations(
+            (previous) =>
+              previous.map(
+                (item) => {
+
+                  const itemId =
+                    getConversationId(
+                      item
+                    );
+
+                  if (
+                    String(itemId) ===
+                    String(conversationId)
+                  ) {
+
+                    return {
+                      ...item,
+
+                      unread_count: 0,
+
+                      unreadCount: 0,
+                    };
+
+                  }
+
+                  return item;
+                }
+              )
+          );
+
+
+          // ---------------------------------------------
+          // Update selected conversation
+          // ---------------------------------------------
+
+          setSelectedConversation(
+            (previous) => {
+
+              if (!previous) {
+                return previous;
+              }
+
+              const previousId =
+                getConversationId(
+                  previous
+                );
+
+              if (
+                String(previousId) ===
+                String(conversationId)
+              ) {
+
+                return {
+                  ...previous,
+
+                  unread_count: 0,
+
+                  unreadCount: 0,
+                };
+
+              }
+
+              return previous;
+            }
+          );
+
+        } catch (readError) {
+
+          console.error(
+            "Failed to mark conversation as read:",
+            readError
+          );
+
+          // Do not stop the chat if the
+          // read API fails.
+        }
+      }
+
+    } catch (err) {
+
+      console.error(
+        "Failed to load messages:",
+        err
+      );
+
+
+      if (showLoader) {
+
+        setMessageError(
+          err?.message ||
+          "Unable to load conversation messages."
         );
 
       }
 
-    };
+    } finally {
 
-    loadMessages();
+      if (showLoader) {
 
-  }, [
-    selectedConversation,
-  ]);
+        setMessagesLoading(false);
+
+      }
+
+    }
+  };
 
 
-  // ==========================================================
-  // SEND MESSAGE
-  // ==========================================================
+  // =======================================================
+  // SELECT CONVERSATION
+  // =======================================================
 
-  const handleSendMessage = async (
-    event
+  const openConversation = async (
+    conversation
   ) => {
 
-    event.preventDefault();
-
-    if (
-      !messageText.trim() ||
-      !selectedConversation
-    ) {
+    if (!conversation) {
       return;
     }
 
-    try {
 
-      setSending(true);
+    setSelectedConversation(
+      conversation
+    );
 
-      const newMessage =
-        await sendChatMessage(
-          selectedConversation.conversation_id,
-          messageText
+    setMobileShowChat(true);
+
+    setMessages([]);
+
+    setInput("");
+
+    setMessageError("");
+
+
+    // -----------------------------------------------
+    // true = show loading
+    // true = mark unread messages as read
+    // -----------------------------------------------
+
+    await loadMessages(
+      conversation,
+      true,
+      true
+    );
+  };
+
+
+  // =======================================================
+  // POLLING
+  // =======================================================
+
+  useEffect(() => {
+
+    // -----------------------------------------------
+    // No selected conversation
+    // -----------------------------------------------
+
+    if (!selectedConversation) {
+
+      if (pollingRef.current) {
+
+        clearInterval(
+          pollingRef.current
         );
 
-      setMessages(
-        (previousMessages) => [
+        pollingRef.current = null;
+      }
 
-          ...previousMessages,
+      return;
+    }
 
-          newMessage,
 
-        ]
+    const conversationId =
+      getConversationId(
+        selectedConversation
       );
 
-      setMessageText("");
 
-    } catch (error) {
+    if (!conversationId) {
+      return;
+    }
+
+
+    // -----------------------------------------------
+    // Poll every 5 seconds
+    // -----------------------------------------------
+
+    pollingRef.current =
+      setInterval(
+        async () => {
+
+          try {
+
+            const data =
+              await getConversationMessages(
+                conversationId
+              );
+
+
+            let messageList = [];
+
+
+            if (Array.isArray(data)) {
+
+              messageList = data;
+
+            } else if (
+              Array.isArray(
+                data?.messages
+              )
+            ) {
+
+              messageList =
+                data.messages;
+
+            } else if (
+              Array.isArray(data?.data)
+            ) {
+
+              messageList =
+                data.data;
+            }
+
+
+            setMessages(
+              messageList
+            );
+
+          } catch (err) {
+
+            console.error(
+              "Conversation polling failed:",
+              err
+            );
+
+          }
+
+        },
+        5000
+      );
+
+
+    // -----------------------------------------------
+    // Cleanup
+    // -----------------------------------------------
+
+    return () => {
+
+      if (pollingRef.current) {
+
+        clearInterval(
+          pollingRef.current
+        );
+
+        pollingRef.current = null;
+      }
+
+    };
+
+  }, [selectedConversation]);
+
+
+  // =======================================================
+  // AUTO SCROLL
+  // =======================================================
+
+  useEffect(() => {
+
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+
+  }, [messages]);
+
+
+  // =======================================================
+  // SEND MESSAGE
+  // =======================================================
+
+  const handleSendMessage = async () => {
+
+    const text =
+      input.trim();
+
+
+    const conversationId =
+      getConversationId(
+        selectedConversation
+      );
+
+
+    if (
+      !text ||
+      !conversationId ||
+      sending
+    ) {
+
+      return;
+    }
+
+
+    setSending(true);
+
+    setMessageError("");
+
+    setInput("");
+
+
+    // ===================================================
+    // TEMPORARY MESSAGE
+    // ===================================================
+
+    const temporaryMessage = {
+
+      id:
+        `temp-${Date.now()}`,
+
+      message:
+        text,
+
+      text:
+        text,
+
+      sender:
+        "consultant",
+
+      sender_type:
+        "consultant",
+
+      temporary:
+        true,
+
+      created_at:
+        new Date().toISOString(),
+
+    };
+
+
+    setMessages(
+      (previous) => [
+        ...previous,
+        temporaryMessage,
+      ]
+    );
+
+
+    try {
+
+      // =================================================
+      // SEND TO BACKEND
+      // =================================================
+
+      const savedMessage =
+        await sendChatMessage(
+          conversationId,
+          text
+        );
+
+
+      console.log(
+        "Consultant message saved:",
+        savedMessage
+      );
+
+
+      // =================================================
+      // REMOVE TEMPORARY MESSAGE
+      // ADD REAL MESSAGE
+      // =================================================
+
+      setMessages(
+        (previous) => {
+
+          const withoutTemporary =
+            previous.filter(
+              (message) =>
+                !message.temporary
+            );
+
+
+          return [
+            ...withoutTemporary,
+
+            {
+              ...savedMessage,
+
+              sender:
+                savedMessage?.sender ||
+                "consultant",
+
+              sender_type:
+                savedMessage?.sender_type ||
+                "consultant",
+            },
+          ];
+
+        }
+      );
+
+
+      // =================================================
+      // REFRESH CONVERSATION LIST
+      // =================================================
+
+      await loadConversations(
+        false
+      );
+
+    } catch (err) {
 
       console.error(
-        "SEND MESSAGE ERROR:",
-        error
+        "Failed to send consultant message:",
+        err
       );
 
-      alert(
-        error.message ||
+
+      // Remove temporary message
+
+      setMessages(
+        (previous) =>
+          previous.filter(
+            (message) =>
+              !message.temporary
+          )
+      );
+
+
+      // Restore input
+
+      setInput(text);
+
+
+      setMessageError(
+        err?.message ||
         "Unable to send message."
       );
 
@@ -210,316 +888,852 @@ export default function Consultations() {
       setSending(false);
 
     }
+  };
+
+
+  // =======================================================
+  // ENTER KEY
+  // =======================================================
+
+  const handleKeyDown = (
+    event
+  ) => {
+
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+
+      event.preventDefault();
+
+      handleSendMessage();
+
+    }
+  };
+
+
+  // =======================================================
+  // MOBILE BACK
+  // =======================================================
+
+  const handleMobileBack = () => {
+
+    setMobileShowChat(false);
 
   };
 
 
+  // =======================================================
+  // FILTER CONVERSATIONS
+  // =======================================================
+
+  const filteredConversations =
+    conversations.filter(
+      (conversation) => {
+
+        const farmerName =
+          getFarmerName(
+            conversation
+          ).toLowerCase();
+
+
+        const lastMessage =
+          String(
+            getLastMessage(
+              conversation
+            )
+          ).toLowerCase();
+
+
+        const search =
+          searchTerm
+            .trim()
+            .toLowerCase();
+
+
+        if (!search) {
+          return true;
+        }
+
+
+        return (
+          farmerName.includes(
+            search
+          ) ||
+          lastMessage.includes(
+            search
+          )
+        );
+
+      }
+    );
+
+
+  // =========================================================
+  // RENDER
+  // =========================================================
+
   return (
 
-    <ConsultantLayout
-      title="Consultations"
-    >
+    <div className="consultations-page">
 
-      {loading ? (
 
-        <div className="ys-empty-card">
+      {/* =================================================
+          PAGE HEADER
+      ================================================= */}
 
-          <Loader2
-            size={32}
-            className="ys-loading-icon"
-          />
+      <div className="consultations-page-header">
 
-          <p>
-            Loading consultations...
-          </p>
+        <div>
 
-        </div>
+          <div className="consultations-title-row">
 
-      ) : consultations.length === 0 ? (
+            <div className="consultations-title-icon">
 
-        <div className="ys-card ys-empty-card">
-
-          <div>
-
-            <div
-              className="ys-empty-icon"
-            >
-
-              <MessageSquare
-                size={31}
+              <MessageCircle
+                size={22}
               />
 
             </div>
 
-            <h2>
-              No Consultations Yet
-            </h2>
 
-            <p>
+            <div>
 
-              Conversations started
-              by farmers will appear
-              here.
+              <h1>
+                Consultations
+              </h1>
 
-            </p>
+              <p>
+                Communicate directly with farmers
+                and provide agricultural guidance.
+              </p>
+
+            </div>
 
           </div>
 
         </div>
 
-      ) : (
 
-        <div
-          className="ys-consultation-workspace"
+        <button
+          type="button"
+          className="consultations-refresh-button"
+          onClick={() =>
+            loadConversations(true)
+          }
+          disabled={
+            refreshing ||
+            loading
+          }
         >
 
+          {refreshing ? (
 
-          {/* LEFT SIDE */}
+            <Loader2
+              size={17}
+              className="consultations-spin"
+            />
 
-          <aside
-            className="ys-conversation-sidebar"
+          ) : (
+
+            <RefreshCw
+              size={17}
+            />
+
+          )}
+
+          <span>
+            Refresh
+          </span>
+
+        </button>
+
+      </div>
+
+
+      {/* =================================================
+          ERROR
+      ================================================= */}
+
+      {error && (
+
+        <div className="consultations-error">
+
+          <AlertCircle
+            size={18}
+          />
+
+          <span>
+            {error}
+          </span>
+
+          <button
+            type="button"
+            onClick={() =>
+              loadConversations(true)
+            }
           >
+            Try again
+          </button>
 
-            <h3>
+        </div>
 
-              Farmer Conversations
-
-            </h3>
+      )}
 
 
-            {consultations.map(
-              (conversation) => (
+      {/* =================================================
+          MAIN CHAT AREA
+      ================================================= */}
 
-                <button
-                  key={
-                    conversation.conversation_id
-                  }
-                  type="button"
-                  onClick={() =>
-                    setSelectedConversation(
+      <div
+        className={`consultations-chat-container ${
+          mobileShowChat
+            ? "mobile-chat-open"
+            : ""
+        }`}
+      >
+
+
+        {/* =================================================
+            LEFT - CONVERSATIONS
+        ================================================= */}
+
+        <aside className="consultations-sidebar">
+
+          <div className="consultations-sidebar-header">
+
+            <div>
+
+              <h2>
+                Conversations
+              </h2>
+
+              <span>
+                {conversations.length}{" "}
+                {conversations.length === 1
+                  ? "conversation"
+                  : "conversations"}
+              </span>
+
+            </div>
+
+          </div>
+
+
+          {/* SEARCH */}
+
+          <div className="consultations-search">
+
+            <Search
+              size={17}
+            />
+
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(event) =>
+                setSearchTerm(
+                  event.target.value
+                )
+              }
+              placeholder="Search farmers..."
+            />
+
+          </div>
+
+
+          {/* =================================================
+              CONVERSATION LIST
+          ================================================= */}
+
+          <div className="conversation-list">
+
+            {loading ? (
+
+              <div className="conversations-loading">
+
+                <Loader2
+                  size={24}
+                  className="consultations-spin"
+                />
+
+                <span>
+                  Loading conversations...
+                </span>
+
+              </div>
+
+            ) : filteredConversations.length === 0 ? (
+
+              <div className="no-conversations">
+
+                <div className="no-conversations-icon">
+
+                  <MessageCircle
+                    size={27}
+                  />
+
+                </div>
+
+                <strong>
+                  {searchTerm
+                    ? "No conversations found"
+                    : "No consultations yet"}
+                </strong>
+
+                <span>
+                  {searchTerm
+                    ? "Try a different search."
+                    : "Farmer conversations will appear here when they contact you."}
+                </span>
+
+              </div>
+
+            ) : (
+
+              filteredConversations.map(
+                (conversation) => {
+
+                  const conversationId =
+                    getConversationId(
                       conversation
-                    )
-                  }
-                  className={`ys-conversation-item ${
-                    selectedConversation
-                      ?.conversation_id
-                    ===
-                    conversation.conversation_id
-                      ? "active"
-                      : ""
-                  }`}
-                >
-
-                  <div
-                    className="ys-avatar"
-                  >
-
-                    {
-                      conversation.farmer
-                        ?.full_name
-                        ?.charAt(0)
-                        ?.toUpperCase()
-                    }
-
-                  </div>
+                    );
 
 
-                  <div
-                    className="ys-conversation-copy"
-                  >
+                  const isSelected =
+                    String(
+                      getConversationId(
+                        selectedConversation
+                      )
+                    ) ===
+                    String(
+                      conversationId
+                    );
 
-                    <strong>
 
-                      {
-                        conversation.farmer
-                          ?.full_name
+                  const unreadCount =
+                    Number(
+                      conversation?.unread_count ??
+                      conversation?.unreadCount ??
+                      0
+                    );
+
+
+                  return (
+
+                    <button
+                      type="button"
+                      key={conversationId}
+                      className={`conversation-item ${
+                        isSelected
+                          ? "active"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        openConversation(
+                          conversation
+                        )
                       }
-
-                    </strong>
-
-                    <span>
-
-                      {
-                        conversation
-                          .last_message
-                          ?.message ||
-                        "No messages yet"
-                      }
-
-                    </span>
-
-                  </div>
-
-
-                  {conversation.unread_count > 0 && (
-
-                    <span
-                      className="ys-unread-badge"
                     >
 
-                      {
-                        conversation.unread_count
-                      }
 
-                    </span>
+                      {/* AVATAR */}
 
-                  )}
+                      <div className="conversation-avatar">
+
+                        {conversation?.farmer?.profile_image ? (
+
+                          <img
+                            src={
+                              conversation.farmer.profile_image
+                            }
+                            alt=""
+                          />
+
+                        ) : (
+
+                          getFarmerInitial(
+                            conversation
+                          )
+
+                        )}
+
+                      </div>
+
+
+                      {/* CONTENT */}
+
+                      <div className="conversation-item-content">
+
+                        <div className="conversation-item-top">
+
+                          <strong>
+                            {getFarmerName(
+                              conversation
+                            )}
+                          </strong>
+
+                          <span>
+                            {formatTime(
+                              getLastMessageTime(
+                                conversation
+                              )
+                            )}
+                          </span>
+
+                        </div>
+
+
+                        <div className="conversation-item-bottom">
+
+                          <p>
+                            {getLastMessage(
+                              conversation
+                            )}
+                          </p>
+
+
+                          {/* UNREAD BADGE */}
+
+                          {unreadCount > 0 && (
+
+                            <span className="unread-count">
+
+                              {unreadCount}
+
+                            </span>
+
+                          )}
+
+                        </div>
+
+                      </div>
+
+                    </button>
+
+                  );
+
+                }
+              )
+
+            )}
+
+          </div>
+
+        </aside>
+
+
+        {/* =================================================
+            RIGHT - CHAT
+        ================================================= */}
+
+        <section className="consultations-chat-panel">
+
+
+          {/* =================================================
+              EMPTY STATE
+          ================================================= */}
+
+          {!selectedConversation ? (
+
+            <div className="consultation-empty-state">
+
+              <div className="consultation-empty-icon">
+
+                <MessageCircle
+                  size={38}
+                />
+
+              </div>
+
+              <h2>
+                Select a conversation
+              </h2>
+
+              <p>
+                Choose a farmer from the
+                conversation list to view their
+                messages and respond.
+              </p>
+
+            </div>
+
+          ) : (
+
+            <>
+
+
+              {/* =================================================
+                  CHAT HEADER
+              ================================================= */}
+
+              <div className="consultation-chat-header">
+
+                <button
+                  type="button"
+                  className="mobile-back-button"
+                  onClick={
+                    handleMobileBack
+                  }
+                >
+
+                  <ArrowLeft
+                    size={20}
+                  />
 
                 </button>
 
-              )
-            )}
 
-          </aside>
+                <div className="consultation-chat-user-avatar">
 
-
-          {/* CHAT */}
-
-          <section
-            className="ys-chat-area"
-          >
-
-            {selectedConversation && (
-
-              <>
-
-                <div
-                  className="ys-chat-header"
-                >
-
-                  <div>
-
-                    <h3>
-
-                      {
-                        selectedConversation
-                          .farmer
-                          ?.full_name
-                      }
-
-                    </h3>
-
-                    <span>
-
-                      {
-                        selectedConversation
-                          .farmer
-                          ?.location ||
-                        "Farmer"
-                      }
-
-                    </span>
-
-                  </div>
+                  {getFarmerInitial(
+                    selectedConversation
+                  )}
 
                 </div>
 
 
-                <div
-                  className="ys-messages"
-                >
+                <div className="consultation-chat-user-info">
 
-                  {messages.map(
+                  <h2>
+                    {getFarmerName(
+                      selectedConversation
+                    )}
+                  </h2>
+
+                  <span>
+
+                    <span className="chat-online-dot" />
+
+                    Farmer consultation
+
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              {/* =================================================
+                  MESSAGES
+              ================================================= */}
+
+              <div className="consultation-messages">
+
+                {messagesLoading ? (
+
+                  <div className="consultation-messages-loading">
+
+                    <Loader2
+                      size={27}
+                      className="consultations-spin"
+                    />
+
+                    <span>
+                      Loading messages...
+                    </span>
+
+                  </div>
+
+                ) : messageError ? (
+
+                  <div className="conversation-message-error">
+
+                    <AlertCircle
+                      size={22}
+                    />
+
+                    <span>
+                      {messageError}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        loadMessages(
+                          selectedConversation,
+                          true,
+                          true
+                        )
+                      }
+                    >
+                      Retry
+                    </button>
+
+                  </div>
+
+                ) : messages.length === 0 ? (
+
+                  <div className="no-messages">
+
+                    <div className="no-messages-icon">
+
+                      <MessageCircle
+                        size={28}
+                      />
+
+                    </div>
+
+                    <strong>
+                      No messages yet
+                    </strong>
+
+                    <span>
+                      Start the consultation by
+                      sending a message to the farmer.
+                    </span>
+
+                  </div>
+
+                ) : (
+
+                  messages.map(
                     (message) => {
 
-                      const isMine =
-                        message.sender
-                          ?.role
-                        === "consultant";
+                      const senderType =
+                        String(
+                          message?.sender_type ??
+                          message?.sender_role ??
+                          message?.role ??
+                          message?.sender?.role ??
+                          message?.sender ??
+                          ""
+                        ).toLowerCase();
+
+
+                      const isConsultant =
+                        message?.temporary ||
+                        senderType ===
+                          "consultant" ||
+                        senderType ===
+                          "expert" ||
+                        senderType ===
+                          "admin";
+
 
                       return (
 
                         <div
-                          key={message.id}
-                          className={`ys-message-row ${
-                            isMine
-                              ? "mine"
-                              : "theirs"
+                          key={
+                            message.id ??
+                            `${message.created_at}-${message.message}`
+                          }
+                          className={`consultation-message-row ${
+                            isConsultant
+                              ? "consultant-message-row"
+                              : "farmer-message-row"
                           }`}
                         >
 
+
+                          {/* FARMER AVATAR */}
+
+                          {!isConsultant && (
+
+                            <div className="message-avatar farmer-message-avatar">
+
+                              <User
+                                size={16}
+                              />
+
+                            </div>
+
+                          )}
+
+
+                          {/* MESSAGE BUBBLE */}
+
                           <div
-                            className="ys-message"
+                            className={`consultation-message-bubble ${
+                              isConsultant
+                                ? "consultant-bubble"
+                                : "farmer-bubble"
+                            }`}
                           >
 
-                            <p>
+                            <div className="message-content">
 
-                              {message.message}
+                              {getMessageText(
+                                message
+                              )}
 
-                            </p>
+                            </div>
 
-                            <small>
 
-                              {
-                                message.created_at
-                                  ? new Date(
-                                      message.created_at
-                                    ).toLocaleString()
-                                  : ""
-                              }
+                            <div className="message-meta">
 
-                            </small>
+                              <span>
+
+                                {formatTime(
+                                  message?.created_at ??
+                                  message?.createdAt
+                                )}
+
+                              </span>
+
+
+                              {/* CONSULTANT MESSAGE STATUS */}
+
+                              {isConsultant && (
+
+                                message?.temporary ? (
+
+                                  <Clock
+                                    size={12}
+                                  />
+
+                                ) : (
+
+                                  <CheckCheck
+                                    size={13}
+                                  />
+
+                                )
+
+                              )}
+
+                            </div>
 
                           </div>
+
+
+                          {/* CONSULTANT AVATAR */}
+
+                          {isConsultant && (
+
+                            <div className="message-avatar consultant-message-avatar">
+
+                              <User
+                                size={16}
+                              />
+
+                            </div>
+
+                          )}
 
                         </div>
 
                       );
 
                     }
-                  )}
+                  )
+
+                )}
+
+
+                <div
+                  ref={
+                    messagesEndRef
+                  }
+                />
+
+              </div>
+
+
+              {/* =================================================
+                  MESSAGE ERROR
+              ================================================= */}
+
+              {messageError && (
+
+                <div className="message-send-error">
+
+                  <AlertCircle
+                    size={15}
+                  />
+
+                  {messageError}
 
                 </div>
 
+              )}
 
-                <form
-                  className="ys-message-form"
-                  onSubmit={
+
+              {/* =================================================
+                  INPUT
+              ================================================= */}
+
+              <div className="consultation-input-container">
+
+                <textarea
+                  value={input}
+                  onChange={(event) =>
+                    setInput(
+                      event.target.value
+                    )
+                  }
+                  onKeyDown={
+                    handleKeyDown
+                  }
+                  placeholder={`Reply to ${getFarmerName(
+                    selectedConversation
+                  )}...`}
+                  rows={1}
+                  disabled={sending}
+                />
+
+
+                <button
+                  type="button"
+                  className="consultation-send-button"
+                  onClick={
                     handleSendMessage
                   }
+                  disabled={
+                    !input.trim() ||
+                    sending
+                  }
+                  title="Send message"
                 >
 
-                  <input
-                    value={messageText}
-                    onChange={(event) =>
-                      setMessageText(
-                        event.target.value
-                      )
-                    }
-                    placeholder="Write your response..."
-                  />
+                  {sending ? (
 
-                  <button
-                    type="submit"
-                    disabled={sending}
-                  >
+                    <Loader2
+                      size={19}
+                      className="consultations-spin"
+                    />
 
-                    {sending ? (
+                  ) : (
 
-                      <Loader2 size={18} />
+                    <Send
+                      size={19}
+                    />
 
-                    ) : (
+                  )}
 
-                      <Send size={18} />
+                </button>
 
-                    )}
+              </div>
 
-                  </button>
 
-                </form>
+              {/* =================================================
+                  DISCLAIMER
+              ================================================= */}
 
-              </>
+              <div className="consultation-disclaimer">
 
-            )}
+                <MessageCircle
+                  size={13}
+                />
 
-          </section>
+                <span>
+                  Your response will be delivered
+                  directly to the farmer's Chat Expert.
+                </span>
 
-        </div>
+              </div>
 
-      )}
+            </>
 
-    </ConsultantLayout>
+          )}
 
+        </section>
+
+      </div>
+
+    </div>
   );
+};
 
-}
+
+export default Consultations;

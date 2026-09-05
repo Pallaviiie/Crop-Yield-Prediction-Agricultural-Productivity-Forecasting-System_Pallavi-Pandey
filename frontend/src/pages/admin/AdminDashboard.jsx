@@ -1,36 +1,38 @@
-import HeroBanner from "../../components/admin/HeroBanner";
-import PredictionChart from "../../components/admin/PredictionChart";
-import CropPieChart from "../../components/admin/CropPieChart";
-import RecentUsers from "../../components/admin/RecentUsers";
-import BottomSection from "../../components/admin/BottomSection";
+import { useState } from "react";
 
-export default function AdminDashboard() {
+import AdminLayout from "../../components/admin/AdminLayout";
+
+import Dashboard from "./Dashboard";
+import Users from "./Users";
+import Datasets from "./Datasets";
+import Predictions from "./Predictions";
+import Analytics from "./Analytics";
+import ActivityLogs from "./ActivityLogs";
+import Profile from "./Profile";
+
+const AdminDashboard = () => {
+  const [activePage, setActivePage] = useState("Dashboard");
+
   return (
-    <div className="space-y-8">
+    <AdminLayout
+      activePage={activePage}
+      setActivePage={setActivePage}
+    >
+      {activePage === "Dashboard" && <Dashboard />}
 
-      {/* Hero */}
-      <HeroBanner />
+      {activePage === "User Management" && <Users />}
 
-      {/* Charts Row */}
-      <div className="grid lg:grid-cols-4 gap-8">
+      {activePage === "Dataset Management" && <Datasets />}
 
-        <div className="lg:col-span-2">
-          <PredictionChart />
-        </div>
+      {activePage === "Prediction Monitor" && <Predictions />}
 
-        <div>
-          <CropPieChart />
-        </div>
+      {activePage === "Analytics" && <Analytics />}
 
-        <div>
-          <RecentUsers />
-        </div>
+      {activePage === "Activity Log" && <ActivityLogs />}
 
-      </div>
-
-      {/* Bottom Section */}
-      <BottomSection />
-
-    </div>
+      {activePage === "Profile" && <Profile />}
+    </AdminLayout>
   );
-}
+};
+
+export default AdminDashboard;

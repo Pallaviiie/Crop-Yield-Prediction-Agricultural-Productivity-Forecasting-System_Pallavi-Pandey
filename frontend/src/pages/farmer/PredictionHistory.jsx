@@ -13,12 +13,15 @@ import { api } from "../../services/api";
 
 import "../../styles/farmer/PredictionHistory.css";
 
+
 const PredictionHistory = () => {
+
   const [predictions, setPredictions] = useState([]);
   const [selectedPrediction, setSelectedPrediction] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
 
   /* =====================================================
      FETCH PREDICTION HISTORY
@@ -28,19 +31,15 @@ const PredictionHistory = () => {
     fetchPredictionHistory();
   }, []);
 
+
   const fetchPredictionHistory = async () => {
+
     try {
+
       setLoading(true);
       setError("");
 
       const data = await api.getPredictionHistory();
-
-      /*
-        Depending on your backend, the API may return:
-        1. An array directly
-        2. { predictions: [...] }
-        3. { data: [...] }
-      */
 
       const historyData = Array.isArray(data)
         ? data
@@ -49,61 +48,117 @@ const PredictionHistory = () => {
           [];
 
       setPredictions(historyData);
+
     } catch (err) {
-      console.error("Prediction history error:", err);
+
+      console.error(
+        "Prediction history error:",
+        err
+      );
 
       setError(
         err?.message ||
-          "Unable to load prediction history."
+        "Unable to load prediction history."
       );
 
       setPredictions([]);
+
     } finally {
+
       setLoading(false);
+
     }
   };
+
 
   /* =====================================================
      FORMAT DATE
   ===================================================== */
 
   const formatDate = (date) => {
+
     if (!date) return "—";
 
     try {
-      return new Date(date).toLocaleDateString("en-IN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
+
+      return new Date(date).toLocaleDateString(
+        "en-IN",
+        {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }
+      );
+
     } catch {
+
       return "—";
+
     }
   };
+
 
   /* =====================================================
      FORMAT NUMBER
   ===================================================== */
 
-  const formatNumber = (value, decimals = 2) => {
-    if (value === null || value === undefined || value === "") {
+  const formatNumber = (
+    value,
+    decimals = 2
+  ) => {
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
       return "—";
     }
 
     const number = Number(value);
 
-    if (Number.isNaN(number)) {
-      return value;
+    if (!Number.isFinite(number)) {
+      return "—";
     }
 
     return number.toFixed(decimals);
   };
 
+
   /* =====================================================
-     CONFIDENCE
+     CONVERT HG/HA → TONNES/HA
+  ===================================================== */
+
+  const formatYield = (value) => {
+
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return "—";
+    }
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return "—";
+    }
+
+    // 1 tonne = 10,000 hg
+    const tonnesPerHectare =
+      number / 10000;
+
+    return `${tonnesPerHectare.toFixed(2)} T/ha`;
+  };
+
+
+  /* =====================================================
+     GET CONFIDENCE
   ===================================================== */
 
   const getConfidence = (value) => {
+
     if (
       value === null ||
       value === undefined ||
@@ -114,21 +169,40 @@ const PredictionHistory = () => {
 
     const number = Number(value);
 
-    if (Number.isNaN(number)) {
+    if (!Number.isFinite(number)) {
       return 0;
     }
 
-    return Math.min(Math.max(number, 0), 100);
+    return Math.min(
+      Math.max(number, 0),
+      99
+    );
   };
+
+
+  /* =====================================================
+     FORMAT CONFIDENCE
+  ===================================================== */
+
+  const formatConfidence = (value) => {
+
+    const confidence =
+      getConfidence(value);
+
+    return `${confidence.toFixed(2)}%`;
+  };
+
 
   /* =====================================================
      CATEGORY CLASS
   ===================================================== */
 
   const getCategoryClass = (category) => {
+
     if (!category) return "";
 
-    const value = category.toLowerCase();
+    const value =
+      String(category).toLowerCase();
 
     if (
       value.includes("high") ||
@@ -148,14 +222,17 @@ const PredictionHistory = () => {
     return "medium";
   };
 
+
   /* =====================================================
      EXPORT CSV
   ===================================================== */
 
   const handleExport = () => {
+
     if (!predictions.length) {
       return;
     }
+
 
     const headers = [
       "ID",
@@ -167,62 +244,115 @@ const PredictionHistory = () => {
       "Humidity",
       "Wind Speed",
       "Pesticides",
-      "Predicted Yield",
-      "Confidence",
+      "Predicted Yield (T/ha)",
+      "Confidence (%)",
       "Category",
       "Recommendation",
       "Created At",
     ];
 
-    const rows = predictions.map((item, index) => [
-      item.id ?? index + 1,
-      item.crop ?? "",
-      item.area ?? "",
-      item.year ?? "",
-      item.rainfall ?? "",
-      item.temperature ?? "",
-      item.humidity ?? "",
-      item.wind_speed ?? "",
-      item.pesticides ?? "",
-      item.predicted_yield ?? "",
-      item.confidence ?? "",
-      item.category ?? "",
-      item.recommendation ?? "",
-      item.created_at ?? "",
-    ]);
+
+    const rows = predictions.map(
+      (item, index) => [
+
+        item.id ?? index + 1,
+
+        item.crop ?? "",
+
+        item.area ?? "",
+
+        item.year ?? "",
+
+        item.rainfall ?? "",
+
+        item.temperature ?? "",
+
+        item.humidity ?? "",
+
+        item.wind_speed ?? "",
+
+        item.pesticides ?? "",
+
+        item.predicted_yield != null
+          ? (
+              Number(item.predicted_yield) /
+              10000
+            ).toFixed(2)
+          : "",
+
+        item.confidence != null
+          ? getConfidence(
+              item.confidence
+            ).toFixed(2)
+          : "",
+
+        item.category ?? "",
+
+        item.recommendation ?? "",
+
+        item.created_at ?? "",
+      ]
+    );
+
 
     const escapeCSV = (value) => {
-      const stringValue = String(value ?? "");
+
+      const stringValue =
+        String(value ?? "");
 
       if (
         stringValue.includes(",") ||
         stringValue.includes('"') ||
         stringValue.includes("\n")
       ) {
-        return `"${stringValue.replace(/"/g, '""')}"`;
+
+        return `"${stringValue.replace(
+          /"/g,
+          '""'
+        )}"`;
+
       }
 
       return stringValue;
     };
 
+
     const csvContent = [
-      headers.map(escapeCSV).join(","),
+
+      headers
+        .map(escapeCSV)
+        .join(","),
+
       ...rows.map((row) =>
-        row.map(escapeCSV).join(",")
+        row
+          .map(escapeCSV)
+          .join(",")
       ),
+
     ].join("\n");
 
-    const blob = new Blob([csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
 
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob(
+      [csvContent],
+      {
+        type: "text/csv;charset=utf-8;",
+      }
+    );
 
-    const link = document.createElement("a");
+
+    const url =
+      URL.createObjectURL(blob);
+
+
+    const link =
+      document.createElement("a");
+
 
     link.href = url;
+
     link.download =
       "yieldsense_prediction_history.csv";
+
 
     document.body.appendChild(link);
 
@@ -232,47 +362,72 @@ const PredictionHistory = () => {
 
     URL.revokeObjectURL(url);
   };
+
+
   /* =====================================================
      VIEW PREDICTION
   ===================================================== */
 
-  const handleViewPrediction = (prediction) => {
-    setSelectedPrediction(prediction);
+  const handleViewPrediction = (
+    prediction
+  ) => {
+
+    setSelectedPrediction(
+      prediction
+    );
+
   };
+
 
   /* =====================================================
      CLOSE MODAL
   ===================================================== */
 
   const closeModal = () => {
+
     setSelectedPrediction(null);
+
   };
+
 
   /* =====================================================
      LOADING
   ===================================================== */
 
   if (loading) {
+
     return (
+
       <div className="history-page">
+
         <div className="history-loading">
+
           <Loader2
             size={28}
             className="history-loading-icon"
           />
 
-          <p>Loading prediction history...</p>
+          <p>
+            Loading prediction history...
+          </p>
+
         </div>
+
       </div>
+
     );
+
   }
+
 
   /* =====================================================
      PAGE
   ===================================================== */
 
   return (
+
     <div className="history-page">
+
 
       {/* =================================================
           TOP BAR
@@ -281,71 +436,98 @@ const PredictionHistory = () => {
       <div className="history-top">
 
         <p>
+
           <History size={16} />
 
           {predictions.length}{" "}
+
           {predictions.length === 1
             ? "prediction"
             : "predictions"}{" "}
+
           made
+
         </p>
+
 
         <button
           className="export-button"
           onClick={handleExport}
           disabled={!predictions.length}
         >
+
           <Download size={17} />
 
           Export
+
         </button>
 
       </div>
+
 
       {/* =================================================
           ERROR
       ================================================= */}
 
       {error && (
+
         <div className="history-error">
+
           <AlertCircle size={18} />
 
-          <span>{error}</span>
+          <span>
+            {error}
+          </span>
 
           <button
-            onClick={fetchPredictionHistory}
+            onClick={
+              fetchPredictionHistory
+            }
           >
             Retry
           </button>
+
         </div>
+
       )}
+
 
       {/* =================================================
           EMPTY STATE
       ================================================= */}
 
-      {!error && predictions.length === 0 && (
-        <div className="history-empty">
+      {!error &&
+        predictions.length === 0 && (
 
-          <div className="history-empty-icon">
-            <History size={30} />
+          <div className="history-empty">
+
+            <div className="history-empty-icon">
+
+              <History size={30} />
+
+            </div>
+
+            <h3>
+              No predictions yet
+            </h3>
+
+            <p>
+              Your crop yield predictions
+              will appear here after you
+              make a prediction.
+            </p>
+
           </div>
 
-          <h3>No predictions yet</h3>
+        )}
 
-          <p>
-            Your crop yield predictions will
-            appear here after you make a prediction.
-          </p>
-
-        </div>
-      )}
 
       {/* =================================================
           TABLE
       ================================================= */}
 
       {predictions.length > 0 && (
+
         <div className="history-table-card">
 
           <div className="history-table-wrapper">
@@ -353,6 +535,7 @@ const PredictionHistory = () => {
             <table className="history-table">
 
               <thead>
+
                 <tr>
 
                   <th>#</th>
@@ -378,148 +561,192 @@ const PredictionHistory = () => {
                   <th>ACTIONS</th>
 
                 </tr>
+
               </thead>
+
 
               <tbody>
 
-                {predictions.map((item, index) => {
+                {predictions.map(
+                  (item, index) => {
 
-                  const confidence =
-                    getConfidence(
-                      item.confidence
-                    );
+                    const confidence =
+                      getConfidence(
+                        item.confidence
+                      );
 
-                  return (
-                    <tr
-                      key={
-                        item.id ??
-                        item.created_at ??
-                        index
-                      }
-                    >
 
-                      {/* NUMBER */}
+                    return (
 
-                      <td className="history-number">
-                        {index + 1}
-                      </td>
+                      <tr
+                        key={
+                          item.id ??
+                          item.created_at ??
+                          index
+                        }
+                      >
 
-                      {/* CROP */}
 
-                      <td className="crop-name">
-                        {item.crop || "—"}
-                      </td>
+                        {/* NUMBER */}
 
-                      {/* AREA */}
+                        <td className="history-number">
+                          {index + 1}
+                        </td>
 
-                      <td>
-                        {item.area || "—"}
-                      </td>
 
-                      {/* YEAR */}
+                        {/* CROP */}
 
-                      <td>
-                        {item.year || "—"}
-                      </td>
+                        <td className="crop-name">
+                          {item.crop || "—"}
+                        </td>
 
-                      {/* RAINFALL */}
 
-                      <td>
-                        {item.rainfall != null
-                          ? `${formatNumber(
-                              item.rainfall,
-                              0
-                            )} mm`
-                          : "—"}
-                      </td>
+                        {/* AREA */}
 
-                      {/* TEMPERATURE */}
+                        <td>
+                          {item.area || "—"}
+                        </td>
 
-                      <td>
-                        {item.temperature != null
-                          ? `${formatNumber(
-                              item.temperature,
-                              1
-                            )} °C`
-                          : "—"}
-                      </td>
 
-                      {/* PREDICTED YIELD */}
+                        {/* YEAR */}
 
-                      <td className="predicted-yield">
-                        {item.predicted_yield != null
-                          ? `${formatNumber(
-                              item.predicted_yield,
-                              2
-                            )} T/Ha`
-                          : "—"}
-                      </td>
+                        <td>
+                          {item.year || "—"}
+                        </td>
 
-                      {/* CONFIDENCE */}
 
-                      <td>
+                        {/* RAINFALL */}
 
-                        <div className="confidence-cell">
+                        <td>
 
-                          <div className="confidence-track">
+                          {item.rainfall != null
+                            ? `${formatNumber(
+                                item.rainfall,
+                                0
+                              )} mm`
+                            : "—"}
 
-                            <div
-                              className="confidence-fill"
-                              style={{
-                                width: `${confidence}%`,
-                              }}
-                            />
+                        </td>
+
+
+                        {/* TEMPERATURE */}
+
+                        <td>
+
+                          {item.temperature != null
+                            ? `${formatNumber(
+                                item.temperature,
+                                1
+                              )} °C`
+                            : "—"}
+
+                        </td>
+
+
+                        {/* PREDICTED YIELD */}
+
+                        <td className="predicted-yield">
+
+                          {formatYield(
+                            item.predicted_yield
+                          )}
+
+                        </td>
+
+
+                        {/* CONFIDENCE */}
+
+                        <td>
+
+                          <div className="confidence-cell">
+
+                            <div className="confidence-track">
+
+                              <div
+                                className="confidence-fill"
+                                style={{
+                                  width:
+                                    `${confidence}%`,
+                                }}
+                              />
+
+                            </div>
+
+
+                            <span>
+                              {formatConfidence(
+                                item.confidence
+                              )}
+                            </span>
 
                           </div>
 
-                          <span>
-                            {item.confidence != null
-                              ? `${item.confidence}%`
-                              : "—"}
+                        </td>
+
+
+                        {/* CATEGORY */}
+
+                        <td>
+
+                          <span
+                            className={
+                              `category-badge ${
+                                getCategoryClass(
+                                  item.category
+                                )
+                              }`
+                            }
+                          >
+
+                            {item.category || "—"}
+
                           </span>
 
-                        </div>
+                        </td>
 
-                      </td>
 
-                      {/* CATEGORY */}
+                        {/* DATE */}
 
-                      <td>
+                        <td>
 
-                        <span
-                          className={`category-badge ${getCategoryClass(
-                            item.category
-                          )}`}
-                        >
-                          {item.category || "—"}
-                        </span>
+                          {formatDate(
+                            item.created_at
+                          )}
 
-                      </td>
+                        </td>
 
-                      {/* DATE */}
 
-                      <td>
-                        {formatDate(
-                          item.created_at
-                        )}
-                      </td>
+                        {/* ACTION */}
 
-                      {/* ACTION */}
+                        <td className="actions-cell">
 
-                      <td className="actions-cell">
-  <button
-    type="button"
-    className="view-prediction-btn"
-    onClick={() => handleViewPrediction(item)}
-    title="View prediction"
-  >
-    <Eye size={17} strokeWidth={2} />
-  </button>
-</td>
+                          <button
+                            type="button"
+                            className="view-prediction-btn"
+                            onClick={() =>
+                              handleViewPrediction(
+                                item
+                              )
+                            }
+                            title="View prediction"
+                          >
 
-                    </tr>
-                  );
-                })}
+                            <Eye
+                              size={17}
+                              strokeWidth={2}
+                            />
+
+                          </button>
+
+                        </td>
+
+
+                      </tr>
+
+                    );
+
+                  }
+                )}
 
               </tbody>
 
@@ -528,7 +755,9 @@ const PredictionHistory = () => {
           </div>
 
         </div>
+
       )}
+
 
       {/* =================================================
           PREDICTION DETAILS MODAL
@@ -548,6 +777,7 @@ const PredictionHistory = () => {
             }
           >
 
+
             {/* MODAL HEADER */}
 
             <div className="prediction-modal-header">
@@ -556,19 +786,24 @@ const PredictionHistory = () => {
                 Prediction Details
               </h2>
 
+
               <button
                 className="modal-close-button"
                 onClick={closeModal}
                 aria-label="Close"
               >
+
                 <X size={21} />
+
               </button>
 
             </div>
 
+
             {/* MODAL CONTENT */}
 
             <div className="prediction-modal-content">
+
 
               {/* PREDICTED YIELD */}
 
@@ -578,14 +813,15 @@ const PredictionHistory = () => {
                   Predicted Yield
                 </p>
 
+
                 <h1>
-                  {selectedPrediction.predicted_yield != null
-                    ? `${formatNumber(
-                        selectedPrediction.predicted_yield,
-                        2
-                      )} T/Ha`
-                    : "—"}
+
+                  {formatYield(
+                    selectedPrediction.predicted_yield
+                  )}
+
                 </h1>
+
 
                 <span>
                   Tonnes/Hectare
@@ -593,136 +829,210 @@ const PredictionHistory = () => {
 
               </div>
 
+
               {/* DETAILS */}
 
               <div className="prediction-details-grid">
 
+
                 <div className="detail-box">
-                  <span>Crop</span>
+
+                  <span>
+                    Crop
+                  </span>
 
                   <strong>
                     {selectedPrediction.crop ||
                       "—"}
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Area</span>
+
+                  <span>
+                    Area
+                  </span>
 
                   <strong>
                     {selectedPrediction.area ||
                       "—"}
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Year</span>
+
+                  <span>
+                    Year
+                  </span>
 
                   <strong>
                     {selectedPrediction.year ||
                       "—"}
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Rainfall</span>
+
+                  <span>
+                    Rainfall
+                  </span>
 
                   <strong>
+
                     {selectedPrediction.rainfall != null
                       ? `${formatNumber(
                           selectedPrediction.rainfall,
                           0
                         )} mm`
                       : "—"}
+
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Temperature</span>
+
+                  <span>
+                    Temperature
+                  </span>
 
                   <strong>
+
                     {selectedPrediction.temperature != null
                       ? `${formatNumber(
                           selectedPrediction.temperature,
                           1
                         )} °C`
                       : "—"}
+
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Humidity</span>
+
+                  <span>
+                    Humidity
+                  </span>
 
                   <strong>
+
                     {selectedPrediction.humidity != null
                       ? `${formatNumber(
                           selectedPrediction.humidity,
                           1
                         )}%`
                       : "—"}
+
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Wind Speed</span>
+
+                  <span>
+                    Wind Speed
+                  </span>
 
                   <strong>
+
                     {selectedPrediction.wind_speed != null
                       ? formatNumber(
                           selectedPrediction.wind_speed,
                           2
                         )
                       : "—"}
+
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Pesticides</span>
+
+                  <span>
+                    Pesticides
+                  </span>
 
                   <strong>
+
                     {selectedPrediction.pesticides != null
                       ? formatNumber(
                           selectedPrediction.pesticides,
                           2
                         )
                       : "—"}
+
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Confidence</span>
+
+                  <span>
+                    Confidence
+                  </span>
 
                   <strong>
-                    {selectedPrediction.confidence != null
-                      ? `${selectedPrediction.confidence}%`
-                      : "—"}
+
+                    {formatConfidence(
+                      selectedPrediction.confidence
+                    )}
+
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Category</span>
+
+                  <span>
+                    Category
+                  </span>
 
                   <strong>
+
                     {selectedPrediction.category ||
                       "—"}
+
                   </strong>
+
                 </div>
 
+
                 <div className="detail-box">
-                  <span>Date</span>
+
+                  <span>
+                    Date
+                  </span>
 
                   <strong>
+
                     {formatDate(
                       selectedPrediction.created_at
                     )}
+
                   </strong>
+
                 </div>
 
               </div>
 
+
               {/* AI RECOMMENDATION */}
 
               {selectedPrediction.recommendation && (
+
                 <div className="modal-recommendation">
 
                   <span>
@@ -736,6 +1046,7 @@ const PredictionHistory = () => {
                   </p>
 
                 </div>
+
               )}
 
             </div>
@@ -743,10 +1054,14 @@ const PredictionHistory = () => {
           </div>
 
         </div>
+
       )}
 
     </div>
+
   );
+
 };
+
 
 export default PredictionHistory;

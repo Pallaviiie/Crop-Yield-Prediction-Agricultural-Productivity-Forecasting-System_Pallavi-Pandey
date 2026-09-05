@@ -1,0 +1,938 @@
+/* =========================================================
+   DATASETS PAGE
+========================================================= */
+
+.admin-datasets-page {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+
+  /* SPACE FROM NAVBAR + SIDEBAR */
+  padding: 28px 30px 40px 30px;
+
+  font-family: "Segoe UI", Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.admin-datasets-page .admin-page-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+
+  margin-bottom: 26px;
+}
+
+.admin-datasets-page .admin-page-header h1 {
+  margin: 0 0 7px 0;
+
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #064e3b;
+}
+
+.admin-datasets-page .admin-page-header p {
+  margin: 0;
+
+  font-size: 14px;
+  line-height: 1.6;
+
+  color: #6b8f80;
+}
+
+/* =========================================================
+   HEADER BUTTONS
+========================================================= */
+
+.dataset-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.dataset-refresh,
+.dataset-add-button {
+  height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 0 16px;
+
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.dataset-refresh {
+  background: #ffffff;
+  color: #087f5b;
+
+  border: 1px solid #cde8da;
+}
+
+.dataset-refresh:hover:not(:disabled) {
+  background: #f1faf5;
+  transform: translateY(-1px);
+}
+
+.dataset-add-button {
+  border: none;
+
+  background: #078a4f;
+  color: #ffffff;
+
+  box-shadow: 0 4px 12px rgba(7, 138, 79, 0.16);
+}
+
+.dataset-add-button:hover {
+  background: #067542;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(7, 138, 79, 0.22);
+}
+
+.dataset-refresh:disabled,
+.dataset-add-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.dataset-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+  padding: 13px 16px;
+
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+
+  background: #fff7f7;
+  color: #b42318;
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.dataset-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  margin-bottom: 18px;
+}
+
+.dataset-search {
+  flex: 1;
+  max-width: 520px;
+
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0 14px;
+
+  background: #ffffff;
+
+  border: 1px solid #d8eade;
+  border-radius: 10px;
+
+  color: #6b8f80;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dataset-search:focus-within {
+  border-color: #3aaf78;
+
+  box-shadow:
+    0 0 0 3px rgba(58, 175, 120, 0.1);
+}
+
+.dataset-search input {
+  width: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  font-size: 14px;
+  color: #24483a;
+}
+
+.dataset-search input::placeholder {
+  color: #9ab2a7;
+}
+
+.dataset-count {
+  min-width: 90px;
+
+  padding: 9px 14px;
+
+  text-align: center;
+
+  border-radius: 20px;
+
+  background: #edf9f2;
+  color: #087f5b;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   DATASET CARD
+========================================================= */
+
+.dataset-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #d8eadf;
+  border-radius: 15px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 4px 16px rgba(24, 84, 53, 0.05);
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.dataset-loading {
+  min-height: 300px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  color: #6b8f80;
+
+  font-size: 14px;
+}
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.dataset-empty {
+  min-height: 330px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px 20px;
+
+  text-align: center;
+}
+
+.dataset-empty-icon {
+  width: 72px;
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+
+  border-radius: 50%;
+
+  background: #edf9f2;
+  color: #078a4f;
+}
+
+.dataset-empty h3 {
+  margin: 0 0 7px;
+
+  color: #214b3a;
+
+  font-size: 18px;
+}
+
+.dataset-empty p {
+  margin: 0 0 20px;
+
+  color: #78968a;
+
+  font-size: 14px;
+}
+
+.dataset-empty-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #078a4f;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.dataset-empty-button:hover {
+  background: #067542;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.dataset-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dataset-table {
+  width: 100%;
+  min-width: 900px;
+
+  border-collapse: collapse;
+
+  table-layout: auto;
+}
+
+.dataset-table thead {
+  background: #f4faf6;
+}
+
+.dataset-table th {
+  padding: 15px 18px;
+
+  text-align: left;
+
+  border-bottom: 1px solid #dcece2;
+
+  color: #527667;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  white-space: nowrap;
+}
+
+.dataset-table td {
+  padding: 17px 18px;
+
+  border-bottom: 1px solid #edf3ef;
+
+  color: #365b4c;
+
+  font-size: 14px;
+
+  vertical-align: middle;
+}
+
+.dataset-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.dataset-table tbody tr:hover {
+  background: #f8fcf9;
+}
+
+.dataset-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================================================
+   DATASET NAME
+========================================================= */
+
+.dataset-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-width: 220px;
+}
+
+.dataset-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eaf8f0;
+  color: #078a4f;
+}
+
+.dataset-name-cell > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  min-width: 0;
+}
+
+.dataset-name-cell strong {
+  color: #244c3c;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.dataset-name-cell span {
+  max-width: 260px;
+
+  overflow: hidden;
+
+  color: #829b91;
+
+  font-size: 12px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   TYPE
+========================================================= */
+
+.dataset-type {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 6px 10px;
+
+  border-radius: 7px;
+
+  background: #f0f7f3;
+
+  color: #467463;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   RECORD NUMBERS
+========================================================= */
+
+.dataset-number {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #365f4d;
+
+  font-weight: 600;
+}
+
+.dataset-number svg {
+  color: #7da392;
+}
+
+.dataset-columns {
+  color: #527667;
+  font-weight: 600;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.dataset-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.dataset-status.active {
+  background: #eaf8f0;
+  color: #078a4f;
+}
+
+.dataset-status.inactive {
+  background: #fff2f2;
+  color: #c43c3c;
+}
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.dataset-date {
+  color: #718f83;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+.dataset-delete {
+  width: 36px;
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #f0d6d6;
+  border-radius: 8px;
+
+  background: #fffafa;
+  color: #c84b4b;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dataset-delete:hover {
+  background: #fff0f0;
+  color: #b42318;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   MODAL OVERLAY
+========================================================= */
+
+.dataset-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(17, 43, 32, 0.38);
+
+  backdrop-filter: blur(3px);
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.dataset-modal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border: 1px solid #dcebe2;
+  border-radius: 16px;
+
+  box-shadow:
+    0 20px 60px rgba(20, 65, 43, 0.2);
+}
+
+/* =========================================================
+   MODAL HEADER
+========================================================= */
+
+.dataset-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 22px 24px;
+
+  border-bottom: 1px solid #e5eee9;
+}
+
+.dataset-modal-header h2 {
+  margin: 0 0 6px;
+
+  color: #174b36;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.dataset-modal-header p {
+  margin: 0;
+
+  color: #7a9589;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dataset-modal-close {
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #f3f8f5;
+  color: #638276;
+
+  cursor: pointer;
+}
+
+.dataset-modal-close:hover {
+  background: #e8f2ec;
+  color: #285847;
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.dataset-form {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+
+  padding: 24px;
+}
+
+.dataset-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.dataset-form-group label {
+  color: #355d4c;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dataset-form-group input,
+.dataset-form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 11px 13px;
+
+  border: 1px solid #d5e6dc;
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #294f40;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dataset-form-group input {
+  height: 43px;
+}
+
+.dataset-form-group textarea {
+  min-height: 85px;
+
+  resize: vertical;
+}
+
+.dataset-form-group input:focus,
+.dataset-form-group textarea:focus {
+  border-color: #39a872;
+
+  box-shadow:
+    0 0 0 3px rgba(57, 168, 114, 0.1);
+}
+
+.dataset-form-group input::placeholder,
+.dataset-form-group textarea::placeholder {
+  color: #a0b6ac;
+}
+
+.dataset-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 15px;
+}
+
+/* =========================================================
+   FORM BUTTONS
+========================================================= */
+
+.dataset-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 6px;
+  padding-top: 18px;
+
+  border-top: 1px solid #e7efea;
+}
+
+.dataset-cancel-button,
+.dataset-save-button {
+  min-height: 41px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 0 17px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.dataset-cancel-button {
+  border: 1px solid #d5e5dc;
+
+  background: #ffffff;
+  color: #5b786b;
+}
+
+.dataset-cancel-button:hover {
+  background: #f5faf7;
+}
+
+.dataset-save-button {
+  border: none;
+
+  background: #078a4f;
+  color: #ffffff;
+
+  box-shadow: 0 4px 10px rgba(7, 138, 79, 0.14);
+}
+
+.dataset-save-button:hover {
+  background: #067542;
+}
+
+.dataset-cancel-button:disabled,
+.dataset-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   SPIN ANIMATION
+========================================================= */
+
+.admin-spin {
+  animation: adminDatasetSpin 0.9s linear infinite;
+}
+
+@keyframes adminDatasetSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   IMPORTANT LAYOUT FIX
+   Gives the entire admin content area breathing room
+   from the navbar.
+========================================================= */
+
+.admin-content {
+  box-sizing: border-box;
+
+  padding: 0 !important;
+}
+
+/*
+   The page itself provides the spacing.
+   This prevents the content from touching the
+   navbar while avoiding double spacing.
+*/
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+  .admin-datasets-page {
+    padding: 24px 22px 35px;
+  }
+
+  .dataset-table {
+    min-width: 850px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-datasets-page {
+    padding: 20px 16px 30px;
+  }
+
+  .admin-datasets-page .admin-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    margin-bottom: 20px;
+  }
+
+  .dataset-header-actions {
+    width: 100%;
+  }
+
+  .dataset-refresh,
+  .dataset-add-button {
+    flex: 1;
+  }
+
+  .dataset-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dataset-search {
+    max-width: none;
+  }
+
+  .dataset-count {
+    align-self: flex-start;
+  }
+
+  .dataset-modal-overlay {
+    padding: 15px;
+  }
+
+  .dataset-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-datasets-page {
+    padding: 16px 12px 25px;
+  }
+
+  .admin-datasets-page .admin-page-header h1 {
+    font-size: 25px;
+  }
+
+  .dataset-header-actions {
+    flex-direction: column;
+  }
+
+  .dataset-refresh,
+  .dataset-add-button {
+    width: 100%;
+  }
+
+  .dataset-modal-header,
+  .dataset-form {
+    padding: 18px;
+  }
+
+  .dataset-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dataset-cancel-button,
+  .dataset-save-button {
+    width: 100%;
+  }
+}

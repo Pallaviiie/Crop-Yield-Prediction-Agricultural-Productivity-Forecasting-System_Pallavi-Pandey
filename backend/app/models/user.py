@@ -51,11 +51,21 @@ class User(Base):
     )
 
     # ============================================================
-    # CONTACT
+    # CONTACT / LOCATION
     # ============================================================
 
     phone = Column(
         String(30),
+        nullable=True,
+    )
+
+    city = Column(
+        String(100),
+        nullable=True,
+    )
+
+    district = Column(
+        String(100),
         nullable=True,
     )
 
@@ -98,6 +108,7 @@ class User(Base):
         String(255),
         nullable=True,
     )
+
     # ============================================================
     # CONSULTANT INFORMATION
     # ============================================================
@@ -116,6 +127,12 @@ class User(Base):
         String(255),
         nullable=True,
     )
+
+    license_number = Column(
+        String(255),
+        nullable=True,
+    )
+
     # ============================================================
     # PROFILE
     # ============================================================

@@ -1,20 +1,29 @@
-const API_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+// ============================================================
+// YIELDSENSE AI - API SERVICE
+// ============================================================
 
-// ==========================================
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  "http://127.0.0.1:8000";
+
+// ============================================================
 // TOKEN
-// ==========================================
+// ============================================================
 
 const getToken = () => {
   return (
     localStorage.getItem("access_token") ||
-    localStorage.getItem("token")
+    sessionStorage.getItem("access_token") ||
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("token") ||
+    ""
   );
 };
 
-// ==========================================
+// ============================================================
 // HEADERS
-// ==========================================
+// ============================================================
 
 const getHeaders = (auth = false) => {
   const headers = {
@@ -32,11 +41,84 @@ const getHeaders = (auth = false) => {
   return headers;
 };
 
-// ==========================================
-// LOGIN
-// ==========================================
+// ============================================================
+// COMMON RESPONSE HANDLER
+// ============================================================
 
-export const loginUser = async (email, password) => {
+const parseResponse = async (response) => {
+  const text = await response.text();
+
+  let data = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+
+  if (!response.ok) {
+    let message =
+      data?.detail ||
+      data?.message ||
+      data?.error ||
+      `Request failed with status ${response.status}`;
+
+    if (Array.isArray(message)) {
+      message = message
+        .map((item) => {
+          if (typeof item === "string") {
+            return item;
+          }
+
+          return (
+            item?.msg ||
+            item?.message ||
+            "Invalid request"
+          );
+        })
+        .join(", ");
+    }
+
+    throw new Error(message);
+  }
+
+  return data;
+};
+
+// ============================================================
+// GENERIC REQUEST
+// ============================================================
+
+const request = async (
+  endpoint,
+  options = {}
+) => {
+  const response = await fetch(
+    `${API_URL}${endpoint}`,
+    {
+      ...options,
+
+      headers: {
+        ...(options.body instanceof FormData
+          ? {}
+          : getHeaders(true)),
+
+        ...(options.headers || {}),
+      },
+    }
+  );
+
+  return parseResponse(response);
+};
+
+// ============================================================
+// LOGIN
+// ============================================================
+
+export const loginUser = async (
+  email,
+  password
+) => {
   const formData = new URLSearchParams();
 
   formData.append("username", email);
@@ -56,45 +138,33 @@ export const loginUser = async (email, password) => {
     }
   );
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-        "Invalid email or password."
-    );
-  }
+  const data =
+    await parseResponse(response);
 
   return data;
 };
 
-// ==========================================
-// CURRENT USER / FARMER PROFILE
-// ==========================================
+// ============================================================
+// CURRENT USER
+// ============================================================
 
 export const getCurrentUser = async () => {
-  const response = await fetch(
-    `${API_URL}/users/me`,
+  const data = await request(
+    "/users/me",
     {
       method: "GET",
       headers: getHeaders(true),
     }
   );
 
-  const data = await response.json();
+  console.log(
+    "GET CURRENT USER:",
+    data
+  );
 
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-        "Unable to fetch farmer profile"
-    );
-  }
-
-  console.log("GET CURRENT USER RESPONSE:", data);
-
-  // Support all common backend response structures
   return (
     data?.profile ||
+    data?.consultant ||
     data?.user ||
     data?.data?.profile ||
     data?.data?.user ||
@@ -102,10 +172,15 @@ export const getCurrentUser = async () => {
   );
 };
 
+// ============================================================
+// UPDATE CURRENT USER
+// ============================================================
 
-export const updateCurrentUser = async (profileData) => {
-  const response = await fetch(
-    `${API_URL}/users/me`,
+export const updateCurrentUser = async (
+  profileData
+) => {
+  const data = await request(
+    "/users/me",
     {
       method: "PUT",
       headers: getHeaders(true),
@@ -113,29 +188,57 @@ export const updateCurrentUser = async (profileData) => {
     }
   );
 
-  const data = await response.json();
+  console.log(
+    "UPDATE CURRENT USER:",
+    data
+  );
 
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-        "Unable to update farmer profile"
-    );
-  }
-
-  console.log("UPDATE CURRENT USER RESPONSE:", data);
-
-  // Normalize backend response
   return (
     data?.profile ||
+    data?.consultant ||
     data?.user ||
     data?.data?.profile ||
     data?.data?.user ||
     data
   );
 };
-// ==========================================
-// PROFILE IMAGE UPLOAD
-// ==========================================
+
+// ============================================================
+// CONSULTANT PROFILE
+// ============================================================
+// Uses the same authenticated /users/me endpoint
+// because your registration/login system stores consultant
+// information as a user.
+
+export const getConsultantProfile = async () => {
+  const data =
+    await getCurrentUser();
+
+  return {
+    consultant: data,
+    profile: data,
+    ...data,
+  };
+};
+
+export const updateConsultantProfile = async (
+  profileData
+) => {
+  const data =
+    await updateCurrentUser(
+      profileData
+    );
+
+  return {
+    consultant: data,
+    profile: data,
+    ...data,
+  };
+};
+
+// ============================================================
+// PROFILE IMAGE
+// ============================================================
 
 export const uploadProfileImage = async (file) => {
   const formData = new FormData();
@@ -159,526 +262,672 @@ export const uploadProfileImage = async (file) => {
     }
   );
 
-  const data = await response.json();
+  const data = await parseResponse(response);
 
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-        "Failed to upload profile image"
+  console.log("UPLOAD PROFILE IMAGE RESPONSE:", data);
+
+  return (
+    data?.profile ||
+    data?.consultant ||
+    data?.user ||
+    data?.data?.profile ||
+    data?.data?.user ||
+    data
+  );
+};
+// ============================================================
+// DELETE PROFILE IMAGE
+// ============================================================
+
+export const deleteProfileImage = async () => {
+  const token = getToken();
+
+  const headers = {};
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(
+    `${API_URL}/users/profile-image`,
+    {
+      method: "DELETE",
+      headers,
+    }
+  );
+
+  const data = await parseResponse(response);
+
+  console.log("DELETE PROFILE IMAGE RESPONSE:", data);
+
+  return (
+    data?.profile ||
+    data?.consultant ||
+    data?.user ||
+    data?.data?.profile ||
+    data?.data?.user ||
+    data
+  );
+};
+// ============================================================
+// DATASET
+// ============================================================
+
+export const getDatasetSummary =
+  async () => {
+    return request(
+      "/datasets/summary"
     );
-  }
+  };
 
-  return data;
-};
+export const getCropData =
+  async () => {
+    return request(
+      "/datasets/crop"
+    );
+  };
 
-// ==========================================
-// DATASET API
-// ==========================================
+export const getSoilData =
+  async () => {
+    return request(
+      "/datasets/soil"
+    );
+  };
 
-export const getDatasetSummary = async () => {
-  const response = await fetch(`${API_URL}/datasets/summary`);
+export const getRainfallData =
+  async () => {
+    return request(
+      "/datasets/rainfall"
+    );
+  };
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch dataset summary");
-  }
+export const getTemperatureData =
+  async () => {
+    return request(
+      "/datasets/temperature"
+    );
+  };
 
-  return response.json();
-};
+export const getPesticideData =
+  async () => {
+    return request(
+      "/datasets/pesticides"
+    );
+  };
 
-export const getCropData = async () => {
-  const response = await fetch(`${API_URL}/datasets/crop`);
+// ============================================================
+// DATASET ANALYTICS
+// ============================================================
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch crop data");
-  }
+export const getCropAnalytics =
+  async () => {
+    return request(
+      "/datasets/analytics/crop"
+    );
+  };
 
-  return response.json();
-};
+export const getSoilAnalytics =
+  async () => {
+    return request(
+      "/datasets/analytics/soil"
+    );
+  };
 
-export const getSoilData = async () => {
-  const response = await fetch(`${API_URL}/datasets/soil`);
+export const getRainfallAnalytics =
+  async () => {
+    return request(
+      "/datasets/analytics/rainfall"
+    );
+  };
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch soil data");
-  }
+export const getTemperatureAnalytics =
+  async () => {
+    return request(
+      "/datasets/analytics/temperature"
+    );
+  };
 
-  return response.json();
-};
+export const getPesticideAnalytics =
+  async () => {
+    return request(
+      "/datasets/analytics/pesticides"
+    );
+  };
 
-export const getRainfallData = async () => {
-  const response = await fetch(`${API_URL}/datasets/rainfall`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch rainfall data");
-  }
-
-  return response.json();
-};
-
-export const getTemperatureData = async () => {
-  const response = await fetch(`${API_URL}/datasets/temperature`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch temperature data");
-  }
-
-  return response.json();
-};
-
-export const getPesticideData = async () => {
-  const response = await fetch(`${API_URL}/datasets/pesticides`);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch pesticide data");
-  }
-
-  return response.json();
-};
-
-// ==========================================
-// ANALYTICS API
-// ==========================================
-
-export const getCropAnalytics = async () => {
-  const response = await fetch(
-    `${API_URL}/datasets/analytics/crop`
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch crop analytics");
-  }
-
-  return response.json();
-};
-
-export const getSoilAnalytics = async () => {
-  const response = await fetch(
-    `${API_URL}/datasets/analytics/soil`
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch soil analytics");
-  }
-
-  return response.json();
-};
-
-export const getRainfallAnalytics = async () => {
-  const response = await fetch(
-    `${API_URL}/datasets/analytics/rainfall`
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch rainfall analytics");
-  }
-
-  return response.json();
-};
-
-export const getTemperatureAnalytics = async () => {
-  const response = await fetch(
-    `${API_URL}/datasets/analytics/temperature`
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch temperature analytics");
-  }
-
-  return response.json();
-};
-
-export const getPesticideAnalytics = async () => {
-  const response = await fetch(
-    `${API_URL}/datasets/analytics/pesticides`
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch pesticide analytics");
-  }
-
-  return response.json();
-};
-
-// ==========================================
+// ============================================================
 // CROP YIELD PREDICTION
-// ==========================================
+// ============================================================
 
-export const predictCropYield = async (predictionData) => {
-  const response = await fetch(
-    `${API_URL}/prediction/predict`,
-    {
-      method: "POST",
-      headers: getHeaders(true),
-      body: JSON.stringify(predictionData),
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail || "Failed to predict crop yield"
+export const predictCropYield =
+  async (predictionData) => {
+    return request(
+      "/prediction/predict",
+      {
+        method: "POST",
+        headers: getHeaders(true),
+        body: JSON.stringify(
+          predictionData
+        ),
+      }
     );
-  }
+  };
 
-  return data;
-};
+// ============================================================
+// RISK
+// ============================================================
 
-export const assessFarmRisk = async (riskData) => {
-
-  const response = await fetch(
-    `${API_URL}/risk-assessment/`,
-    {
-      method: "POST",
-
-      headers: getHeaders(true),
-
-      body: JSON.stringify(riskData),
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-
-    throw new Error(
-      data?.detail ||
-      "Unable to assess farm risk."
+export const assessFarmRisk =
+  async (riskData) => {
+    return request(
+      "/risk-assessment/",
+      {
+        method: "POST",
+        headers: getHeaders(true),
+        body: JSON.stringify(
+          riskData
+        ),
+      }
     );
+  };
 
-  }
-
-  return data;
-};
-
-// ==========================================
+// ============================================================
 // PREDICTION HISTORY
-// ==========================================
-
-export const getPredictionHistory = async () => {
-  const response = await fetch(
-    `${API_URL}/prediction/history`,
-    {
-      method: "GET",
-      headers: getHeaders(true),
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail || "Failed to fetch prediction history"
-    );
-  }
-
-  return data;
-};
-// ==========================================
-// REAL-TIME WEATHER
-// ==========================================
-
-export const getWeatherForecast = async (latitude, longitude) => {
-  const response = await fetch(
-    `${API_URL}/weather/forecast?latitude=${encodeURIComponent(
-      latitude
-    )}&longitude=${encodeURIComponent(longitude)}`
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail || "Failed to fetch weather forecast"
-    );
-  }
-
-  return data;
-};
-
-// ============================================================
-// SOIL HEALTH ANALYSIS
 // ============================================================
 
-export const analyzeSoil = async (soilData) => {
-  const response = await fetch(
-    `${API_URL}/soil/analyze`,
-    {
-      method: "POST",
-      headers: getHeaders(true),
-      body: JSON.stringify(soilData),
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Failed to analyze soil"
+export const getPredictionHistory =
+  async () => {
+    return request(
+      "/prediction/history",
+      {
+        method: "GET",
+        headers: getHeaders(true),
+      }
     );
-  }
+  };
 
-  return data;
-};
+// ============================================================
+// WEATHER
+// ============================================================
 
-// ==========================================
+export const getWeatherForecast =
+  async (
+    latitude,
+    longitude
+  ) => {
+    const params =
+      new URLSearchParams({
+        latitude,
+        longitude,
+      });
+
+    return request(
+      `/weather/forecast?${params.toString()}`
+    );
+  };
+
+// ============================================================
+// SOIL
+// ============================================================
+
+export const analyzeSoil =
+  async (soilData) => {
+    return request(
+      "/soil/analyze",
+      {
+        method: "POST",
+        headers: getHeaders(true),
+        body: JSON.stringify(
+          soilData
+        ),
+      }
+    );
+  };
+
+// ============================================================
+// AI RECOMMENDATIONS
+// ============================================================
+
+export const generateRecommendations =
+  async (data) => {
+    return request(
+      "/recommendation/generate",
+      {
+        method: "POST",
+        headers: getHeaders(false),
+        body: JSON.stringify(data),
+      }
+    );
+  };
+
+// ============================================================
+// ============================================================
+// CONSULTANT APIs
+// ============================================================
+// ============================================================
+
+// ------------------------------------------------------------
 // CONSULTANT DASHBOARD
-// ==========================================
+// ------------------------------------------------------------
 
-export const getConsultantDashboard = async () => {
-  const response = await fetch(
-    `${API_URL}/consultant/dashboard`,
-    {
-      method: "GET",
-      headers: getHeaders(true),
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail || "Failed to fetch consultant dashboard"
+export const getConsultantDashboard =
+  async () => {
+    return request(
+      "/consultant/dashboard",
+      {
+        method: "GET",
+        headers: getHeaders(true),
+      }
     );
-  }
+  };
 
-  return data;
-};
+// ------------------------------------------------------------
+// CONSULTANT FARMERS
+// ------------------------------------------------------------
+// Your existing backend already exposes:
+// GET /chat/farmers
 
-// ==========================================
-// CONSULTANT - FARMERS
-// ==========================================
-
-export const getConsultantFarmers = async () => {
-  const response = await fetch(
-    `${API_URL}/chat/farmers`,
-    {
-      method: "GET",
-      headers: getHeaders(true),
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Failed to fetch registered farmers"
+export const getConsultantFarmers =
+  async () => {
+    return request(
+      "/chat/farmers",
+      {
+        method: "GET",
+        headers: getHeaders(true),
+      }
     );
-  }
+  };
 
-  return data;
-};
+// Alias used by Farmer Management page
 
-// ==========================================
-// CONSULTANT - CONSULTATIONS
-// ==========================================
+export const getFarmers =
+  getConsultantFarmers;
 
-export const getConsultantConsultations = async () => {
-  const response = await fetch(
-    `${API_URL}/consultant/consultations`,
-    {
-      method: "GET",
-      headers: getHeaders(true),
-    }
-  );
+// ------------------------------------------------------------
+// CONSULTANT CONSULTATIONS
+// ------------------------------------------------------------
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Failed to fetch consultations"
+export const getConsultantConsultations =
+  async () => {
+    return request(
+      "/consultant/consultations",
+      {
+        method: "GET",
+        headers: getHeaders(true),
+      }
     );
-  }
+  };
 
-  return data;
-};
-// ==========================================
-// CONSULTANT - PENDING CONSULTATIONS
-// ==========================================
+// Alias used by Consultations page
 
-export const getPendingConsultations = async () => {
-  const response = await fetch(
-    `${API_URL}/chat/pending`,
-    {
-      method: "GET",
-      headers: getHeaders(true),
-    }
-  );
+export const getConsultations =
+  getConsultantConsultations;
 
-  const data = await response.json();
+// ------------------------------------------------------------
+// PENDING CONSULTATIONS
+// ------------------------------------------------------------
 
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Failed to fetch pending consultations"
+export const getPendingConsultations =
+  async () => {
+    return request(
+      "/chat/pending",
+      {
+        method: "GET",
+        headers: getHeaders(true),
+      }
     );
-  }
+  };
 
-  return data;
-};
-
-// ==========================================
-// CONSULTANT - ANALYTICS
-// ==========================================
+// ------------------------------------------------------------
+// CONSULTANT ANALYTICS
+// ------------------------------------------------------------
 
 export const getConsultantAnalytics = async () => {
-  const response = await fetch(
-    `${API_URL}/consultant/analytics`,
+  return request(
+    "/consultant/analytics",
     {
       method: "GET",
       headers: getHeaders(true),
     }
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Failed to fetch consultant analytics"
-    );
-  }
-
-  return data;
 };
 
+// ------------------------------------------------------------
+// CONSULTATION / CHAT MESSAGE
+// ------------------------------------------------------------
 
-// ==========================================
-// CHAT
-// ==========================================
+export const getChatConversations =
+  async () => {
+    return request(
+      "/chat/conversations",
+      {
+        method: "GET",
+        headers: getHeaders(true),
+      }
+    );
+  };
 
-export const getChatConversations = async () => {
+export const getConversationMessages =
+  async (conversationId) => {
+    return request(
+      `/chat/conversations/${encodeURIComponent(
+        conversationId
+      )}/messages`,
+      {
+        method: "GET",
+        headers: getHeaders(true),
+      }
+    );
+  };
+  // ------------------------------------------------------------
+// MARK CONVERSATION AS READ
+// ------------------------------------------------------------
 
-  const response = await fetch(
-    `${API_URL}/chat/conversations`,
+export const markConversationAsRead =
+  async (conversationId) => {
+    return request(
+      `/chat/conversations/${encodeURIComponent(
+        conversationId
+      )}/read`,
+      {
+        method: "PUT",
+        headers: getHeaders(true),
+      }
+    );
+  };
+
+export const sendChatMessage =
+  async (
+    conversationId,
+    message
+  ) => {
+    return request(
+      `/chat/conversations/${encodeURIComponent(
+        conversationId
+      )}/messages`,
+      {
+        method: "POST",
+        headers: getHeaders(true),
+        body: JSON.stringify({
+          message,
+        }),
+      }
+    );
+  };
+
+// ------------------------------------------------------------
+// CONSULTANT SEND MESSAGE
+// ------------------------------------------------------------
+
+export const sendConsultationMessage =
+  async (
+    conversationId,
+    message
+  ) => {
+    return sendChatMessage(
+      conversationId,
+      message
+    );
+  };
+
+// ============================================================
+// CONSULTANT NOTES
+// ============================================================
+// IMPORTANT:
+// Your pasted API did not show an existing Notes endpoint.
+// This uses /consultant/notes.
+// If your FastAPI backend has a different Notes route,
+// change ONLY this constant.
+
+// ================= CONSULTANT NOTES =================
+
+export const getConsultantNotes = async () => {
+  return request("/consultant/notes", {
+    method: "GET",
+    headers: getHeaders(true),
+  });
+};
+
+export const createConsultantNote = async (title, content) => {
+  return request("/consultant/notes", {
+    method: "POST",
+    headers: getHeaders(true),
+    body: JSON.stringify({
+      title,
+      content,
+    }),
+  });
+};
+
+export const updateConsultantNote = async (noteId, title, content) => {
+  return request(`/consultant/notes/${noteId}`, {
+    method: "PUT",
+    headers: getHeaders(true),
+    body: JSON.stringify({
+      title,
+      content,
+    }),
+  });
+};
+
+export const deleteConsultantNote = async (noteId) => {
+  return request(`/consultant/notes/${noteId}`, {
+    method: "DELETE",
+    headers: getHeaders(true),
+  });
+};
+
+// ============================================================
+// FARMER MANAGEMENT - OPTIONAL CREATE
+// ============================================================
+
+export const createFarmer =
+  async (farmerData) => {
+    return request(
+      "/chat/farmers",
+      {
+        method: "POST",
+        headers: getHeaders(true),
+        body: JSON.stringify(
+          farmerData
+        ),
+      }
+    );
+  };
+// ============================================================
+// PREDICTION REVIEWS
+// ============================================================
+
+export const getPredictionReviews = async () => {
+  return request(
+    "/prediction-reviews/",
     {
       method: "GET",
       headers: getHeaders(true),
     }
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Unable to fetch conversations."
-    );
-  }
-
-  return data;
 };
 
 
-export const getConversationMessages = async (
-  conversationId
+// ============================================================
+// GET SINGLE PREDICTION REVIEW
+// ============================================================
+
+export const getPredictionReview = async (
+  predictionId
 ) => {
-
-  const response = await fetch(
-    `${API_URL}/chat/conversations/${conversationId}/messages`,
+  return request(
+    `/prediction-reviews/${encodeURIComponent(
+      predictionId
+    )}`,
     {
       method: "GET",
       headers: getHeaders(true),
     }
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Unable to fetch messages."
-    );
-  }
-
-  return data;
 };
 
 
-export const sendChatMessage = async (
-  conversationId,
-  message
-) => {
+// ============================================================
+// SAVE PREDICTION REVIEW
+// ============================================================
 
-  const response = await fetch(
-    `${API_URL}/chat/conversations/${conversationId}/messages`,
+export const reviewPrediction = async (
+  predictionId,
+  status,
+  comment
+) => {
+  return request(
+    `/prediction-reviews/${encodeURIComponent(
+      predictionId
+    )}/review`,
     {
-      method: "POST",
+      method: "PUT",
+
       headers: getHeaders(true),
+
       body: JSON.stringify({
-        message,
+        status,
+        comment: comment || null,
       }),
     }
   );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data?.detail ||
-      "Unable to send message."
-    );
-  }
-
-  return data;
 };
 
-// ==========================================
-// AI CROP RECOMMENDATIONS
-// ==========================================
 
-export const generateRecommendations = async (
-  data
+// ============================================================
+// DELETE PREDICTION REVIEW
+// ============================================================
+
+export const deletePredictionReview = async (
+  predictionId
 ) => {
-
-  const response = await fetch(
-    `${API_URL}/recommendation/generate`,
+  return request(
+    `/prediction-reviews/${encodeURIComponent(
+      predictionId
+    )}/review`,
     {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify(data),
+      method: "DELETE",
+      headers: getHeaders(true),
     }
   );
+};
+// ============================================================
+// CONSULTANT ALERTS
+// ============================================================
 
+// ------------------------------------------------------------
+// GET ALL ALERTS
+// ------------------------------------------------------------
 
-  const result =
-    await response.json();
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      result.detail ||
-      "Unable to generate AI recommendations."
-    );
-
-  }
-
-
-  return result;
-
+export const getConsultantAlerts = async () => {
+  return request(
+    "/consultant/alerts/",
+    {
+      method: "GET",
+      headers: getHeaders(true),
+    }
+  );
 };
 
-// ==========================================
+
+// ------------------------------------------------------------
+// GET UNREAD ALERT COUNT
+// ------------------------------------------------------------
+
+export const getConsultantUnreadAlertCount = async () => {
+  return request(
+    "/consultant/alerts/unread-count",
+    {
+      method: "GET",
+      headers: getHeaders(true),
+    }
+  );
+};
+
+
+// ------------------------------------------------------------
+// MARK ONE ALERT AS READ
+// ------------------------------------------------------------
+
+export const markConsultantAlertAsRead = async (
+  alertId
+) => {
+  return request(
+    `/consultant/alerts/${encodeURIComponent(
+      alertId
+    )}/read`,
+    {
+      method: "PUT",
+      headers: getHeaders(true),
+    }
+  );
+};
+
+
+// ------------------------------------------------------------
+// MARK ALL ALERTS AS READ
+// ------------------------------------------------------------
+
+export const markAllConsultantAlertsAsRead = async () => {
+  return request(
+    "/consultant/alerts/read-all",
+    {
+      method: "PUT",
+      headers: getHeaders(true),
+    }
+  );
+};
+
+
+// ------------------------------------------------------------
+// DELETE ALERT
+// ------------------------------------------------------------
+
+export const deleteConsultantAlert = async (
+  alertId
+) => {
+  return request(
+    `/consultant/alerts/${encodeURIComponent(
+      alertId
+    )}`,
+    {
+      method: "DELETE",
+      headers: getHeaders(true),
+    }
+  );
+};
+
+
+// ------------------------------------------------------------
+// CREATE ALERT
+// ------------------------------------------------------------
+
+export const createConsultantAlert = async (
+  alertData
+) => {
+  return request(
+    "/consultant/alerts/",
+    {
+      method: "POST",
+      headers: getHeaders(true),
+      body: JSON.stringify(alertData),
+    }
+  );
+};
+// ============================================================
 // API OBJECT
-// ==========================================
+// ============================================================
 
 export const api = {
 
   // Authentication
   loginUser,
 
-  // Profile
+  // User
   getCurrentUser,
   updateCurrentUser,
   uploadProfileImage,
+  deleteProfileImage,
 
   // Dataset
   getDatasetSummary,
@@ -688,7 +937,7 @@ export const api = {
   getTemperatureData,
   getPesticideData,
 
-  // Dataset Analytics
+  // Dataset analytics
   getCropAnalytics,
   getSoilAnalytics,
   getRainfallAnalytics,
@@ -708,18 +957,58 @@ export const api = {
   // Soil
   analyzeSoil,
 
+  // Recommendations
   generateRecommendations,
 
-  // Consultant
+  // Consultant dashboard
   getConsultantDashboard,
-  getConsultantFarmers,
-  getConsultantConsultations,
-  getPendingConsultations,
-  getConsultantAnalytics,
 
+  // Consultant farmers
+  getConsultantFarmers,
+  getFarmers,
+  createFarmer,
+
+  // Consultant consultations
+  getConsultantConsultations,
+  getConsultations,
+  getPendingConsultations,
+  sendConsultationMessage,
+
+  // Consultant analytics
+  getConsultantAnalytics,
+  
+
+  // Consultant profile
+  getConsultantProfile,
+  updateConsultantProfile,
+
+  // Prediction Reviews
+  getPredictionReviews,
+  getPredictionReview,
+  reviewPrediction,
+  deletePredictionReview,
+
+  // Consultant Alerts
+  getConsultantAlerts,
+  getConsultantUnreadAlertCount,
+  markConsultantAlertAsRead,
+  markAllConsultantAlertsAsRead,
+  deleteConsultantAlert,
+  createConsultantAlert, 
+
+  // Consultant notes
+  getConsultantNotes,
+  createConsultantNote,
+  updateConsultantNote,
+  deleteConsultantNote,
 
   // Chat
   getChatConversations,
   getConversationMessages,
   sendChatMessage,
+  markConversationAsRead
+
+  
 };
+
+export default api;

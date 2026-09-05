@@ -2,6 +2,7 @@ import pickle
 from pathlib import Path
 
 import pandas as pd
+import numpy as np
 
 
 # ============================================================
@@ -14,7 +15,6 @@ import pandas as pd
 ML_DIR = Path(__file__).resolve().parent
 
 MODEL_PATH = ML_DIR / "model.pkl"
-
 ENCODER_PATH = ML_DIR / "label_encoders.pkl"
 
 
@@ -38,12 +38,18 @@ if not ENCODER_PATH.exists():
     )
 
 
-# Load Random Forest model
+# ============================================================
+# LOAD RANDOM FOREST MODEL
+# ============================================================
+
 with open(MODEL_PATH, "rb") as file:
     model = pickle.load(file)
 
 
-# Load encoders and metadata
+# ============================================================
+# LOAD ENCODERS AND METADATA
+# ============================================================
+
 with open(ENCODER_PATH, "rb") as file:
     model_metadata = pickle.load(file)
 
@@ -54,10 +60,12 @@ with open(ENCODER_PATH, "rb") as file:
 
 encoders = model_metadata.get("encoders", {})
 
+
 if "Area" not in encoders:
     raise ValueError(
         "Area encoder is missing from label_encoders.pkl"
     )
+
 
 if "Item" not in encoders:
     raise ValueError(
@@ -66,7 +74,6 @@ if "Item" not in encoders:
 
 
 area_encoder = encoders["Area"]
-
 item_encoder = encoders["Item"]
 
 
@@ -96,10 +103,106 @@ MODEL_TYPE = model_metadata.get(
     "RandomForestRegressor"
 )
 
+
 R2_SCORE = model_metadata.get(
     "r2_score",
     None
 )
+
+
+# ============================================================
+# CONFIDENCE CALCULATION
+# ============================================================
+
+def calculate_prediction_confidence(model, X):
+    """
+    Estimate prediction confidence based on agreement
+    between individual trees in a Random Forest.
+
+    Returns a percentage between 0 and 99.
+    """
+
+    try:
+
+        # ----------------------------------------------------
+        # RANDOM FOREST / ENSEMBLE MODEL
+        # ----------------------------------------------------
+
+        if hasattr(model, "estimators_"):
+
+            tree_predictions = np.array([
+                estimator.predict(X)[0]
+                for estimator in model.estimators_
+            ])
+
+            mean_prediction = np.mean(
+                tree_predictions
+            )
+
+            std_prediction = np.std(
+                tree_predictions
+            )
+
+            # Avoid division by zero
+            if mean_prediction == 0:
+                return 0.0
+
+            # Coefficient of variation
+            variation = (
+                std_prediction
+                / abs(mean_prediction)
+            )
+
+            # Convert variation to confidence
+            confidence = (
+                100 * np.exp(-variation)
+            )
+
+            return round(
+                float(
+                    np.clip(
+                        confidence,
+                        0,
+                        99
+                    )
+                ),
+                2
+            )
+
+
+        # ----------------------------------------------------
+        # FALLBACK FOR OTHER MODELS
+        # ----------------------------------------------------
+
+        if R2_SCORE is not None:
+
+            confidence = (
+                float(R2_SCORE) * 100
+            )
+
+            return round(
+                float(
+                    np.clip(
+                        confidence,
+                        0,
+                        99
+                    )
+                ),
+                2
+            )
+
+
+        return 0.0
+
+
+    except Exception as e:
+
+        print(
+            "Confidence calculation error:",
+            repr(e)
+        )
+
+        return 0.0
 
 
 # ============================================================
@@ -117,6 +220,9 @@ def predict_crop(
     """
     Predict crop yield using the trained
     Random Forest Regression model.
+
+    Returns:
+        predicted_yield, confidence
     """
 
     # --------------------------------------------------------
@@ -125,6 +231,7 @@ def predict_crop(
 
     area = str(area).strip()
     item = str(item).strip()
+
 
     # --------------------------------------------------------
     # VALIDATE AREA
@@ -137,6 +244,7 @@ def predict_crop(
             "the trained dataset."
         )
 
+
     # --------------------------------------------------------
     # VALIDATE CROP
     # --------------------------------------------------------
@@ -148,6 +256,7 @@ def predict_crop(
             "the trained dataset."
         )
 
+
     # --------------------------------------------------------
     # ENCODE AREA
     # --------------------------------------------------------
@@ -156,6 +265,7 @@ def predict_crop(
         [area]
     )[0]
 
+
     # --------------------------------------------------------
     # ENCODE CROP
     # --------------------------------------------------------
@@ -163,6 +273,7 @@ def predict_crop(
     item_encoded = item_encoder.transform(
         [item]
     )[0]
+
 
     # --------------------------------------------------------
     # CREATE INPUT DATAFRAME
@@ -182,6 +293,7 @@ def predict_crop(
         columns=feature_columns,
     )
 
+
     # --------------------------------------------------------
     # MAKE PREDICTION
     # --------------------------------------------------------
@@ -190,16 +302,29 @@ def predict_crop(
         input_data
     )[0]
 
-    # --------------------------------------------------------
-    # PREVENT NEGATIVE YIELD
-    # --------------------------------------------------------
 
-    prediction = max(
-        0.0,
-        float(prediction)
+    # Prevent negative yield
+    predicted_yield = max(
+        float(prediction),
+        0.0
     )
 
-    return prediction
+
+    # --------------------------------------------------------
+    # CALCULATE CONFIDENCE
+    # --------------------------------------------------------
+
+    confidence = calculate_prediction_confidence(
+        model,
+        input_data
+    )
+
+
+    # --------------------------------------------------------
+    # RETURN BOTH VALUES
+    # --------------------------------------------------------
+
+    return predicted_yield, confidence
 
 
 # ============================================================
@@ -213,7 +338,9 @@ def get_model_info():
 
     return {
         "model_type": MODEL_TYPE,
+
         "r2_score": R2_SCORE,
+
         "feature_columns": feature_columns,
     }
 

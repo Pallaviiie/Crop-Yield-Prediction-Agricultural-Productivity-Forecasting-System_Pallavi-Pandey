@@ -981,7 +981,13 @@ const YieldPrediction = () => {
 
   };
 
+  const toNumber = (value, fallback = 0) => {
+    const number = Number(value);
 
+    return Number.isFinite(number)
+      ? number
+      : fallback;
+  };
   // ==========================================================
   // SUBMIT
   // ==========================================================
@@ -1010,26 +1016,13 @@ const YieldPrediction = () => {
 
       const requestData = {
 
-        area:
-          formData.country,
-
-        item:
-          formData.crop,
-
-        year:
-          Number(formData.year),
-
-        season:
-          formData.season,
-
-        average_rain_fall_mm_per_year:
-          Number(formData.rainfall),
-
-        pesticides_tonnes:
-          Number(formData.pesticide),
-
-        avg_temp:
-          Number(formData.temperature),
+        area: String(formData.country || ""),
+        item: String(formData.crop || ""),
+        year: toNumber(formData.year),
+        season: formData.season || null,
+        average_rain_fall_mm_per_year: toNumber(formData.rainfall),
+        pesticides_tonnes: toNumber(formData.pesticide),
+        avg_temp: toNumber(formData.temperature),
 
       };
 
@@ -1039,6 +1032,20 @@ const YieldPrediction = () => {
           requestData
         );
 
+      console.log(
+        "FULL PREDICTION RESPONSE:", 
+        result
+      );
+
+      const predictedYield =
+        toNumber(
+          result?.prediction?.predicted_yield
+        );
+
+      console.log(
+        "PREDICTED YIELD:", 
+        predictedYield
+      );
 
       // ======================================================
       // 2. COMPLETE PREDICTION
@@ -1048,14 +1055,23 @@ const YieldPrediction = () => {
        ...requestData,
 
        // Original frontend form values
-       crop: formData.crop,
-       crop_type: formData.crop,
+       crop: 
+         formData.crop,
 
-       country: formData.country,
-       area: formData.country,
+       crop_type: 
+         formData.crop,
 
-       year: Number(formData.year),
-       season: formData.season,
+       country: 
+         formData.country,
+
+       area: 
+         formData.country,
+
+       year: 
+         Number(formData.year),
+
+       season: 
+         formData.season,
 
        areaHectares:
          Number(formData.areaHectares || 0),
@@ -1082,29 +1098,29 @@ const YieldPrediction = () => {
          Number(formData.temperature || 0),
 
        humidity:
-         Number(formData.humidity || 0),
+         toNumber(formData.humidity),
 
        fertilizer:
-         Number(formData.fertilizer || 0),
+         toNumber(formData.fertilizer),
 
        pesticide:
-         Number(formData.pesticide || 0),
+         toNumber(formData.pesticide),
 
        pesticides_tonnes:
-          Number(formData.pesticide || 0),
+          toNumber(formData.pesticide),
 
        // Prediction result
        predicted_yield:
-         result.predicted_yield,
+          predictedYield,
 
        unit:
-         result.unit,
+         result?.prediction?.unit || "hg/ha",
 
        model:
-         result.model,
+         result?.model?.model_type || "Random Forest",
 
        r2_score:
-         result.r2_score,
+         result?.model?.r2_score ?? null,
 
        created_at:
           new Date().toISOString(),
@@ -1136,36 +1152,29 @@ const YieldPrediction = () => {
 
         const recommendationRequest = {
 
-          area:
-            formData.country,
+          area: String(formData.country || ""),
 
-          item:
-            formData.crop,
+          item: String(formData.crop || ""),
 
-          year:
-            Number(formData.year),
+          year: toNumber(formData.year),
 
-          rainfall:
-            Number(formData.rainfall),
+          rainfall: 
+            toNumber(formData.rainfall),
+          
+          temperature: 
+            toNumber(formData.temperature),
+          
+          season: 
+            formData.season || null,
 
-          temperature:
-            Number(formData.temperature),
+          soil_type: 
+            formData.soilType || null,
 
-          season:
-            formData.season,
+          predicted_yield: 
+            predictedYield,
 
-          soil_type:
-            formData.soilType,
-
-          predicted_yield:
-            Number(
-              result.predicted_yield
-            ),
-
-          pesticides_tonnes:
-            Number(
-              formData.pesticide
-            ),
+          pesticides_tonnes: 
+            toNumber(formData.pesticide),
 
         };
 
@@ -1240,34 +1249,22 @@ const YieldPrediction = () => {
             formData.crop,
 
           rainfall:
-            Number(
-              formData.rainfall
-            ),
+            toNumber(formData.rainfall),
 
           temperature:
-            Number(
-              formData.temperature
-            ),
+            toNumber(formData.temperature),
 
           pesticide:
-            Number(
-              formData.pesticide
-            ),
+            toNumber(formData.pesticide),
 
           fertilizer:
-            Number(
-              formData.fertilizer || 0
-            ),
+            toNumber(formData.fertilizer),
 
           soil_ph:
-            Number(
-              formData.soilPh || 0
-            ),
+            toNumber(formData.soilPh),
 
           predicted_yield:
-            Number(
-              result.predicted_yield
-            ),
+            predictedYield,
 
         };
 

@@ -13,6 +13,7 @@ import {
   Mountain,
   Leaf,
   Camera,
+  Trash2,
   Loader2,
   Save,
   X,
@@ -26,6 +27,7 @@ const Profile = () => {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingImage, setDeletingImage] = useState(false);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -74,8 +76,7 @@ const Profile = () => {
       console.error("Profile loading error:", err);
 
       setError(
-        err?.message ||
-          "Unable to load your profile."
+        err?.message || "Unable to load your profile."
       );
     } finally {
       setLoading(false);
@@ -103,63 +104,62 @@ const Profile = () => {
   // UPDATE PROFILE
   // ============================================================
 
- const handleSave = async () => {
-  try {
-    setSaving(true);
-    setError("");
-    setSuccess("");
-
-    const response = await api.updateCurrentUser(formData);
-
-    console.log("PROFILE UPDATE RESPONSE:", response);
-
-    // Backend may return:
-    // 1. { profile: {...} }
-    // 2. { data: {...} }
-    // 3. {...profile directly}
-    const updatedProfile =
-      response?.profile ||
-      response?.data?.profile ||
-      response?.data ||
-      response;
-
-    if (!updatedProfile) {
-      throw new Error("Profile update returned no user data.");
-    }
-
-    console.log("UPDATED PROFILE:", updatedProfile);
-
-    setProfile(updatedProfile);
-
-    setFormData({
-      full_name: updatedProfile.full_name || "",
-      phone: updatedProfile.phone || "",
-      location: updatedProfile.location || "",
-      state: updatedProfile.state || "",
-      country: updatedProfile.country || "",
-      farm_location: updatedProfile.farm_location || "",
-      farm_size: updatedProfile.farm_size || "",
-      soil_type: updatedProfile.soil_type || "",
-      primary_crops: updatedProfile.primary_crops || "",
-    });
-
-    setEditMode(false);
-    setSuccess("Profile updated successfully.");
-
-    setTimeout(() => {
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setError("");
       setSuccess("");
-    }, 3000);
-  } catch (err) {
-    console.error("Profile update error:", err);
 
-    setError(
-      err?.message ||
-        "Unable to update profile."
-    );
-  } finally {
-    setSaving(false);
-  }
-};
+      const updatedProfile =
+        await api.updateCurrentUser(formData);
+
+      console.log("UPDATED PROFILE:", updatedProfile);
+
+      if (!updatedProfile) {
+        throw new Error(
+          "Profile update returned no user data."
+        );
+      }
+
+      setProfile(updatedProfile);
+
+      setFormData({
+        full_name: updatedProfile.full_name || "",
+        phone: updatedProfile.phone || "",
+        location: updatedProfile.location || "",
+        state: updatedProfile.state || "",
+        country: updatedProfile.country || "",
+        farm_location:
+          updatedProfile.farm_location || "",
+        farm_size: updatedProfile.farm_size || "",
+        soil_type: updatedProfile.soil_type || "",
+        primary_crops:
+          updatedProfile.primary_crops || "",
+      });
+
+      setEditMode(false);
+
+      setSuccess(
+        "Profile updated successfully."
+      );
+
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000);
+    } catch (err) {
+      console.error(
+        "Profile update error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Unable to update profile."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // ============================================================
   // CANCEL EDIT
@@ -172,17 +172,20 @@ const Profile = () => {
       location: profile?.location || "",
       state: profile?.state || "",
       country: profile?.country || "",
-      farm_location: profile?.farm_location || "",
+      farm_location:
+        profile?.farm_location || "",
       farm_size: profile?.farm_size || "",
       soil_type: profile?.soil_type || "",
-      primary_crops: profile?.primary_crops || "",
+      primary_crops:
+        profile?.primary_crops || "",
     });
 
+    setError("");
     setEditMode(false);
   };
 
   // ============================================================
-  // PROFILE IMAGE
+  // UPLOAD PROFILE IMAGE
   // ============================================================
 
   const handleImageUpload = async (event) => {
@@ -190,26 +193,43 @@ const Profile = () => {
 
     if (!file) return;
 
+    setError("");
+    setSuccess("");
+
     // Maximum 5 MB
     if (file.size > 5 * 1024 * 1024) {
       setError(
         "Profile image must be smaller than 5 MB."
       );
 
+      event.target.value = "";
       return;
     }
 
-    // Only images
+    // Only image files
     if (!file.type.startsWith("image/")) {
       setError("Please select an image file.");
 
+      event.target.value = "";
       return;
     }
 
     try {
-      setError("");
+      setSaving(true);
 
-      const updated = await api.uploadProfileImage(file);
+      const updated =
+        await api.uploadProfileImage(file);
+
+      console.log(
+        "PROFILE IMAGE UPDATED:",
+        updated
+      );
+
+      if (!updated) {
+        throw new Error(
+          "Profile image upload returned no user data."
+        );
+      }
 
       setProfile(updated);
 
@@ -230,10 +250,74 @@ const Profile = () => {
         err?.message ||
           "Unable to upload profile image."
       );
+    } finally {
+      setSaving(false);
+
+      // Allows selecting same image again
+      event.target.value = "";
+    }
+  };
+
+  // ============================================================
+  // DELETE PROFILE IMAGE
+  // ============================================================
+
+  const handleDeleteImage = async () => {
+    // Safety check
+    if (!profile?.profile_image) {
+      return;
     }
 
-    // Allows selecting the same file again
-    event.target.value = "";
+    const confirmed = window.confirm(
+      "Are you sure you want to remove your profile picture?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingImage(true);
+      setError("");
+      setSuccess("");
+
+      const updated =
+        await api.deleteProfileImage();
+
+      console.log(
+        "PROFILE IMAGE DELETED:",
+        updated
+      );
+
+      if (!updated) {
+        throw new Error(
+          "Profile image deletion returned no user data."
+        );
+      }
+
+      // Update profile immediately
+      setProfile(updated);
+
+      setSuccess(
+        "Profile picture removed successfully."
+      );
+
+      setTimeout(() => {
+        setSuccess("");
+      }, 3000);
+    } catch (err) {
+      console.error(
+        "Profile image delete error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Unable to remove profile picture."
+      );
+    } finally {
+      setDeletingImage(false);
+    }
   };
 
   // ============================================================
@@ -254,7 +338,7 @@ const Profile = () => {
   }
 
   // ============================================================
-  // ERROR
+  // ERROR / NO PROFILE
   // ============================================================
 
   if (!profile) {
@@ -281,6 +365,7 @@ const Profile = () => {
   const initials =
     profile.full_name
       ?.split(" ")
+      .filter(Boolean)
       .map((name) => name[0])
       .join("")
       .substring(0, 2)
@@ -298,6 +383,7 @@ const Profile = () => {
       ===================================================== */}
 
       <div className="profile-page-header">
+
         <div>
           <h1>My Profile</h1>
 
@@ -309,7 +395,11 @@ const Profile = () => {
         {!editMode ? (
           <button
             className="profile-edit-btn"
-            onClick={() => setEditMode(true)}
+            onClick={() => {
+              setError("");
+              setSuccess("");
+              setEditMode(true);
+            }}
           >
             Edit Profile
           </button>
@@ -331,15 +421,19 @@ const Profile = () => {
               disabled={saving}
             >
               {saving ? (
-                <Loader2
-                  size={16}
-                  className="profile-spinner"
-                />
+                <>
+                  <Loader2
+                    size={16}
+                    className="profile-spinner"
+                  />
+                  Saving...
+                </>
               ) : (
-                <Save size={16} />
+                <>
+                  <Save size={16} />
+                  Save Changes
+                </>
               )}
-
-              Save Changes
             </button>
 
           </div>
@@ -347,18 +441,24 @@ const Profile = () => {
       </div>
 
       {/* =====================================================
-          SUCCESS / ERROR
+          SUCCESS MESSAGE
       ===================================================== */}
 
       {success && (
         <div className="profile-success">
-          {success}
+          <ShieldCheck size={17} />
+          <span>{success}</span>
         </div>
       )}
 
+      {/* =====================================================
+          ERROR MESSAGE
+      ===================================================== */}
+
       {error && (
         <div className="profile-error-message">
-          {error}
+          <X size={17} />
+          <span>{error}</span>
         </div>
       )}
 
@@ -368,54 +468,123 @@ const Profile = () => {
 
       <section className="profile-hero">
 
-        <div className="profile-photo-wrapper">
+        {/* ===================================================
+            PROFILE PHOTO
+        =================================================== */}
 
-          {profile.profile_image ? (
-            <img
-              src={profile.profile_image}
-              alt={profile.full_name}
-              className="profile-photo"
-            />
-          ) : (
-            <div className="profile-photo-placeholder">
-              {initials}
+        <div className="profile-photo-section">
+
+          <div className="profile-photo-wrapper">
+
+            {/* PROFILE IMAGE */}
+
+            {profile.profile_image ? (
+              <img
+                src={profile.profile_image}
+                alt={
+                  profile.full_name ||
+                  "Profile"
+                }
+                className="profile-photo"
+              />
+            ) : (
+              <div className="profile-photo-placeholder">
+                {initials}
+              </div>
+            )}
+
+            {/* =============================================
+                IMAGE ACTION BUTTONS
+                ============================================= */}
+
+            <div className="profile-photo-actions">
+
+              {/* CAMERA / UPLOAD */}
+
+              <label
+                htmlFor="profile-image-upload"
+                className="profile-camera-button"
+                title={
+                  profile.profile_image
+                    ? "Change profile picture"
+                    : "Upload profile picture"
+                }
+              >
+                {saving ? (
+                  <Loader2
+                    size={16}
+                    className="profile-button-spinner"
+                  />
+                ) : (
+                  <Camera size={16} />
+                )}
+
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  hidden
+                  disabled={
+                    saving ||
+                    deletingImage
+                  }
+                />
+              </label>
+
+              {/* DELETE BUTTON */}
+
+              {profile.profile_image && (
+                <button
+                  type="button"
+                  className="profile-delete-image-button"
+                  onClick={handleDeleteImage}
+                  title="Remove profile picture"
+                  disabled={
+                    saving ||
+                    deletingImage
+                  }
+                >
+                  {deletingImage ? (
+                    <Loader2
+                      size={15}
+                      className="profile-button-spinner"
+                    />
+                  ) : (
+                    <Trash2 size={15} />
+                  )}
+                </button>
+              )}
+
             </div>
-          )}
 
-          <label
-            htmlFor="profile-image-upload"
-            className="profile-camera-button"
-            title="Upload profile picture"
-          >
-            <Camera size={17} />
-
-            <input
-              id="profile-image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              hidden
-            />
-          </label>
-
-        </div>
-
-        <div className="profile-hero-info">
-
-          <h2>
-            {profile.full_name || "Farmer"}
-          </h2>
-
-          <div className="profile-role">
-            <ShieldCheck size={15} />
-
-            {profile.role || "farmer"}
           </div>
 
-          <div className="profile-email">
-            <Mail size={15} />
+          {/* ===============================================
+              PROFILE NAME / ROLE
+              =============================================== */}
 
-            {profile.email}
+          <div className="profile-photo-info">
+
+            <h2>
+              {profile.full_name ||
+                "User"}
+            </h2>
+
+            <div className="profile-role">
+              <ShieldCheck size={14} />
+
+              <span>
+                {profile.role || "farmer"}
+              </span>
+            </div>
+
+            <p>
+              {profile.profile_image
+                ? "Use the camera to change your photo or trash icon to remove it."
+                : "Add a profile picture using the camera button."}
+            </p>
+
           </div>
 
         </div>
@@ -459,7 +628,8 @@ const Profile = () => {
                 />
               ) : (
                 <strong>
-                  {profile.full_name || "Not provided"}
+                  {profile.full_name ||
+                    "Not provided"}
                 </strong>
               )}
             </div>
@@ -476,7 +646,8 @@ const Profile = () => {
               <span>Email Address</span>
 
               <strong>
-                {profile.email || "Not provided"}
+                {profile.email ||
+                  "Not provided"}
               </strong>
             </div>
 
@@ -499,7 +670,8 @@ const Profile = () => {
                 />
               ) : (
                 <strong>
-                  {profile.phone || "Not provided"}
+                  {profile.phone ||
+                    "Not provided"}
                 </strong>
               )}
             </div>
@@ -516,7 +688,8 @@ const Profile = () => {
               <span>Account Role</span>
 
               <strong>
-                {profile.role || "farmer"}
+                {profile.role ||
+                  "farmer"}
               </strong>
             </div>
 
@@ -535,7 +708,9 @@ const Profile = () => {
                 {profile.created_at
                   ? new Date(
                       profile.created_at
-                    ).toLocaleDateString("en-IN")
+                    ).toLocaleDateString(
+                      "en-IN"
+                    )
                   : "Not available"}
               </strong>
             </div>
@@ -559,7 +734,8 @@ const Profile = () => {
                 />
               ) : (
                 <strong>
-                  {profile.location || "Not provided"}
+                  {profile.location ||
+                    "Not provided"}
                 </strong>
               )}
             </div>
@@ -583,7 +759,8 @@ const Profile = () => {
                 />
               ) : (
                 <strong>
-                  {profile.state || "Not provided"}
+                  {profile.state ||
+                    "Not provided"}
                 </strong>
               )}
             </div>
@@ -607,7 +784,8 @@ const Profile = () => {
                 />
               ) : (
                 <strong>
-                  {profile.country || "Not provided"}
+                  {profile.country ||
+                    "Not provided"}
                 </strong>
               )}
             </div>
@@ -652,7 +830,9 @@ const Profile = () => {
               {editMode ? (
                 <input
                   name="farm_location"
-                  value={formData.farm_location}
+                  value={
+                    formData.farm_location
+                  }
                   onChange={handleChange}
                 />
               ) : (
@@ -703,7 +883,9 @@ const Profile = () => {
               {editMode ? (
                 <input
                   name="soil_type"
-                  value={formData.soil_type}
+                  value={
+                    formData.soil_type
+                  }
                   onChange={handleChange}
                 />
               ) : (
@@ -728,7 +910,9 @@ const Profile = () => {
               {editMode ? (
                 <input
                   name="primary_crops"
-                  value={formData.primary_crops}
+                  value={
+                    formData.primary_crops
+                  }
                   onChange={handleChange}
                 />
               ) : (

@@ -1,0 +1,919 @@
+/* =========================================================
+   FARMER MANAGEMENT PAGE
+   ========================================================= */
+
+.farmer-management-page {
+  width: 100%;
+  box-sizing: border-box;
+
+  /* SPACE FROM NAVBAR + SIDEBAR */
+  padding: 22px 24px 30px 24px;
+
+  min-height: calc(100vh - 60px);
+}
+/* =========================================================
+   FARMER MANAGEMENT PAGE
+   YieldSense AI - Consultant Portal
+   ========================================================= */
+
+.farmer-management-page {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TOP ROW
+   ========================================================= */
+
+.fm-top-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.fm-count {
+  margin: 0;
+  color: #009b43;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   ADD FARMER BUTTON
+   ========================================================= */
+
+.fm-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 10px 17px;
+
+  border: none;
+  border-radius: 18px;
+
+  background: #008c3a;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.fm-add-button:hover {
+  background: #007b33;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 140, 58, 0.18);
+}
+
+.fm-add-button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   TABLE CARD
+   ========================================================= */
+
+.fm-table-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #d5efdf;
+  border-radius: 17px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 2px 6px rgba(0, 90, 40, 0.06);
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+.fm-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.fm-table {
+  width: 100%;
+  min-width: 1000px;
+
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   ========================================================= */
+
+.fm-table thead {
+  background: #effbf3;
+}
+
+.fm-table th {
+  height: 39px;
+
+  padding: 0 16px;
+
+  text-align: left;
+  vertical-align: middle;
+
+  color: #008c3a;
+
+  font-size: 10.5px;
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   COLUMN WIDTHS
+   ========================================================= */
+
+.fm-table th:nth-child(1),
+.fm-table td:nth-child(1) {
+  width: 21%;
+}
+
+.fm-table th:nth-child(2),
+.fm-table td:nth-child(2) {
+  width: 16%;
+}
+
+.fm-table th:nth-child(3),
+.fm-table td:nth-child(3) {
+  width: 11%;
+}
+
+.fm-table th:nth-child(4),
+.fm-table td:nth-child(4) {
+  width: 16%;
+}
+
+.fm-table th:nth-child(5),
+.fm-table td:nth-child(5) {
+  width: 12%;
+}
+
+.fm-table th:nth-child(6),
+.fm-table td:nth-child(6) {
+  width: 10%;
+}
+
+.fm-table th:nth-child(7),
+.fm-table td:nth-child(7) {
+  width: 8%;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+.fm-table tbody tr {
+  height: 59px;
+
+  background: #ffffff;
+
+  transition: background 0.15s ease;
+}
+
+.fm-table tbody tr:hover {
+  background: #fbfefc;
+}
+
+.fm-table td {
+  padding: 9px 16px;
+
+  border-top: 1px solid #e4f2e9;
+
+  vertical-align: middle;
+
+  color: #168149;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   FARMER INFORMATION
+   ========================================================= */
+
+.fm-farmer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   FARMER AVATAR
+   ========================================================= */
+
+.fm-avatar {
+  width: 31px;
+  height: 31px;
+
+  flex: 0 0 31px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #18b92b,
+    #73ca00
+  );
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   FARMER NAME + EMAIL
+   ========================================================= */
+
+.fm-farmer-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fm-farmer-info strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: #07552d;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  text-overflow: ellipsis;
+}
+
+.fm-farmer-info span {
+  display: block;
+
+  overflow: hidden;
+
+  color: #00a344;
+
+  font-size: 10px;
+
+  line-height: 1.2;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   LOCATION
+   ========================================================= */
+
+.fm-location {
+  color: #168149;
+
+  font-size: 11.5px;
+}
+
+
+/* =========================================================
+   NORMAL TABLE TEXT
+   ========================================================= */
+
+.fm-normal-text {
+  color: #168149;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   REGISTERED DATE
+   ========================================================= */
+
+.fm-date {
+  color: #00a344;
+
+  font-size: 11.5px;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.fm-status {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 47px;
+
+  padding: 4px 9px;
+
+  border-radius: 13px;
+
+  background: #d6f6e3;
+
+  color: #168149;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  text-transform: lowercase;
+
+  line-height: 1;
+}
+
+.fm-status.inactive {
+  background: #edf0ed;
+  color: #63736a;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.fm-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.fm-action-button {
+  width: 27px;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 7px;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+
+/* View */
+
+.fm-action-button.view {
+  color: #00a344;
+}
+
+.fm-action-button.view:hover {
+  background: #eaf9ef;
+}
+
+
+/* Edit */
+
+.fm-action-button.edit {
+  color: #4285f4;
+}
+
+.fm-action-button.edit:hover {
+  background: #edf4ff;
+}
+
+
+/* =========================================================
+   MODAL OVERLAY
+   ========================================================= */
+
+.fm-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(3, 38, 20, 0.38);
+
+  backdrop-filter: blur(3px);
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.fm-modal {
+  width: min(540px, 100%);
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  box-sizing: border-box;
+
+  padding: 24px;
+
+  background: #ffffff;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 70, 35, 0.20);
+
+  animation: fmModalIn 0.2s ease-out;
+}
+
+@keyframes fmModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.fm-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+}
+
+.fm-modal-header h2 {
+  margin: 0 0 5px;
+
+  color: #07552d;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.fm-modal-header p {
+  margin: 0;
+
+  color: #71927d;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.fm-close-button {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 9px;
+
+  background: #f1f8f3;
+
+  color: #4d715a;
+
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.fm-close-button:hover {
+  background: #e3f2e7;
+  color: #07552d;
+}
+
+
+/* =========================================================
+   PROFILE HEADER
+   ========================================================= */
+
+.fm-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 15px;
+
+  margin-bottom: 18px;
+
+  border-radius: 14px;
+
+  background: #f4fbf6;
+}
+
+.fm-modal-avatar {
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: linear-gradient(
+    135deg,
+    #20bd2d,
+    #75c900
+  );
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.fm-profile-header h3 {
+  margin: 0 0 4px;
+
+  color: #07552d;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.fm-profile-header p {
+  margin: 0;
+
+  color: #00a344;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   FARMER DETAILS GRID
+   ========================================================= */
+
+.fm-details-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+
+  margin-bottom: 15px;
+}
+
+.fm-detail {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+
+  padding: 13px;
+
+  border: 1px solid #e0f0e5;
+  border-radius: 12px;
+
+  color: #008c3a;
+}
+
+.fm-detail div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.fm-detail small {
+  color: #789083;
+
+  font-size: 10px;
+}
+
+.fm-detail strong {
+  overflow: hidden;
+
+  color: #07552d;
+
+  font-size: 11px;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   CROPS BOX
+   ========================================================= */
+
+.fm-crops-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 13px 15px;
+
+  border-radius: 12px;
+
+  background: #effaf2;
+}
+
+.fm-crops-box span {
+  color: #6f8d79;
+
+  font-size: 11px;
+}
+
+.fm-crops-box strong {
+  color: #07552d;
+
+  font-size: 12px;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   MODAL FOOTER
+   ========================================================= */
+
+.fm-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 20px;
+}
+
+.fm-modal-close {
+  border: none;
+  border-radius: 10px;
+
+  padding: 9px 17px;
+
+  background: #008c3a;
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.fm-modal-close:hover {
+  background: #007b33;
+}
+
+
+/* =========================================================
+   ADD FARMER FORM
+   ========================================================= */
+
+.fm-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+}
+
+.fm-form label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  color: #07552d;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fm-form input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 11px 12px;
+
+  border: 1px solid #d8ebe0;
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #fbfefc;
+
+  color: #07552d;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.fm-form input::placeholder {
+  color: #a0b2a7;
+}
+
+.fm-form input:focus {
+  border-color: #00a344;
+
+  box-shadow:
+    0 0 0 3px rgba(0, 163, 68, 0.08);
+}
+
+
+/* =========================================================
+   FORM BUTTONS
+   ========================================================= */
+
+.fm-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 7px;
+}
+
+.fm-cancel-button,
+.fm-save-button {
+  border: none;
+  border-radius: 10px;
+
+  padding: 10px 18px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.fm-cancel-button {
+  background: #eef4f0;
+  color: #537060;
+}
+
+.fm-cancel-button:hover {
+  background: #e2ebe5;
+}
+
+.fm-save-button {
+  background: #008c3a;
+  color: #ffffff;
+}
+
+.fm-save-button:hover {
+  background: #007b33;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.fm-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.fm-table-wrapper::-webkit-scrollbar-track {
+  background: #f5faf6;
+}
+
+.fm-table-wrapper::-webkit-scrollbar-thumb {
+  background: #c8e6d2;
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  .fm-table {
+    min-width: 950px;
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .fm-top-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .fm-add-button {
+    width: 100%;
+  }
+
+  .fm-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fm-modal {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+}
+
+
+@media (max-width: 450px) {
+
+  .fm-modal-overlay {
+    padding: 10px;
+  }
+
+  .fm-modal {
+    padding: 16px;
+  }
+
+  .fm-profile-header {
+    padding: 12px;
+  }
+
+  .fm-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .fm-cancel-button,
+  .fm-save-button {
+    width: 100%;
+  }
+
+}

@@ -1,219 +1,330 @@
+# ============================================================
+# app/routers/consultant.py
+# ============================================================
+
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from typing import Optional
 
 from app.database.db import get_db
 from app.models.user import User
 from app.models.conversation import Conversation
 from app.models.message import Message
+from app.models.prediction_history import PredictionHistory
+from app.models.note import Note
 from app.routers.users import get_authenticated_user
 
 
+# ============================================================
+# ROUTER
+# ============================================================
+
 router = APIRouter(
     prefix="/consultant",
-    tags=["Consultant"],
+    tags=["Consultant"]
 )
 
 
 # ============================================================
-# HELPERS
+# CONSULTANT CHECK
 # ============================================================
 
 def require_consultant(current_user: User):
+    if not current_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required"
+        )
+
     if current_user.role != "consultant":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only agricultural consultants can access this endpoint.",
+            detail="Consultant access required"
         )
 
+    return current_user
 
-def farmer_response(farmer: User):
+
+# ============================================================
+# FARMER RESPONSE
+# ============================================================
+
+def farmer_response(farmer):
+
+    primary_crops = getattr(
+        farmer,
+        "primary_crops",
+        None
+    )
+
+    # Convert crop list/string into a clean response
+    if isinstance(primary_crops, list):
+        crops = primary_crops
+
+    elif isinstance(primary_crops, str):
+        crops = [
+            crop.strip()
+            for crop in primary_crops.replace(";", ",").split(",")
+            if crop.strip()
+        ]
+
+    else:
+        crops = []
+
     return {
         "id": farmer.id,
-        "full_name": farmer.full_name,
-        "email": farmer.email,
-        "role": farmer.role,
+        "user_id": farmer.id,
 
-        "phone": getattr(farmer, "phone", None),
-        "location": getattr(farmer, "location", None),
-        "state": getattr(farmer, "state", None),
-        "country": getattr(farmer, "country", None),
-
-        "farm_location": getattr(
+        "name": getattr(
             farmer,
-            "farm_location",
-            None,
+            "full_name",
+            None
+        ) or getattr(
+            farmer,
+            "name",
+            None
+        ) or "Unknown Farmer",
+
+        "full_name": getattr(
+            farmer,
+            "full_name",
+            None
+        ) or "Unknown Farmer",
+
+        "email": getattr(
+            farmer,
+            "email",
+            None
+        ),
+
+        "location": getattr(
+            farmer,
+            "location",
+            None
+        ) or getattr(
+            farmer,
+            "address",
+            None
         ),
 
         "farm_size": getattr(
             farmer,
             "farm_size",
-            None,
+            None
+        ) or getattr(
+            farmer,
+            "farm_area",
+            None
         ),
 
-        "soil_type": getattr(
-            farmer,
-            "soil_type",
-            None,
+        "crops": crops,
+
+        "primary_crops": crops,
+
+        "created_at": (
+            farmer.created_at.isoformat()
+            if getattr(farmer, "created_at", None)
+            else None
         ),
 
-        "primary_crops": getattr(
-            farmer,
-            "primary_crops",
-            None,
-        ),
-
-        "profile_image": getattr(
-            farmer,
-            "profile_image",
-            None,
-        ),
-
-        "created_at": getattr(
-            farmer,
-            "created_at",
-            None,
-        ),
+        "status": "active"
     }
 
 
 # ============================================================
-# GET FARMERS
+# GET ALL FARMERS
 # ============================================================
 
 @router.get("/farmers")
 def get_consultant_farmers(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_authenticated_user),
+    current_user: User = Depends(get_authenticated_user)
 ):
+
     require_consultant(current_user)
 
     farmers = (
         db.query(User)
         .filter(User.role == "farmer")
-        .order_by(User.full_name.asc())
+        .order_by(User.created_at.desc())
         .all()
     )
 
-    return [
-        farmer_response(farmer)
-        for farmer in farmers
-    ]
-
-
+    return {
+        "success": True,
+        "farmers": [
+            farmer_response(farmer)
+            for farmer in farmers
+        ]
+    }
 # ============================================================
-# GET CONSULTATIONS
-#
-# Uses Conversation + Message because your existing chat system
-# already stores consultant-farmer communication there.
+# NOTE SCHEMAS
 # ============================================================
 
-@router.get("/consultations")
-def get_consultant_consultations(
+class NoteCreate(BaseModel):
+    title: str
+    content: str
+
+
+class NoteUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+# ============================================================
+# CONSULTANT DASHBOARD
+# ============================================================
+
+@router.get("/dashboard")
+def consultant_dashboard(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_authenticated_user),
+    current_user: User = Depends(get_authenticated_user)
 ):
+
     require_consultant(current_user)
+
+    # --------------------------------------------------------
+    # Managed farmers
+    # --------------------------------------------------------
 
     conversations = (
         db.query(Conversation)
         .filter(
-            Conversation.consultant_id
-            == current_user.id
-        )
-        .order_by(
-            Conversation.updated_at.desc()
+            Conversation.consultant_id == current_user.id
         )
         .all()
     )
 
-    result = []
+    farmer_ids = list({
+        conversation.farmer_id
+        for conversation in conversations
+        if conversation.farmer_id
+    })
+
+    total_farmers = len(farmer_ids)
+
+    # --------------------------------------------------------
+    # Active consultations
+    # --------------------------------------------------------
+
+    active_consultations = sum(
+        1
+        for conversation in conversations
+        if getattr(conversation, "status", "active") == "active"
+    )
+
+    # --------------------------------------------------------
+    # Unread messages
+    # --------------------------------------------------------
+
+    # Count unread messages from farmers in this consultant's conversations
+    unread_messages = 0
 
     for conversation in conversations:
-
-        farmer = conversation.farmer
-
-        messages = (
-            db.query(Message)
-            .filter(
-                Message.conversation_id
-                == conversation.id
+        unread_messages += (
+           db.query(Message)
+           .filter(
+               Message.conversation_id == conversation.id,
+               Message.sender_id != current_user.id,
+               Message.is_read == False
             )
-            .order_by(
-                Message.created_at.asc()
-            )
-            .all()
+           .count()
         )
 
-        last_message = (
-            messages[-1]
-            if messages
-            else None
-        )
+    # --------------------------------------------------------
+    # Predictions
+    # --------------------------------------------------------
 
-        unread_count = sum(
-            1
-            for message in messages
-            if (
-                message.sender_id != current_user.id
-                and not message.is_read
-            )
-        )
+    prediction_query = db.query(
+        PredictionHistory
+    )
 
-        result.append(
+    if farmer_ids:
+        prediction_query = prediction_query.filter(
+            PredictionHistory.user_id.in_(farmer_ids)
+        )
+    else:
+        prediction_query = prediction_query.filter(False)
+
+    predictions = (
+        prediction_query
+        .order_by(PredictionHistory.created_at.asc())
+        .all()
+    )
+
+    # --------------------------------------------------------
+    # Weekly predictions
+    # --------------------------------------------------------
+
+    today = datetime.utcnow().date()
+
+    start_of_week = (
+        today - timedelta(days=today.weekday())
+    )
+
+    weekly_predictions = {
+        "Mon": 0,
+        "Tue": 0,
+        "Wed": 0,
+        "Thu": 0,
+        "Fri": 0,
+        "Sat": 0,
+        "Sun": 0,
+    }
+
+    for prediction in predictions:
+
+        if not prediction.created_at:
+            continue
+
+        prediction_date = prediction.created_at.date()
+
+        if prediction_date >= start_of_week:
+
+            day_name = prediction_date.strftime("%a")
+
+            if day_name in weekly_predictions:
+                weekly_predictions[day_name] += 1
+
+    # --------------------------------------------------------
+    # Return
+    # --------------------------------------------------------
+
+    return {
+        "success": True,
+
+        "consultant": {
+            "id": current_user.id,
+            "name": getattr(
+                current_user,
+                "full_name",
+                None
+            ) or "Consultant",
+
+            "email": current_user.email
+        },
+
+        "metrics": {
+            "total_farmers": total_farmers,
+            "active_consultations": active_consultations,
+            "pending_messages": unread_messages,
+            "total_predictions": len(predictions)
+        },
+
+        "weekly_predictions": [
             {
-                "id": conversation.id,
-
-                "farmer": (
-                    farmer_response(farmer)
-                    if farmer
-                    else None
-                ),
-
-                "farmer_id":
-                    conversation.farmer_id,
-
-                "consultant_id":
-                    conversation.consultant_id,
-
-                "created_at":
-                    conversation.created_at,
-
-                "updated_at":
-                    conversation.updated_at,
-
-                "last_message": (
-                    {
-                        "id": last_message.id,
-                        "message":
-                            last_message.message,
-                        "sender_id":
-                            last_message.sender_id,
-                        "created_at":
-                            last_message.created_at,
-                        "is_read":
-                            last_message.is_read,
-                    }
-                    if last_message
-                    else None
-                ),
-
-                "message_count":
-                    len(messages),
-
-                "unread_count":
-                    unread_count,
+                "day": day,
+                "predictions": count
             }
-        )
-
-    return result
+            for day, count in weekly_predictions.items()
+        ]
+    }
 
 
 # ============================================================
-# ANALYTICS
+# CONSULTANT ANALYTICS
 # ============================================================
 
 @router.get("/analytics")
@@ -221,135 +332,684 @@ def get_consultant_analytics(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_authenticated_user),
 ):
+    """
+    Analytics for the currently logged-in consultant.
+
+    Only predictions belonging to farmers managed by this
+    consultant are included.
+    """
+
     require_consultant(current_user)
 
-    # --------------------------------------------------------
-    # Farmers
-    # --------------------------------------------------------
-
-    farmers = (
-        db.query(User)
-        .filter(User.role == "farmer")
-        .all()
-    )
-
-    total_farmers = len(farmers)
-
-    # --------------------------------------------------------
-    # Conversations
-    # --------------------------------------------------------
+    # =========================================================
+    # 1. FIND MANAGED FARMERS
+    # =========================================================
 
     conversations = (
         db.query(Conversation)
         .filter(
-            Conversation.consultant_id
-            == current_user.id
+            Conversation.consultant_id == current_user.id
         )
         .all()
     )
 
-    total_consultations = len(conversations)
-
-    # --------------------------------------------------------
-    # Messages
-    # --------------------------------------------------------
-
-    conversation_ids = [
-        conversation.id
+    farmer_ids = list({
+        conversation.farmer_id
         for conversation in conversations
-    ]
+        if conversation.farmer_id
+    })
+    total_farmers = len(farmer_ids)
+    # ============================================================
+    # ACTIVE CONSULTATIONS
+    # ============================================================
 
-    total_messages = 0
+    active_consultations = len([
+       conversation
+       for conversation in conversations
+       if getattr(conversation, "is_active", True)
+    ])
 
-    if conversation_ids:
-        total_messages = (
-            db.query(Message)
-            .filter(
-                Message.conversation_id.in_(
-                    conversation_ids
-                )
+    # ============================================================
+    # UNREAD MESSAGES
+    # ============================================================
+
+    unread_messages = 0
+
+    for conversation in conversations:
+        unread_messages += (
+           db.query(Message)
+           .filter(
+                Message.conversation_id == conversation.id,
+                Message.sender_id != current_user.id,
+                Message.is_read == False
             )
             .count()
         )
+    # =========================================================
+    # 2. GET FARMERS
+    # =========================================================
 
-    # --------------------------------------------------------
-    # Crop distribution
-    # --------------------------------------------------------
+    farmers = []
 
-    crop_counter = Counter()
+    if farmer_ids:
+
+        farmers = (
+            db.query(User)
+            .filter(
+                User.id.in_(farmer_ids),
+                User.role == "farmer"
+            )
+            .all()
+        )
+
+    farmer_lookup = {
+        farmer.id: farmer
+        for farmer in farmers
+    }
+
+    # =========================================================
+    # 3. GET PREDICTIONS OF MANAGED FARMERS
+    # =========================================================
+
+    predictions = []
+
+    if farmer_ids:
+
+        predictions = (
+            db.query(PredictionHistory)
+            .filter(
+                PredictionHistory.user_id.in_(farmer_ids)
+            )
+            .order_by(
+                PredictionHistory.created_at.asc()
+            )
+            .all()
+        )
+
+    # =========================================================
+    # 4. CROP DISTRIBUTION
+    # =========================================================
+
+    crop_counts = Counter()
 
     for farmer in farmers:
 
         crops = getattr(
             farmer,
             "primary_crops",
-            None,
+            None
         )
 
         if not crops:
             continue
 
-        if isinstance(crops, str):
+        # List
+        if isinstance(crops, list):
 
-            crop_list = crops.split(",")
+            for crop in crops:
+
+                crop_name = str(crop).strip()
+
+                if crop_name:
+                    crop_counts[crop_name] += 1
+
+        # String
+        elif isinstance(crops, str):
+
+            crop_list = (
+                crops
+                .replace(";", ",")
+                .split(",")
+            )
 
             for crop in crop_list:
 
-                crop = crop.strip()
+                crop_name = crop.strip()
 
-                if crop:
-                    crop_counter[crop] += 1
+                if crop_name:
+                    crop_counts[crop_name] += 1
 
-    crop_distribution = [
-        {
-            "crop": crop,
-            "count": count,
-        }
-        for crop, count
-        in crop_counter.most_common()
-    ]
+    total_crop_count = sum(
+        crop_counts.values()
+    )
 
-    # --------------------------------------------------------
-    # Consultation activity by month
-    # --------------------------------------------------------
+    crop_distribution = []
 
-    monthly_counter = Counter()
+    for crop, count in crop_counts.items():
 
-    for conversation in conversations:
-
-        date = (
-            conversation.created_at
-            or conversation.updated_at
+        value = (
+            round(
+                (count / total_crop_count) * 100,
+                2
+            )
+            if total_crop_count > 0
+            else 0
         )
 
-        if date:
+        crop_distribution.append({
+            "crop": crop,
+            "count": count,
+            "value": value,
+        })
 
-            month = date.strftime("%Y-%m")
+    crop_distribution.sort(
+        key=lambda x: x["value"],
+        reverse=True
+    )
 
-            monthly_counter[month] += 1
+    # =========================================================
+    # 5. YIELD TREND
+    # =========================================================
+    #
+    # IMPORTANT:
+    # Every PredictionHistory record becomes one point.
+    #
+    # This means the chart uses the SAME prediction history
+    # that the farmer analytics uses.
+    # =========================================================
 
-    consultation_trends = [
-        {
-            "month": month,
-            "consultations": count,
-        }
-        for month, count
-        in sorted(monthly_counter.items())
-    ]
+    yield_trends = []
+
+    for prediction in predictions:
+
+        farmer = farmer_lookup.get(
+            prediction.user_id
+        )
+
+        try:
+
+            predicted_yield = float(
+                prediction.predicted_yield
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            continue
+
+        created_at = prediction.created_at
+
+        if created_at:
+
+            label = created_at.strftime(
+                "%d %b"
+            )
+
+        else:
+
+            label = str(
+                prediction.year
+            )
+
+        yield_trends.append({
+
+            "id": prediction.id,
+
+            "label": label,
+
+            "year": (
+                str(prediction.year)
+                if prediction.year is not None
+                else ""
+            ),
+
+            "crop": (
+                prediction.crop
+                or "Unknown"
+            ),
+
+            "area": prediction.area,
+
+            "yield": round(
+                predicted_yield,
+                2
+            ),
+
+            "confidence": (
+                prediction.confidence
+                or 0
+            ),
+
+            "farmer_id": prediction.user_id,
+
+            "farmer_name": (
+                farmer.full_name
+                if farmer
+                else "Farmer"
+            ),
+
+            "created_at": (
+                created_at.isoformat()
+                if created_at
+                else None
+            ),
+        })
+
+    # =========================================================
+    # 6. SUMMARY
+    # =========================================================
+
+    yields = []
+
+    for prediction in predictions:
+
+        try:
+
+            yields.append(
+                float(
+                    prediction.predicted_yield
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            pass
+
+    total_predictions = len(yields)
+
+    average_yield = (
+        sum(yields) / len(yields)
+        if yields
+        else 0
+    )
+
+    highest_yield = (
+        max(yields)
+        if yields
+        else 0
+    )
+
+    lowest_yield = (
+        min(yields)
+        if yields
+        else 0
+    )
+
+    # =========================================================
+    # 7. MOST GROWN CROP
+    # =========================================================
+
+    most_grown_crop = None
+
+    if crop_counts:
+
+        most_grown_crop = max(
+            crop_counts,
+            key=crop_counts.get
+        )
+
+    # =========================================================
+    # 8. CROP-WISE YIELD PERFORMANCE
+    # =========================================================
+
+    crop_yields = {}
+
+    for prediction in predictions:
+
+        crop = (
+            prediction.crop
+            or "Unknown"
+        )
+
+        try:
+
+            value = float(
+                prediction.predicted_yield
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            continue
+
+        crop_yields.setdefault(
+            crop,
+            []
+        ).append(value)
+
+    crop_yield_performance = []
+
+    for crop, values in crop_yields.items():
+
+        if not values:
+            continue
+
+        crop_yield_performance.append({
+
+            "crop": crop,
+
+            "yield": round(
+                sum(values) / len(values),
+                2
+            ),
+
+            "predictions": len(values),
+
+        })
+
+    crop_yield_performance.sort(
+        key=lambda x: x["yield"],
+        reverse=True
+    )
+
+    # =========================================================
+    # 9. FARM-WISE YIELD RECORDS
+    # =========================================================
+
+    farm_yield_records = []
+
+    for farmer in farmers:
+
+        farmer_predictions = [
+            prediction
+            for prediction in predictions
+            if prediction.user_id == farmer.id
+        ]
+
+        farmer_yields = []
+
+        for prediction in farmer_predictions:
+
+            try:
+
+                farmer_yields.append(
+                    float(
+                        prediction.predicted_yield
+                    )
+                )
+
+            except (
+                TypeError,
+                ValueError
+            ):
+
+                pass
+
+        farm_yield_records.append({
+
+            "farmer_id": farmer.id,
+
+            "farmer_name": (
+                farmer.full_name
+                or "Farmer"
+            ),
+
+            "predictions": len(
+                farmer_yields
+            ),
+
+            "average_yield": round(
+                (
+                    sum(farmer_yields)
+                    / len(farmer_yields)
+                )
+                if farmer_yields
+                else 0,
+                2
+            ),
+
+        })
+
+    # =========================================================
+    # 10. RESPONSE
+    # =========================================================
 
     return {
-        "total_farmers":
-            total_farmers,
 
-        "total_consultations":
-            total_consultations,
+        "success": True,
 
-        "total_messages":
-            total_messages,
+        "summary": {
+
+            "total_farmers": len(
+                farmers
+            ),
+
+            "total_predictions":
+                total_predictions,
+
+            "average_yield": round(
+                average_yield,
+                2
+            ),
+
+            "highest_yield": round(
+                highest_yield,
+                2
+            ),
+
+            "lowest_yield": round(
+                lowest_yield,
+                2
+            ),
+
+            "most_grown_crop":
+                most_grown_crop,
+
+        },
 
         "crop_distribution":
             crop_distribution,
 
-        "consultation_trends":
-            consultation_trends,
+        "yield_trends":
+            yield_trends,
+
+        "crop_yield_performance":
+            crop_yield_performance,
+
+        "farm_yield_records":
+            farm_yield_records,
+
+    }
+# ============================================================
+# GET CONSULTANT NOTES
+# ============================================================
+
+@router.get("/notes")
+def get_consultant_notes(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_authenticated_user)
+):
+    require_consultant(current_user)
+
+    notes = (
+        db.query(Note)
+        .filter(
+            Note.consultant_id == current_user.id
+        )
+        .order_by(
+            Note.updated_at.desc(),
+            Note.created_at.desc()
+        )
+        .all()
+    )
+
+    return {
+        "success": True,
+        "notes": [
+            {
+                "id": note.id,
+                "title": note.title,
+                "content": note.content,
+                "created_at": (
+                    note.created_at.isoformat()
+                    if note.created_at
+                    else None
+                ),
+                "updated_at": (
+                    note.updated_at.isoformat()
+                    if note.updated_at
+                    else None
+                ),
+            }
+            for note in notes
+        ]
+    }
+# ============================================================
+# CREATE CONSULTANT NOTE
+# ============================================================
+
+@router.post("/notes")
+def create_consultant_note(
+    note_data: NoteCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_authenticated_user)
+):
+    require_consultant(current_user)
+
+    title = note_data.title.strip()
+    content = note_data.content.strip()
+
+    if not title:
+        raise HTTPException(
+            status_code=400,
+            detail="Note title is required"
+        )
+
+    if not content:
+        raise HTTPException(
+            status_code=400,
+            detail="Note content is required"
+        )
+
+    note = Note(
+        consultant_id=current_user.id,
+        title=title,
+        content=content
+    )
+
+    db.add(note)
+    db.commit()
+    db.refresh(note)
+
+    return {
+        "success": True,
+        "message": "Note created successfully",
+        "note": {
+            "id": note.id,
+            "title": note.title,
+            "content": note.content,
+            "created_at": (
+                note.created_at.isoformat()
+                if note.created_at
+                else None
+            ),
+            "updated_at": (
+                note.updated_at.isoformat()
+                if note.updated_at
+                else None
+            )
+        }
+    }
+# ============================================================
+# UPDATE CONSULTANT NOTE
+# ============================================================
+
+@router.put("/notes/{note_id}")
+def update_consultant_note(
+    note_id: int,
+    note_data: NoteUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_authenticated_user)
+):
+    require_consultant(current_user)
+
+    note = (
+        db.query(Note)
+        .filter(
+            Note.id == note_id,
+            Note.consultant_id == current_user.id
+        )
+        .first()
+    )
+
+    if not note:
+        raise HTTPException(
+            status_code=404,
+            detail="Note not found"
+        )
+
+    if note_data.title is not None:
+        title = note_data.title.strip()
+
+        if not title:
+            raise HTTPException(
+                status_code=400,
+                detail="Note title cannot be empty"
+            )
+
+        note.title = title
+
+    if note_data.content is not None:
+        content = note_data.content.strip()
+
+        if not content:
+            raise HTTPException(
+                status_code=400,
+                detail="Note content cannot be empty"
+            )
+
+        note.content = content
+
+    db.commit()
+    db.refresh(note)
+
+    return {
+        "success": True,
+        "message": "Note updated successfully",
+        "note": {
+            "id": note.id,
+            "title": note.title,
+            "content": note.content,
+            "created_at": (
+                note.created_at.isoformat()
+                if note.created_at
+                else None
+            ),
+            "updated_at": (
+                note.updated_at.isoformat()
+                if note.updated_at
+                else None
+            )
+        }
+    }
+# ============================================================
+# DELETE CONSULTANT NOTE
+# ============================================================
+
+@router.delete("/notes/{note_id}")
+def delete_consultant_note(
+    note_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_authenticated_user)
+):
+    require_consultant(current_user)
+
+    note = (
+        db.query(Note)
+        .filter(
+            Note.id == note_id,
+            Note.consultant_id == current_user.id
+        )
+        .first()
+    )
+
+    if not note:
+        raise HTTPException(
+            status_code=404,
+            detail="Note not found"
+        )
+
+    db.delete(note)
+    db.commit()
+
+    return {
+        "success": True,
+        "message": "Note deleted successfully"
     }

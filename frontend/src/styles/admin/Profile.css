@@ -1,0 +1,731 @@
+/* =========================================================
+   ADMIN PROFILE PAGE
+   ========================================================= */
+
+.admin-profile-page {
+  width: 100%;
+  min-height: calc(100vh - 74px);
+  padding: 28px 22px 40px;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.admin-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+}
+
+.admin-page-header h1 {
+  margin: 0;
+
+  color: #075b32;
+
+  font-size: 23px;
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+.admin-page-header p {
+  margin: 6px 0 0;
+
+  color: #6f8d7b;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+.profile-message {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 13px 15px;
+
+  margin-bottom: 18px;
+
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.profile-success {
+  border: 1px solid #b9e7c9;
+
+  background: #f1fbf4;
+
+  color: #087c3b;
+}
+
+.profile-error {
+  border: 1px solid #f0c4c4;
+
+  background: #fff7f7;
+
+  color: #b42318;
+}
+
+
+/* =========================================================
+   PROFILE LAYOUT
+   ========================================================= */
+
+.profile-layout {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(240px, 0.75fr)
+    minmax(450px, 1.7fr);
+
+  gap: 20px;
+
+  align-items: start;
+}
+
+
+/* =========================================================
+   LEFT SUMMARY CARD
+   ========================================================= */
+
+.profile-summary-card {
+  background: #ffffff;
+
+  border: 1px solid #d7efdf;
+
+  border-radius: 14px;
+
+  padding: 28px 24px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 2px 8px rgba(20, 105, 58, 0.05);
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.profile-avatar {
+  width: 82px;
+  height: 82px;
+
+  margin: 0 auto 15px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(
+    135deg,
+    #65cf12,
+    #079642
+  );
+
+  color: #ffffff;
+
+  font-size: 30px;
+  font-weight: 700;
+
+  box-shadow:
+    0 5px 14px rgba(20, 145, 69, 0.18);
+}
+
+
+/* =========================================================
+   SUMMARY NAME
+   ========================================================= */
+
+.profile-summary-card h2 {
+  margin: 0;
+
+  color: #075b32;
+
+  font-size: 19px;
+
+  font-weight: 700;
+}
+
+.profile-summary-email {
+  margin: 7px 0 14px;
+
+  color: #718d7d;
+
+  font-size: 12px;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   ROLE
+   ========================================================= */
+
+.profile-role {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 7px 13px;
+
+  border-radius: 20px;
+
+  background: #ecf9f0;
+
+  color: #087c3b;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+.profile-role svg {
+  color: #079447;
+}
+
+
+/* =========================================================
+   SUMMARY DIVIDER
+   ========================================================= */
+
+.profile-summary-divider {
+  height: 1px;
+
+  margin: 24px 0 20px;
+
+  background: #e4f2e8;
+}
+
+
+/* =========================================================
+   SUMMARY ITEMS
+   ========================================================= */
+
+.profile-summary-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  text-align: left;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid #edf5ef;
+}
+
+.profile-summary-item:last-child {
+  border-bottom: 0;
+}
+
+.profile-summary-item > svg {
+  flex-shrink: 0;
+
+  color: #0a9a4b;
+}
+
+.profile-summary-item div {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.profile-summary-item span {
+  color: #7a9685;
+
+  font-size: 10px;
+}
+
+.profile-summary-item strong {
+  color: #165c38;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   RIGHT FORM CARD
+   ========================================================= */
+
+.profile-form-card {
+  background: #ffffff;
+
+  border: 1px solid #d7efdf;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 2px 8px rgba(20, 105, 58, 0.05);
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   FORM CARD HEADER
+   ========================================================= */
+
+.profile-card-header {
+  min-height: 78px;
+
+  padding: 17px 20px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  border-bottom: 1px solid #e2f1e7;
+}
+
+.profile-card-header h2 {
+  margin: 0;
+
+  color: #075b32;
+
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+.profile-card-header p {
+  margin: 5px 0 0;
+
+  color: #789183;
+
+  font-size: 11px;
+}
+
+.profile-card-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: #edf9f1;
+
+  color: #079447;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.profile-form {
+  padding: 22px 20px 20px;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  column-gap: 18px;
+
+  row-gap: 18px;
+}
+
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+
+.profile-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.profile-field label {
+  color: #276444;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   INPUT WRAPPER
+   ========================================================= */
+
+.profile-input-wrapper {
+  height: 43px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 0 12px;
+
+  border: 1px solid #d6eadd;
+
+  border-radius: 9px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.profile-input-wrapper:focus-within {
+  border-color: #52bf7a;
+
+  box-shadow:
+    0 0 0 3px rgba(25, 150, 76, 0.08);
+}
+
+.profile-input-wrapper svg {
+  flex-shrink: 0;
+
+  color: #55a575;
+}
+
+.profile-input-wrapper input {
+  width: 100%;
+
+  min-width: 0;
+
+  border: 0;
+
+  outline: 0;
+
+  background: transparent;
+
+  color: #175b39;
+
+  font-family: inherit;
+
+  font-size: 12px;
+}
+
+.profile-input-wrapper input::placeholder {
+  color: #9aada1;
+}
+
+
+/* =========================================================
+   DISABLED EMAIL
+   ========================================================= */
+
+.profile-input-wrapper input:disabled {
+  cursor: not-allowed;
+
+  color: #789083;
+
+  opacity: 1;
+}
+
+.profile-input-wrapper:has(input:disabled) {
+  background: #f7faf8;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   FIELD HELP TEXT
+   ========================================================= */
+
+.profile-field small {
+  margin-top: -2px;
+
+  color: #8aa092;
+
+  font-size: 9px;
+
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   SAVE ACTION
+   ========================================================= */
+
+.profile-form-actions {
+  grid-column: 1 / -1;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  padding-top: 3px;
+
+  margin-top: 2px;
+
+  border-top: 1px solid #edf4ef;
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+   ========================================================= */
+
+.profile-save-button {
+  min-width: 145px;
+
+  height: 40px;
+
+  padding: 0 17px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  border: 0;
+
+  border-radius: 9px;
+
+  background: #078b3f;
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.profile-save-button:hover:not(:disabled) {
+  background: #057535;
+
+  box-shadow:
+    0 4px 10px rgba(5, 117, 53, 0.18);
+}
+
+.profile-save-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.profile-save-button:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.profile-loading {
+  min-height: 450px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #138748;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   SPINNER
+   ========================================================= */
+
+.admin-spin {
+  animation:
+    adminProfileSpin 0.9s linear infinite;
+}
+
+@keyframes adminProfileSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-summary-card {
+    display: grid;
+
+    grid-template-columns:
+      auto 1fr;
+
+    column-gap: 18px;
+
+    text-align: left;
+
+    align-items: center;
+  }
+
+  .profile-avatar {
+    grid-row: span 3;
+
+    margin: 0;
+  }
+
+  .profile-summary-card h2 {
+    align-self: end;
+  }
+
+  .profile-summary-email {
+    margin: 4px 0;
+  }
+
+  .profile-role {
+    justify-self: start;
+  }
+
+  .profile-summary-divider {
+    grid-column: 1 / -1;
+
+    width: 100%;
+
+    margin: 18px 0 8px;
+  }
+
+  .profile-summary-item {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  .admin-profile-page {
+    padding: 20px 13px 30px;
+  }
+
+  .admin-page-header h1 {
+    font-size: 20px;
+  }
+
+  .admin-page-header p {
+    font-size: 11px;
+  }
+
+  .profile-summary-card {
+    display: flex;
+
+    flex-direction: column;
+
+    text-align: center;
+  }
+
+  .profile-avatar {
+    margin: 0 auto 13px;
+  }
+
+  .profile-summary-email {
+    margin: 6px 0 12px;
+  }
+
+  .profile-role {
+    align-self: center;
+  }
+
+  .profile-form {
+    grid-template-columns: 1fr;
+
+    padding: 18px 15px;
+  }
+
+  .profile-form-actions {
+    grid-column: auto;
+
+    justify-content: stretch;
+  }
+
+  .profile-save-button {
+    width: 100%;
+  }
+
+  .profile-card-header {
+    padding: 15px;
+  }
+
+}

@@ -5,8 +5,14 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
-from app.ml.predictor import predict_crop, get_model_info
+from app.models.user import User
 from app.models.prediction_history import PredictionHistory
+from app.routers.users import get_authenticated_user
+
+from app.ml.predictor import (
+    predict_crop,
+    get_model_info,
+)
 
 
 router = APIRouter(
@@ -61,6 +67,7 @@ class PredictionRequest(BaseModel):
 # ============================================================
 
 class PredictionResponse(BaseModel):
+
     id: Optional[int] = None
 
     area: str
@@ -75,7 +82,7 @@ class PredictionResponse(BaseModel):
 
     r2_score: Optional[float] = None
 
-    confidence: Optional[int] = 0
+    confidence: Optional[float] = 0
 
 
 # ============================================================
@@ -90,6 +97,8 @@ class PredictionHistoryResponse(BaseModel):
     crop: Optional[str] = None
     year: Optional[int] = None
 
+    season: Optional[str] = None
+
     rainfall: Optional[float] = None
     temperature: Optional[float] = None
     humidity: Optional[float] = None
@@ -103,7 +112,7 @@ class PredictionHistoryResponse(BaseModel):
 
     category: Optional[str] = "Average"
 
-    confidence: Optional[int] = 0
+    confidence: Optional[float] = 0
 
     created_at: Optional[str] = None
 
@@ -112,22 +121,20 @@ class PredictionHistoryResponse(BaseModel):
 # PREDICT CROP YIELD
 # ============================================================
 
-@router.post(
-    "/predict",
-    response_model=PredictionResponse
-)
-def predict_yield(
+@router.post("/predict")
+def predict(
     request: PredictionRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_authenticated_user),
 ):
 
     try:
 
-        # ----------------------------------------------------
-        # RUN ML MODEL
-        # ----------------------------------------------------
+        # =====================================================
+        # RUN ML PREDICTION
+        # =====================================================
 
-        predicted_yield = predict_crop(
+        predicted_yield, confidence = predict_crop(
 
             area=request.area,
 
@@ -141,36 +148,45 @@ def predict_yield(
 
             pesticides_tonnes=request.pesticides_tonnes,
 
-            avg_temp=request.avg_temp
+            avg_temp=request.avg_temp,
         )
 
-        # ----------------------------------------------------
+
+        # =====================================================
         # MODEL INFORMATION
-        # ----------------------------------------------------
+        # =====================================================
 
         model_info = get_model_info()
 
-        r2_score = model_info.get("r2_score")
 
-        # ----------------------------------------------------
-        # CALCULATE MODEL CONFIDENCE
-        # ----------------------------------------------------
+        # =====================================================
+        # CATEGORY
+        # =====================================================
 
-        if r2_score is not None:
-          confidence = round(max(0, min(100, float(r2_score) * 100)))
+        if predicted_yield >= 15000:
+            category = "High"
+
+        elif predicted_yield >= 8000:
+            category = "Average"
+
         else:
-           confidence = 0
+            category = "Low"
 
-        predicted_yield = round(
-            float(predicted_yield),
-            2
-        )
 
-        # ----------------------------------------------------
+        # =====================================================
+        # RECOMMENDATION
+        # =====================================================
+
+        recommendation = None
+
+
+        # =====================================================
         # SAVE PREDICTION HISTORY
-        # ----------------------------------------------------
+        # =====================================================
 
         history = PredictionHistory(
+
+            user_id=current_user.id,
 
             area=request.area,
 
@@ -184,20 +200,17 @@ def predict_yield(
 
             temperature=request.avg_temp,
 
-            humidity=None,
-
-            wind_speed=None,
-
             pesticides=request.pesticides_tonnes,
 
             predicted_yield=predicted_yield,
 
-            recommendation=None,
+            confidence=confidence,
 
-            category="Average",
+            category=category,
 
-            confidence=confidence
+            recommendation=recommendation,
         )
+
 
         db.add(history)
 
@@ -205,49 +218,85 @@ def predict_yield(
 
         db.refresh(history)
 
-        # ----------------------------------------------------
-        # RETURN RESPONSE
-        # ----------------------------------------------------
 
-        return PredictionResponse(
+        # =====================================================
+        # RESPONSE
+        # =====================================================
 
-         id=history.id,
+        return {
 
-         area=request.area,
+            "success": True,
 
-         item=request.item,
+            "prediction": {
 
-         year=request.year,
+                "id": history.id,
 
-        
+                "user_id": history.user_id,
 
-         predicted_yield=predicted_yield,
+                "area": history.area,
 
-         unit="hg/ha",
+                "crop": history.crop,
 
-         model="Random Forest",
+                "year": history.year,
 
-         r2_score=r2_score,
+                "season": history.season,
 
-         confidence=confidence
-       )
+                "rainfall": history.rainfall,
 
-    except ValueError as error:
+                "temperature": history.temperature,
+
+                "pesticides": history.pesticides,
+
+                "predicted_yield": history.predicted_yield,
+
+                "category": history.category,
+
+                "confidence": history.confidence,
+
+                "created_at": (
+                    history.created_at.isoformat()
+                    if history.created_at
+                    else None
+                ),
+            },
+
+            "model": {
+
+                "model_type": model_info.get(
+                    "model_type",
+                    "Random Forest"
+                ),
+
+                "r2_score": model_info.get(
+                    "r2_score"
+                ),
+
+                "feature_columns": model_info.get(
+                    "feature_columns",
+                    []
+                ),
+
+                "confidence": confidence,
+            },
+        }
+
+
+    except Exception as e:
 
         db.rollback()
 
-        raise HTTPException(
-            status_code=400,
-            detail=str(error)
+        print(
+            "Prediction error:",
+            repr(e)
         )
 
-    except Exception as error:
-
-        db.rollback()
-
         raise HTTPException(
+
             status_code=500,
-            detail=f"Prediction failed: {str(error)}"
+
+            detail=(
+                f"Prediction failed: {str(e)}"
+            )
         )
 
 
@@ -260,24 +309,36 @@ def predict_yield(
     response_model=list[PredictionHistoryResponse]
 )
 def get_prediction_history(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_authenticated_user),
 ):
 
     try:
 
         history = (
+
             db.query(PredictionHistory)
+
+            .filter(
+                PredictionHistory.user_id
+                == current_user.id
+            )
+
             .order_by(
                 PredictionHistory.created_at.desc()
             )
+
             .all()
         )
 
+
         result = []
+
 
         for item in history:
 
             result.append(
+
                 PredictionHistoryResponse(
 
                     id=item.id,
@@ -287,6 +348,8 @@ def get_prediction_history(
                     crop=item.crop,
 
                     year=item.year,
+
+                    season=item.season,
 
                     rainfall=item.rainfall,
 
@@ -314,7 +377,9 @@ def get_prediction_history(
                 )
             )
 
+
         return result
+
 
     except Exception as error:
 

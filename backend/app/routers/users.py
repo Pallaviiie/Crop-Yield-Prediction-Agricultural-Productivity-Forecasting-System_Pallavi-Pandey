@@ -33,7 +33,7 @@ from app.models.user import User
 from app.schemas.user import (
     UserLogin,
 )
-
+from app.utils.activity_logger import log_activity
 
 # ============================================================
 # ROUTER
@@ -237,6 +237,23 @@ def user_response(user: User):
             "country",
             None,
         ),
+        "city": getattr(
+            user,
+           "city",
+           None,
+        ),
+
+        "district": getattr(
+            user,
+            "district",
+            None,
+        ),
+
+        "license_number": getattr(
+            user,
+            "license_number",
+            None,
+        ),
         "specialization": getattr(
             user,
            "specialization",
@@ -414,7 +431,11 @@ def register_user(
             "country",
             "India",
         ),
+        license_number=user_data.get("license_number"),
 
+        city=user_data.get("city"),
+
+        district=user_data.get("district"),
         farm_location=user_data.get(
             "farm_location"
         ),
@@ -441,6 +462,14 @@ def register_user(
     db.commit()
 
     db.refresh(new_user)
+
+    log_activity(
+       db=db,
+       action=f"New {new_user.role} registered",
+       actor=new_user,
+       details=new_user.email,
+       log_type="success",
+    )
 
     return user_response(
         new_user
@@ -513,7 +542,14 @@ def login_user(
         print(
             "PASSWORD VERIFICATION FAILED"
         )
-
+        log_activity(
+            db=db,
+            action="Failed login attempt",
+            actor_name=user.email,
+            actor_role=user.role,
+            details="Invalid password",
+            log_type="warning",
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
@@ -545,6 +581,13 @@ def login_user(
         }
 
     )
+    log_activity(
+       db=db,
+       action="User logged in",
+       actor=user,
+       details=user.email,
+       log_type="success",
+    )
 
     print(
         "JWT CREATED"
@@ -552,6 +595,13 @@ def login_user(
 
     print(
         "LOGIN SUCCESS"
+    )
+    log_activity(
+        db=db,
+        action="User logged in",
+        actor=user,
+        details=user.email,
+        log_type="success",
     )
 
     print("==============================\n")
@@ -659,6 +709,13 @@ def update_me(
 
     db.refresh(
         current_user
+    )
+    log_activity(
+        db=db,
+        action="Profile updated",
+        actor=current_user,
+        details="Account information updated",
+        log_type="info",
     )
 
     return user_response(
@@ -861,6 +918,80 @@ async def upload_profile_image(
     db.refresh(
         current_user
     )
+
+    return user_response(
+        current_user
+    )
+# ============================================================
+# DELETE PROFILE IMAGE
+# ============================================================
+
+@router.delete("/profile-image")
+def delete_profile_image(
+
+    db: Session = Depends(
+        get_db
+    ),
+
+    current_user: User = Depends(
+        get_authenticated_user
+    ),
+
+):
+
+    # --------------------------------------------------------
+    # GET CURRENT IMAGE
+    # --------------------------------------------------------
+
+    current_image = getattr(
+        current_user,
+        "profile_image",
+        None,
+    )
+
+    # --------------------------------------------------------
+    # DELETE PHYSICAL IMAGE FILE
+    # --------------------------------------------------------
+
+    if current_image:
+
+        filename = os.path.basename(
+            current_image
+        )
+
+        filepath = os.path.join(
+            UPLOAD_DIR,
+            filename,
+        )
+
+        if os.path.exists(filepath):
+
+            try:
+
+                os.remove(filepath)
+
+            except OSError as e:
+
+                print(
+                    "Could not delete profile image file:",
+                    e,
+                )
+
+    # --------------------------------------------------------
+    # REMOVE IMAGE FROM DATABASE
+    # --------------------------------------------------------
+
+    current_user.profile_image = None
+
+    db.commit()
+
+    db.refresh(
+        current_user
+    )
+
+    # --------------------------------------------------------
+    # RESPONSE
+    # --------------------------------------------------------
 
     return user_response(
         current_user

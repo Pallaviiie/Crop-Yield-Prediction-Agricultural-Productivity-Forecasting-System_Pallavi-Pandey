@@ -148,7 +148,7 @@ const FarmerSidebar = ({
           {!collapsed && (
             <div className="logo-text">
               <strong>YieldSense</strong>
-              <span>AI</span>
+              <span>Farmer Portal</span>
             </div>
           )}
 

@@ -1,0 +1,682 @@
+/* =========================================================
+   ACTIVITY LOGS PAGE
+   ========================================================= */
+
+.activity-page {
+  width: 100%;
+  min-height: calc(100vh - 74px);
+  padding: 28px 22px 40px;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.activity-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.activity-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activity-title-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #eaf8ef;
+  color: #008f43;
+}
+
+.activity-header-left h1 {
+  margin: 0;
+
+  font-size: 23px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #075b32;
+}
+
+.activity-header-left p {
+  margin: 5px 0 0;
+
+  font-size: 13px;
+  color: #6b8b79;
+}
+
+
+/* =========================================================
+   HEADER BUTTONS
+   ========================================================= */
+
+.activity-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-refresh-btn {
+  height: 38px;
+
+  padding: 0 15px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 1px solid #bde8cd;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #087c3b;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.activity-refresh-btn:hover {
+  background: #f1fbf5;
+  border-color: #8bd6aa;
+}
+
+.activity-refresh-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.activity-error {
+  width: 100%;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 13px 15px;
+  margin-bottom: 18px;
+
+  border: 1px solid #f2c5c5;
+  border-radius: 10px;
+
+  background: #fff7f7;
+  color: #b42318;
+}
+
+.activity-error > svg {
+  flex-shrink: 0;
+}
+
+.activity-error div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  flex: 1;
+}
+
+.activity-error strong {
+  font-size: 13px;
+}
+
+.activity-error span {
+  font-size: 12px;
+  color: #8c4a4a;
+}
+
+.activity-error button {
+  border: 0;
+  background: transparent;
+
+  color: #b42318;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.activity-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #d6efdf;
+  border-radius: 14px;
+
+  box-shadow:
+    0 2px 7px rgba(17, 101, 56, 0.05);
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   CARD HEADER
+   ========================================================= */
+
+.activity-card-header {
+  min-height: 60px;
+
+  padding: 0 17px 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid #dff1e5;
+}
+
+.activity-card-header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activity-card-header h2 {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  color: #075b32;
+}
+
+.activity-count {
+  padding: 4px 8px;
+
+  border-radius: 20px;
+
+  background: #edf9f1;
+  color: #16834a;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   CARD ACTIONS
+   ========================================================= */
+
+.activity-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.activity-search {
+  width: 180px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 0 10px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d6ebdd;
+  border-radius: 18px;
+
+  background: #f3fbf6;
+
+  color: #008d42;
+}
+
+.activity-search svg {
+  flex-shrink: 0;
+}
+
+.activity-search input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: #175b39;
+
+  font-size: 12px;
+}
+
+.activity-search input::placeholder {
+  color: #7b9a88;
+}
+
+.activity-search-clear {
+  width: 18px;
+  height: 18px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #d8eee0;
+  color: #23734a;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   EXPORT
+   ========================================================= */
+
+.activity-export-btn {
+  height: 34px;
+
+  padding: 0 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  border: 1px solid #b9e7c9;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  color: #087c3b;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.activity-export-btn:hover:not(:disabled) {
+  background: #effaf3;
+  border-color: #88d3a6;
+}
+
+.activity-export-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   ACTIVITY LIST
+   ========================================================= */
+
+.activity-list {
+  width: 100%;
+}
+
+
+/* =========================================================
+   ACTIVITY ROW
+   ========================================================= */
+
+.activity-row {
+  min-height: 72px;
+
+  padding: 0 18px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  border-bottom: 1px solid #edf5ef;
+
+  transition:
+    background 0.15s ease;
+}
+
+.activity-row:last-child {
+  border-bottom: 0;
+}
+
+.activity-row:hover {
+  background: #fbfefc;
+}
+
+
+/* =========================================================
+   ACTIVITY DOT
+   ========================================================= */
+
+.activity-dot {
+  width: 8px;
+  height: 8px;
+
+  flex: 0 0 8px;
+
+  margin-right: 13px;
+
+  border-radius: 50%;
+}
+
+.activity-dot-success {
+  background: #10b95a;
+}
+
+.activity-dot-info {
+  background: #3b82f6;
+}
+
+.activity-dot-warning {
+  background: #f59e0b;
+}
+
+.activity-dot-error {
+  background: #ef4444;
+}
+
+
+/* =========================================================
+   ACTIVITY CONTENT
+   ========================================================= */
+
+.activity-row-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.activity-action {
+  color: #075b32;
+
+  font-size: 13px;
+  line-height: 1.35;
+
+  font-weight: 500;
+}
+
+.activity-actor {
+  margin-top: 3px;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #08a650;
+
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.activity-role {
+  padding: 2px 6px;
+
+  border-radius: 10px;
+
+  background: #eff9f2;
+
+  color: #4d8564;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  text-transform: capitalize;
+}
+
+.activity-details {
+  margin-top: 4px;
+
+  color: #769082;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   TIME
+   ========================================================= */
+
+.activity-time {
+  min-width: 105px;
+
+  margin-left: 20px;
+
+  text-align: right;
+
+  color: #13aa56;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.activity-empty {
+  min-height: 260px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  text-align: center;
+}
+
+.activity-empty-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 13px;
+
+  border-radius: 50%;
+
+  background: #eff9f2;
+
+  color: #1b9b51;
+}
+
+.activity-empty h3 {
+  margin: 0;
+
+  color: #075b32;
+
+  font-size: 15px;
+}
+
+.activity-empty p {
+  max-width: 420px;
+
+  margin: 7px 0 0;
+
+  color: #7b9585;
+
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.activity-loading {
+  min-height: 450px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: #138748;
+}
+
+.activity-loading p {
+  margin-top: 10px;
+
+  color: #719181;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   SPINNER
+   ========================================================= */
+
+.activity-spinner {
+  animation: activitySpin 0.9s linear infinite;
+}
+
+@keyframes activitySpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .activity-page {
+    padding: 22px 16px 35px;
+  }
+
+  .activity-page-header {
+    align-items: flex-start;
+  }
+
+  .activity-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+
+    padding: 15px;
+  }
+
+  .activity-card-actions {
+    width: 100%;
+  }
+
+  .activity-search {
+    flex: 1;
+    width: auto;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .activity-page {
+    padding: 18px 12px 30px;
+  }
+
+  .activity-page-header {
+    flex-direction: column;
+  }
+
+  .activity-header-actions {
+    width: 100%;
+  }
+
+  .activity-refresh-btn {
+    width: 100%;
+  }
+
+  .activity-card-header > div:first-child {
+    width: 100%;
+  }
+
+  .activity-card-actions {
+    flex-direction: column;
+  }
+
+  .activity-search,
+  .activity-export-btn {
+    width: 100%;
+  }
+
+  .activity-row {
+    min-height: 78px;
+
+    padding: 12px 14px;
+
+    align-items: flex-start;
+  }
+
+  .activity-dot {
+    margin-top: 5px;
+  }
+
+  .activity-time {
+    min-width: auto;
+
+    margin-left: 10px;
+    margin-top: 3px;
+
+    font-size: 9px;
+  }
+
+}

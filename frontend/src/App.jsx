@@ -12,10 +12,10 @@ import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 
 // ================= CONSULTANT =================
 import ConsultantDashboard from "./pages/consultant/ConsultantDashboard";
-import FarmerManagement from "./pages/consultant/FarmerManagement";
-import Consultations from "./pages/consultant/Consultations";
-import Analytics from "./pages/consultant/Analytics";
-import Notes from "./pages/consultant/Notes";
+
+// ================= ADMIN =================
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
   return (
@@ -55,28 +55,25 @@ function App() {
         {/* ================= CONSULTANT ================= */}
 
         <Route
+          path="/consultant/dashboard"
+          element={<ConsultantDashboard />}
+        />
+
+        <Route
           path="/consultant-dashboard"
           element={<ConsultantDashboard />}
         />
+
+        {/* ================= ADMIN ================= */}
+        <Route path="/admin" element={<AdminLayout />}></Route>
         <Route
-  path="/consultant/farmers"
-  element={<FarmerManagement />}
-/>
-
-<Route
-  path="/consultant/consultations"
-  element={<Consultations />}
-/>
-
-<Route
-  path="/consultant/analytics"
-  element={<Analytics />}
-/>
-
-<Route
-  path="/consultant/notes"
-  element={<Notes />}
-/>
+          path="/admin-dashboard"
+          element={<AdminDashboard />}
+        />
+        <Route
+          path="/admin/dashboard"
+          element={<AdminDashboard />}
+        />
 
       </Routes>
 

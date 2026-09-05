@@ -1,57 +1,73 @@
-import React, {
-  useEffect,
-  useState,
-} from "react";
-
 import {
-  BarChart3,
-  TrendingUp,
-  Loader2,
-} from "lucide-react";
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
-import ConsultantLayout from
-  "../../components/consultant/ConsultantLayout";
+import { useEffect, useState } from "react";
 
-import {
-  getConsultantAnalytics,
-} from "../../services/api";
+import "../../styles/consultant/Analytics.css";
 
 
-export default function Analytics() {
+const Analytics = () => {
 
-  const [analytics, setAnalytics] =
-    useState(null);
+  // ==========================================================
+  // STATE
+  // ==========================================================
 
-  const [loading, setLoading] =
-    useState(true);
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [error, setError] =
-    useState("");
 
+  // ==========================================================
+  // FETCH ANALYTICS DATA
+  // ==========================================================
 
   useEffect(() => {
 
-    const loadAnalytics = async () => {
+    const fetchAnalytics = async () => {
 
       try {
 
         setLoading(true);
+        setError("");
 
-        const data =
-          await getConsultantAnalytics();
+        const response = await fetch(
+          "http://127.0.0.1:8000/analytics/dashboard"
+        );
 
-        setAnalytics(data);
+        if (!response.ok) {
+          throw new Error(
+            "Unable to load analytics data"
+          );
+        }
+
+        const data = await response.json();
+
+        console.log(
+          "Analytics API response:",
+          data
+        );
+
+        setAnalyticsData(data);
 
       } catch (error) {
 
         console.error(
-          "CONSULTANT ANALYTICS ERROR:",
+          "Analytics error:",
           error
         );
 
         setError(
-          error.message ||
-          "Unable to load analytics."
+          "Unable to load analytics data."
         );
 
       } finally {
@@ -62,281 +78,871 @@ export default function Analytics() {
 
     };
 
-    loadAnalytics();
+    fetchAnalytics();
 
   }, []);
 
 
-  const cropDistribution =
-    analytics?.crop_distribution || [];
+  // ==========================================================
+  // LOADING
+  // ==========================================================
 
-  const yieldTrends =
-    analytics?.yield_trends || [];
+  if (loading) {
+
+    return (
+      <div className="analytics-page">
+
+        <div className="analytics-loading">
+          Loading analytics...
+        </div>
+
+      </div>
+    );
+
+  }
 
 
-  const totalCropCount =
-    cropDistribution.reduce(
-      (total, item) =>
-        total + item.count,
-      0
+  // ==========================================================
+  // ERROR
+  // ==========================================================
+
+  if (error) {
+
+    return (
+      <div className="analytics-page">
+
+        <div className="analytics-error">
+          {error}
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  // ==========================================================
+  // NO DATA
+  // ==========================================================
+
+  if (
+    !analyticsData ||
+    !analyticsData.summary ||
+    Number(
+      analyticsData.summary.total_predictions
+    ) === 0
+  ) {
+
+    return (
+      <div className="analytics-page">
+
+        <div className="analytics-empty">
+
+          <h2>
+            No Analytics Data Available
+          </h2>
+
+          <p>
+            Make a crop yield prediction first.
+            Your analytics will appear here
+            automatically.
+          </p>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  // ==========================================================
+  // DATA
+  // ==========================================================
+
+  const summary =
+    analyticsData.summary;
+
+  const historicalYield =
+    analyticsData.historical_yield || [];
+
+  const rainfallYield =
+    analyticsData.rainfall_yield || [];
+
+  const temperatureYield =
+    analyticsData.temperature_yield || [];
+
+  const cropComparison =
+    analyticsData.crop_comparison || [];
+
+
+  // ==========================================================
+  // CONVERT hg/ha → T/ha
+  // ==========================================================
+
+  const convertYield = (value) => {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return 0;
+    }
+
+    return number / 10000;
+  };
+
+
+  // ==========================================================
+  // FORMAT NUMBER
+  // ==========================================================
+
+  const formatNumber = (
+    value,
+    decimals = 2
+  ) => {
+
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return "0.00";
+    }
+
+    return number.toFixed(decimals);
+  };
+
+
+  // ==========================================================
+  // FORMAT SUMMARY YIELD
+  // ==========================================================
+
+  const averageYield =
+    convertYield(
+      summary.average_yield
+    );
+
+  const highestYield =
+    convertYield(
+      summary.highest_yield
     );
 
 
-  const maxYield =
-    Math.max(
-      ...yieldTrends.map(
-        (item) =>
-          item.average_yield
-      ),
-      1
-    );
+  // ==========================================================
+  // HISTORICAL DATA
+  // ==========================================================
 
+  const historicalChartData =
+    historicalYield.map((item) => {
+
+      const converted = {
+        year: item.year,
+      };
+
+      Object.keys(item).forEach(
+        (key) => {
+
+          if (key !== "year") {
+
+            converted[key] =
+              convertYield(item[key]);
+
+          }
+
+        }
+      );
+
+      return converted;
+
+    });
+
+
+  // ==========================================================
+  // RAINFALL DATA
+  // ==========================================================
+
+  const rainfallChartData =
+    rainfallYield.map((item) => ({
+
+      year: item.year,
+
+      rainfall:
+        Number(item.rainfall) || 0,
+
+      yield:
+        convertYield(item.yield),
+
+    }));
+
+
+  // ==========================================================
+  // TEMPERATURE DATA
+  // ==========================================================
+
+  const temperatureChartData =
+    temperatureYield.map((item) => ({
+
+      temperature:
+        Number(item.temperature) || 0,
+
+      yield:
+        convertYield(item.yield),
+
+    }));
+
+
+  // ==========================================================
+  // CROP COMPARISON
+  // ==========================================================
+
+  const cropChartData =
+    cropComparison.map((item) => ({
+
+      crop:
+        item.crop || "Unknown",
+
+      yield:
+        convertYield(item.yield),
+
+    }));
+
+
+  // ==========================================================
+  // GET AVAILABLE CROPS
+  // ==========================================================
+
+  const cropKeys = new Set();
+
+  historicalChartData.forEach(
+    (item) => {
+
+      Object.keys(item).forEach(
+        (key) => {
+
+          if (key !== "year") {
+            cropKeys.add(key);
+          }
+
+        }
+      );
+
+    }
+  );
+
+  const crops =
+    Array.from(cropKeys);
+
+
+  // ==========================================================
+  // CHART TOOLTIP FORMATTERS
+  // ==========================================================
+
+  const yieldTooltipFormatter = (
+    value
+  ) => {
+
+    return [
+      `${formatNumber(value)} T/ha`,
+      "Yield",
+    ];
+
+  };
+
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
 
-    <ConsultantLayout
-      title="Analytics"
-    >
+    <div className="analytics-page">
 
-      {loading ? (
 
-        <div className="ys-empty-card">
+      {/* =====================================================
+          PAGE HEADER
+      ===================================================== */}
 
-          <Loader2
-            size={32}
-            className="ys-loading-icon"
-          />
+      <div className="analytics-header">
 
-          <p>
-            Loading analytics...
+        <div className="analytics-header-text">
+
+          <h1 className="analytics-title">
+            Analytics Overview
+          </h1>
+
+          <p className="analytics-subtitle">
+            Understand your crop yield performance
+            and environmental trends.
           </p>
 
         </div>
 
-      ) : error ? (
+      </div>
 
-        <div className="ys-empty-card">
 
-          <p>
-            {error}
-          </p>
+      {/* =====================================================
+          SUMMARY CARDS
+      ===================================================== */}
+
+      <div className="analytics-summary-grid">
+
+
+        {/* TOTAL */}
+
+        <div className="summary-card">
+
+          <span>
+            Total Predictions
+          </span>
+
+          <h2>
+            {summary.total_predictions}
+          </h2>
+
+          <small>
+            Predictions made
+          </small>
 
         </div>
 
-      ) : (
 
-        <div
-          className="ys-analytics-grid"
-        >
+        {/* AVERAGE */}
 
+        <div className="summary-card">
 
-          {/* CROP DISTRIBUTION */}
+          <span>
+            Average Yield
+          </span>
 
-          <div
-            className="ys-card ys-analytics-card"
-          >
-
-            <h3
-              className="ys-card-title"
-            >
-
-              Crop Distribution Among Farmers
-
-            </h3>
-
-
-            {cropDistribution.length === 0 ? (
-
-              <div
-                className="ys-no-data"
-              >
-
-                <BarChart3 size={32} />
-
-                <p>
-
-                  No farmer crop data
-                  available yet.
-
-                </p>
-
-              </div>
-
-            ) : (
-
-              <div
-                className="ys-analytics-bars"
-              >
-
-                {cropDistribution.map(
-                  (item) => {
-
-                    const percentage =
-                      totalCropCount > 0
-                        ? (
-                            item.count /
-                            totalCropCount
-                          ) * 100
-                        : 0;
-
-                    return (
-
-                      <div
-                        className="ys-analytics-bar-row"
-                        key={item.crop}
-                      >
-
-                        <div
-                          className="ys-analytics-bar-head"
-                        >
-
-                          <span>
-
-                            {item.crop}
-
-                          </span>
-
-                          <strong>
-
-                            {
-                              Math.round(
-                                percentage
-                              )
-                            }
-                            %
-
-                          </strong>
-
-                        </div>
-
-
-                        <div
-                          className="ys-progress-track"
-                        >
-
-                          <div
-                            className="ys-progress-fill"
-                            style={{
-                              width:
-                                `${percentage}%`,
-                            }}
-                          />
-
-                        </div>
-
-                      </div>
-
-                    );
-
-                  }
-                )}
-
-              </div>
-
+          <h2>
+            {formatNumber(
+              averageYield
             )}
+          </h2>
+
+          <small>
+            T/ha
+          </small>
+
+        </div>
+
+
+        {/* HIGHEST */}
+
+        <div className="summary-card">
+
+          <span>
+            Highest Yield
+          </span>
+
+          <h2>
+            {formatNumber(
+              highestYield
+            )}
+          </h2>
+
+          <small>
+            T/ha
+          </small>
+
+        </div>
+
+
+        {/* LATEST CROP */}
+
+        <div className="summary-card">
+
+          <span>
+            Latest Crop
+          </span>
+
+          <h2 className="latest-crop">
+
+            {summary.latest_prediction?.crop ||
+              "-"}
+
+          </h2>
+
+          <small>
+
+            {summary.latest_prediction?.year ||
+              ""}
+
+          </small>
+
+        </div>
+
+      </div>
+
+
+      {/* =====================================================
+          ANALYTICS GRID
+      ===================================================== */}
+
+      <div className="analytics-grid">
+
+
+        {/* ===================================================
+            HISTORICAL CROP YIELD
+        =================================================== */}
+
+        <div className="analytics-card">
+
+          <div className="analytics-card-header">
+
+            <div>
+
+              <h2>
+                Historical Crop Yield
+              </h2>
+
+              <p>
+                Yield trend over the years
+              </p>
+
+            </div>
 
           </div>
 
 
-          {/* YIELD TREND */}
+          <div className="chart-container">
 
-          <div
-            className="ys-card ys-analytics-card"
-          >
-
-            <h3
-              className="ys-card-title"
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
             >
 
-              Yield Trends — Managed Farms
-
-            </h3>
-
-
-            {yieldTrends.length === 0 ? (
-
-              <div
-                className="ys-no-data"
+              <LineChart
+                data={
+                  historicalChartData
+                }
+                margin={{
+                  top: 10,
+                  right: 20,
+                  left: 0,
+                  bottom: 5,
+                }}
               >
 
-                <TrendingUp size={32} />
+                <CartesianGrid
+                  stroke="#d9f1df"
+                  strokeDasharray="3 3"
+                />
 
-                <p>
+                <XAxis
+                  dataKey="year"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                />
 
-                  No prediction data
-                  available for managed
-                  farmers.
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                  tickFormatter={(value) =>
+                    `${value}`
+                  }
+                />
 
-                </p>
+                <Tooltip
+                  formatter={
+                    yieldTooltipFormatter
+                  }
+                />
 
-              </div>
+                <Legend
+                  wrapperStyle={{
+                    fontSize: "11px",
+                    paddingTop: "8px",
+                  }}
+                />
 
-            ) : (
+                {crops.map(
+                  (crop, index) => (
 
-              <div
-                className="ys-yield-trends"
-              >
-
-                {yieldTrends.map(
-                  (item) => (
-
-                    <div
-                      className="ys-yield-column"
-                      key={item.year}
-                    >
-
-                      <div
-                        className="ys-yield-value"
-                      >
-
-                        {
-                          item.average_yield
-                        }
-
-                      </div>
-
-
-                      <div
-                        className="ys-yield-bar-track"
-                      >
-
-                        <div
-                          className="ys-yield-bar"
-                          style={{
-                            height:
-                              `${(
-                                item.average_yield /
-                                maxYield
-                              ) * 100}%`,
-                          }}
-                        />
-
-                      </div>
-
-
-                      <span>
-
-                        {item.year}
-
-                      </span>
-
-                    </div>
+                    <Line
+                      key={crop}
+                      type="monotone"
+                      dataKey={crop}
+                      stroke={[
+                        "#0b7a46",
+                        "#d97706",
+                        "#2563eb",
+                        "#9333ea",
+                        "#dc2626",
+                      ][
+                        index % 5
+                      ]}
+                      strokeWidth={2.5}
+                      dot={false}
+                      name={crop}
+                    />
 
                   )
                 )}
 
-              </div>
+              </LineChart>
 
-            )}
+            </ResponsiveContainer>
 
           </div>
 
         </div>
 
-      )}
 
-    </ConsultantLayout>
+        {/* ===================================================
+            RAINFALL VS YIELD
+        =================================================== */}
+
+        <div className="analytics-card">
+
+          <div className="analytics-card-header">
+
+            <div>
+
+              <h2>
+                Rainfall vs Yield
+              </h2>
+
+              <p>
+                Relationship between rainfall
+                and crop yield
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div className="chart-container">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <LineChart
+                data={
+                  rainfallChartData
+                }
+                margin={{
+                  top: 10,
+                  right: 10,
+                  left: 0,
+                  bottom: 5,
+                }}
+              >
+
+                <CartesianGrid
+                  stroke="#d9f1df"
+                  strokeDasharray="3 3"
+                />
+
+                <XAxis
+                  dataKey="year"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                />
+
+                <YAxis
+                  yAxisId="rainfall"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                />
+
+                <YAxis
+                  yAxisId="yield"
+                  orientation="right"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                />
+
+                <Tooltip
+                  formatter={(value, name) => {
+
+                    if (
+                      name ===
+                      "Rainfall (mm)"
+                    ) {
+
+                      return [
+                        `${formatNumber(
+                          value,
+                          0
+                        )} mm`,
+                        name,
+                      ];
+
+                    }
+
+                    return [
+                      `${formatNumber(
+                        value
+                      )} T/ha`,
+                      name,
+                    ];
+
+                  }}
+                />
+
+                <Legend
+                  wrapperStyle={{
+                    fontSize: "11px",
+                    paddingTop: "8px",
+                  }}
+                />
+
+                <Line
+                  yAxisId="rainfall"
+                  type="monotone"
+                  dataKey="rainfall"
+                  stroke="#0ea5e9"
+                  strokeWidth={2.5}
+                  dot={false}
+                  name="Rainfall (mm)"
+                />
+
+                <Line
+                  yAxisId="yield"
+                  type="monotone"
+                  dataKey="yield"
+                  stroke="#15803d"
+                  strokeWidth={2.5}
+                  dot={false}
+                  name="Yield (T/ha)"
+                />
+
+              </LineChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </div>
+
+
+        {/* ===================================================
+            TEMPERATURE VS YIELD
+        =================================================== */}
+
+        <div className="analytics-card">
+
+          <div className="analytics-card-header">
+
+            <div>
+
+              <h2>
+                Temperature vs Yield
+              </h2>
+
+              <p>
+                Temperature impact on yield
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div className="chart-container">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <LineChart
+                data={
+                  temperatureChartData
+                }
+                margin={{
+                  top: 10,
+                  right: 20,
+                  left: 0,
+                  bottom: 5,
+                }}
+              >
+
+                <CartesianGrid
+                  stroke="#d9f1df"
+                  strokeDasharray="3 3"
+                />
+
+                <XAxis
+                  dataKey="temperature"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                  tickFormatter={(value) =>
+                    `${value}°`
+                  }
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                />
+
+                <Tooltip
+                  formatter={(value) => [
+                    `${formatNumber(
+                      value
+                    )} T/ha`,
+                    "Yield",
+                  ]}
+                />
+
+                <Line
+                  type="monotone"
+                  dataKey="yield"
+                  stroke="#d97706"
+                  strokeWidth={2.5}
+                  dot={{
+                    r: 3,
+                  }}
+                  name="Yield (T/ha)"
+                />
+
+              </LineChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </div>
+
+
+        {/* ===================================================
+            CROP YIELD COMPARISON
+        =================================================== */}
+
+        <div className="analytics-card">
+
+          <div className="analytics-card-header">
+
+            <div>
+
+              <h2>
+                Crop Yield Comparison
+              </h2>
+
+              <p>
+                Average yield by crop
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div className="chart-container">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <BarChart
+                data={
+                  cropChartData
+                }
+                margin={{
+                  top: 10,
+                  right: 15,
+                  left: 0,
+                  bottom: 5,
+                }}
+              >
+
+                <CartesianGrid
+                  stroke="#d9f1df"
+                  strokeDasharray="3 3"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="crop"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 10,
+                  }}
+                  interval={0}
+                  angle={
+                    cropChartData.length > 5
+                      ? -25
+                      : 0
+                  }
+                  textAnchor={
+                    cropChartData.length > 5
+                      ? "end"
+                      : "middle"
+                  }
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fontSize: 11,
+                  }}
+                />
+
+                <Tooltip
+                  formatter={(value) => [
+                    `${formatNumber(
+                      value
+                    )} T/ha`,
+                    "Average Yield",
+                  ]}
+                />
+
+                <Bar
+                  dataKey="yield"
+                  fill="#42a96d"
+                  radius={[
+                    6,
+                    6,
+                    0,
+                    0,
+                  ]}
+                  name="Average Yield"
+                  maxBarSize={45}
+                />
+
+              </BarChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </div>
 
   );
 
-}
+};
+
+
+export default Analytics;

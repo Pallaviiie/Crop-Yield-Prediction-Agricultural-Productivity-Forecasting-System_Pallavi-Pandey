@@ -4,7 +4,7 @@ import { Search, Bell } from "lucide-react";
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-const FarmerNavbar = ({ activePage }) => {
+const ConsultantNavbar = ({ activePage = "Consultant Dashboard" }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -25,66 +25,116 @@ const FarmerNavbar = ({ activePage }) => {
         });
 
         if (!response.ok) {
-          console.error("Failed to fetch user:", response.status);
+          console.error(
+            "Failed to fetch consultant:",
+            response.status
+          );
           return;
         }
 
         const data = await response.json();
 
-        console.log("Logged-in user:", data);
+        console.log("Logged-in consultant:", data);
 
         setUser(data);
       } catch (error) {
-        console.error("Error fetching user profile:", error);
+        console.error(
+          "Error fetching consultant profile:",
+          error
+        );
       }
     };
 
     fetchUser();
   }, []);
 
+  /* =====================================================
+     USER DATA
+     ===================================================== */
+
   const userName =
     user?.full_name ||
     user?.email?.split("@")[0] ||
-    "User";
+    "Consultant";
 
-  const userRole =
-    user?.role
-      ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
-      : "Farmer";
+  const userRole = user?.role
+    ? user.role.charAt(0).toUpperCase() +
+      user.role.slice(1)
+    : "Consultant";
 
-  const userInitial = userName.charAt(0).toUpperCase();
+  const userInitial = userName
+    .charAt(0)
+    .toUpperCase();
+
+
+  /* =====================================================
+     NAVBAR
+     ===================================================== */
 
   return (
-    <header className="farmer-navbar">
-      <h2>{activePage}</h2>
+    <header className="consultant-navbar">
 
-      <div className="navbar-right">
+      {/* PAGE TITLE */}
+      <h2 className="consultant-navbar-title">
+        {activePage}
+      </h2>
 
-        <div className="search-box">
+
+      {/* RIGHT SIDE */}
+      <div className="consultant-navbar-right">
+
+        {/* SEARCH */}
+        <div className="consultant-search">
+
           <Search size={17} />
-          <input placeholder="Search..." />
+
+          <input
+            type="text"
+            placeholder="Search..."
+          />
+
         </div>
 
-        <button className="notification-btn">
+
+        {/* NOTIFICATION */}
+        <button
+          className="consultant-notification"
+          type="button"
+        >
+
           <Bell size={19} />
-          <span className="notification-dot"></span>
+
+          <span className="notification-indicator"></span>
+
         </button>
 
+
         {/* USER PROFILE */}
-        <div className="navbar-profile">
-          <div className="profile-avatar">
+        <div className="consultant-navbar-user">
+
+          <div className="consultant-navbar-avatar">
             {userInitial}
           </div>
 
-          <div className="navbar-user-info">
-            <strong>{userName}</strong>
-            <span>{userRole}</span>
+
+          <div className="consultant-navbar-user-details">
+
+            <strong className="consultant-navbar-name">
+              {userName}
+            </strong>
+
+            <span className="consultant-navbar-role">
+              {userRole}
+            </span>
+
           </div>
+
         </div>
 
       </div>
+
     </header>
   );
 };
 
-export default FarmerNavbar;
+export default ConsultantNavbar;

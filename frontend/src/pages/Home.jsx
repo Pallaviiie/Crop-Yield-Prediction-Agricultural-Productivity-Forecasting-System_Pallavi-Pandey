@@ -58,10 +58,10 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-[#f5faf6] text-[#064e2f]">
 
-      {/* =====================================================
-          NAVBAR
-      ====================================================== */}
-      <nav
+     {/* =====================================================
+    NAVBAR
+====================================================== */}
+<nav
   className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
     scrolledToFeatures
       ? "bg-white shadow-md"
@@ -70,43 +70,48 @@ useEffect(() => {
 >
   <div className="max-w-7xl mx-auto px-6 lg:px-8 h-[70px] flex items-center justify-between">
 
-{/* Logo */}
-<Link to="/home" className="flex items-center gap-3">
-  <div
-    className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shadow-md ${
-      scrolledToFeatures
-        ? "bg-green-700"
-        : "bg-green-600"
-    }`}
-  >
-    <img
-      src={cropLogo}
-      alt="YieldSense AI Logo"
-      className="w-8 h-8 object-contain rounded-full"
-    />
-  </div>
+    {/* ================= LOGO ================= */}
+    <Link to="/home" className="flex items-center gap-3">
+      
+      <div
+        className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden shadow-md ${
+          scrolledToFeatures
+            ? "bg-green-700"
+            : "bg-green-600"
+        }`}
+      >
+        <img
+          src={cropLogo}
+          alt="YieldSense AI Logo"
+          className="w-8 h-8 object-contain rounded-full"
+        />
+      </div>
 
-  <span
-    className={`text-xl font-bold transition-colors duration-500 ${
-      scrolledToFeatures
-        ? "text-green-800"
-        : "text-white"
-    }`}
-  >
-    YieldSense <span className="text-lime-400">AI</span>
-  </span>
-</Link>
+      <span
+        className={`text-xl font-bold transition-colors duration-500 ${
+          scrolledToFeatures
+            ? "!text-green-800"
+            : "!text-white"
+        }`}
+      >
+        YieldSense{" "}
+        <span className="!text-lime-400">
+          AI
+        </span>
+      </span>
+
+    </Link>
 
 
-    {/* CENTER NAVIGATION */}
+    {/* ================= CENTER NAVIGATION ================= */}
     <div className="hidden md:flex items-center gap-9">
 
       <a
         href="#features"
-        className={`font-medium transition-colors duration-500 ${
+        className={`font-medium transition-colors duration-300 ${
           scrolledToFeatures
-            ? "text-green-700 hover:text-green-900"
-            : "text-white hover:text-lime-300"
+            ? "!text-green-700 hover:!text-green-900"
+            : "!text-white hover:!text-lime-300"
         }`}
       >
         Features
@@ -114,10 +119,10 @@ useEffect(() => {
 
       <a
         href="#how-it-works"
-        className={`font-medium transition-colors duration-500 ${
+        className={`font-medium transition-colors duration-300 ${
           scrolledToFeatures
-            ? "text-green-700 hover:text-green-900"
-            : "text-white hover:text-lime-300"
+            ? "!text-green-700 hover:!text-green-900"
+            : "!text-white hover:!text-lime-300"
         }`}
       >
         How It Works
@@ -125,10 +130,10 @@ useEffect(() => {
 
       <a
         href="#benefits"
-        className={`font-medium transition-colors duration-500 ${
+        className={`font-medium transition-colors duration-300 ${
           scrolledToFeatures
-            ? "text-green-700 hover:text-green-900"
-            : "text-white hover:text-lime-300"
+            ? "!text-green-700 hover:!text-green-900"
+            : "!text-white hover:!text-lime-300"
         }`}
       >
         Benefits
@@ -136,10 +141,10 @@ useEffect(() => {
 
       <a
         href="#analytics"
-        className={`font-medium transition-colors duration-500 ${
+        className={`font-medium transition-colors duration-300 ${
           scrolledToFeatures
-            ? "text-green-700 hover:text-green-900"
-            : "text-white hover:text-lime-300"
+            ? "!text-green-700 hover:!text-green-900"
+            : "!text-white hover:!text-lime-300"
         }`}
       >
         Analytics
@@ -148,15 +153,15 @@ useEffect(() => {
     </div>
 
 
-    {/* RIGHT SIDE */}
+    {/* ================= RIGHT SIDE ================= */}
     <div className="flex items-center gap-6">
 
       <Link
         to="/login"
-        className={`font-semibold transition-colors duration-500 ${
+        className={`font-semibold transition-colors duration-300 ${
           scrolledToFeatures
-            ? "text-green-800 hover:text-green-600"
-            : "text-white hover:text-lime-300"
+            ? "!text-green-800 hover:!text-green-600"
+            : "!text-white hover:!text-lime-300"
         }`}
       >
         Login
@@ -164,7 +169,7 @@ useEffect(() => {
 
       <Link
         to="/register"
-        className="bg-lime-400 hover:bg-lime-300 text-green-950 font-semibold px-6 py-2.5 rounded-full transition-all duration-300 shadow-lg"
+        className="bg-lime-400 hover:bg-lime-300 !text-green-950 font-semibold px-6 py-2.5 rounded-full transition-all duration-300 shadow-lg"
       >
         Get Started
       </Link>
@@ -173,7 +178,6 @@ useEffect(() => {
 
   </div>
 </nav>
-
 
       {/* ================= HERO SECTION ================= */}
 <section className="relative min-h-[760px] overflow-hidden">

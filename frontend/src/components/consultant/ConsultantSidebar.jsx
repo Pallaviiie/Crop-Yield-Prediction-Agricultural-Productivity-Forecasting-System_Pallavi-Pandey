@@ -1,77 +1,327 @@
-import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import {
+  Home,
+  Users,
+  MessageCircle,
   BarChart3,
   FileText,
-  Home,
-  MessageSquare,
-  Users,
+  Menu,
   LogOut,
-  Sprout,
+  UserCircle,
+  Bell,
+  ClipboardCheck,
 } from "lucide-react";
 
-const items = [
-  { label: "Dashboard", path: "/consultant-dashboard", icon: Home },
-  { label: "Farmer Management", path: "/consultant/farmers", icon: Users },
-  { label: "Consultations", path: "/consultant/consultations", icon: MessageSquare },
-  { label: "Analytics", path: "/consultant/analytics", icon: BarChart3 },
-  { label: "My Notes", path: "/consultant/notes", icon: FileText },
-];
+import cropLogo from "../../assets/crop-logo.png";
 
-export default function ConsultantSidebar({ collapsed }) {
-  const navigate = useNavigate();
-  const userName = localStorage.getItem("user_name") || "Shivam Dagar";
-  const initial = userName.charAt(0).toUpperCase();
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-  const logout = () => {
+const ConsultantSidebar = ({
+  collapsed,
+  setCollapsed,
+  activePage,
+  setActivePage,
+}) => {
+
+  const [user, setUser] = useState(null);
+
+  /* =====================================================
+     FETCH LOGGED-IN CONSULTANT
+     ===================================================== */
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+          console.log("No access token found");
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/users/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.error(
+            "Failed to fetch consultant:",
+            response.status
+          );
+          return;
+        }
+
+        const data = await response.json();
+
+        console.log(
+          "Consultant logged-in user:",
+          data
+        );
+
+        setUser(data);
+
+      } catch (error) {
+        console.error(
+          "Error fetching consultant:",
+          error
+        );
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  /* =====================================================
+     USER DISPLAY DATA
+     ===================================================== */
+
+  const userName =
+    user?.full_name ||
+    user?.email?.split("@")[0] ||
+    "Consultant";
+
+  const userRole =
+    user?.role
+      ? user.role.charAt(0).toUpperCase() +
+        user.role.slice(1)
+      : "Consultant";
+
+  const userInitial =
+    userName.charAt(0).toUpperCase();
+
+
+  /* =====================================================
+     CONSULTANT MENU
+     ===================================================== */
+
+  const menuItems = [
+    {
+      name: "Dashboard",
+      icon: Home,
+    },
+
+    {
+      name: "Farmer Management",
+      icon: Users,
+    },
+
+    {
+      name: "Consultations",
+      icon: MessageCircle,
+    },
+
+    {
+      name: "Analytics",
+      icon: BarChart3,
+    },
+
+    {
+      name: "My Notes",
+      icon: FileText,
+    },
+
+    {
+      name: "Prediction Reviews",
+      icon: ClipboardCheck,
+    },
+
+    {
+      name: "Alerts",
+      icon: Bell,
+    },
+
+    {
+      name: "Profile",
+      icon: UserCircle,
+    },
+  ];
+
+
+  /* =====================================================
+     LOGOUT
+     ===================================================== */
+
+  const handleLogout = () => {
+
     localStorage.removeItem("access_token");
-    localStorage.removeItem("user_name");
-    localStorage.removeItem("user_role");
-    navigate("/login");
+
+    localStorage.removeItem("user");
+
+    window.location.href = "/";
   };
 
+
   return (
-    <aside className={`ys-sidebar ${collapsed ? "collapsed" : ""}`}>
-      <div className="ys-brand">
-        <div className="ys-brand-logo">
-          <Sprout size={18} />
+    <aside
+      className={`consultant-sidebar ${
+        collapsed ? "collapsed" : ""
+      }`}
+    >
+
+      {/* =================================================
+          TOP
+      ================================================= */}
+
+      <div className="consultant-sidebar-top">
+
+        {/* LOGO */}
+
+        <div className="consultant-sidebar-logo">
+
+          <div className="consultant-logo-image-container">
+
+            <img
+              src={cropLogo}
+              alt="YieldSense AI Logo"
+              className="consultant-sidebar-logo-image"
+            />
+
+          </div>
+
+
+          {!collapsed && (
+            <div className="consultant-logo-text">
+
+              <strong>
+                YieldSense
+              </strong>
+
+              <span>
+                Consultant Portal
+              </span>
+
+            </div>
+          )}
+
         </div>
-        <div className="ys-brand-copy">
-          <strong>YieldSense</strong>
-          <span>AI</span>
-        </div>
+
+
+        {/* COLLAPSE BUTTON */}
+
+        <button
+          className="consultant-collapse-btn"
+          onClick={() =>
+            setCollapsed(!collapsed)
+          }
+          aria-label="Toggle consultant sidebar"
+          title={
+            collapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+          }
+        >
+          <Menu size={20} />
+        </button>
+
       </div>
 
-      <nav className="ys-sidebar-nav">
-        {items.map(({ label, path, icon: Icon }) => (
-          <NavLink
-            key={path}
-            to={path}
-            title={collapsed ? label : undefined}
-            className={({ isActive }) =>
-              `ys-nav-item ${isActive ? "active" : ""}`
-            }
-          >
-            <Icon size={19} strokeWidth={1.9} />
-            <span>{label}</span>
-          </NavLink>
-        ))}
+
+      {/* =================================================
+          MENU
+      ================================================= */}
+
+      <nav className="consultant-sidebar-menu">
+
+        {menuItems.map((item) => {
+
+          const Icon = item.icon;
+
+          return (
+            <button
+              key={item.name}
+              onClick={() =>
+                setActivePage(item.name)
+              }
+              className={`consultant-sidebar-item ${
+                activePage === item.name
+                  ? "active"
+                  : ""
+              }`}
+              title={
+                collapsed
+                  ? item.name
+                  : ""
+              }
+            >
+
+              <Icon size={18} />
+
+              {!collapsed && (
+                <span>
+                  {item.name}
+                </span>
+              )}
+
+            </button>
+          );
+        })}
+
       </nav>
 
-      <div className="ys-sidebar-bottom">
-        <div className="ys-side-user">
-          <div className="ys-avatar">{initial}</div>
-          <div className="ys-side-user-copy">
-            <strong>{userName}</strong>
-            <span>Consultant</span>
+
+      {/* =================================================
+          BOTTOM
+      ================================================= */}
+
+      <div className="consultant-sidebar-bottom">
+
+        {/* USER PROFILE */}
+
+        <div className="consultant-sidebar-profile">
+
+          <div className="consultant-profile-avatar">
+            {userInitial}
           </div>
+
+
+          {!collapsed && (
+            <div className="consultant-sidebar-user-info">
+
+              <strong>
+                {userName}
+              </strong>
+
+              <span>
+                {userRole}
+              </span>
+
+            </div>
+          )}
+
         </div>
 
-        <button className="ys-logout" onClick={logout} title={collapsed ? "Logout" : undefined}>
-          <LogOut size={18} />
-          <span>Logout</span>
+
+        {/* LOGOUT */}
+
+        <button
+          className="consultant-logout-btn"
+          onClick={handleLogout}
+          title={
+            collapsed
+              ? "Logout"
+              : ""
+          }
+        >
+
+          <LogOut size={17} />
+
+          {!collapsed && (
+            <span>
+              Logout
+            </span>
+          )}
+
         </button>
+
       </div>
+
     </aside>
   );
-}
+};
+
+export default ConsultantSidebar;

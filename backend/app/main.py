@@ -14,6 +14,9 @@ from app.models.user import User
 from app.models.prediction_history import PredictionHistory
 from app.models.conversation import Conversation
 from app.models.message import Message
+from app.models.alert import Alert
+from app.models.admin_dataset import AdminDataset
+from app.models.activity_log import ActivityLog
 
 
 # ============================================================
@@ -28,10 +31,15 @@ from app.routers.dataset import router as dataset_router
 from app.routers.weather import router as weather_router
 from app.routers.chat import router as chat_router
 from app.routers import consultant
+from app.routers.consultant_analytics import router as consultant_analytics_router
+from app.routers.prediction_reviews import router as prediction_reviews_router
+from app.routers.alerts import router as alerts_router
 from app.routers.analytics import router as analytics_router
 from app.routers import recommendation
 from app.routers.reports import router as reports_router
 from app.routers import risk_assessment
+from app.routers.admin import router as admin_router
+from app.routers import admin_analytics
 
 
 
@@ -99,12 +107,15 @@ app.include_router(weather_router)
 app.include_router(soil.router)
 app.include_router(chat_router)
 app.include_router(consultant.router)
+app.include_router(consultant_analytics_router)
+app.include_router(prediction_reviews_router)
+app.include_router(alerts_router)
 app.include_router(analytics_router)
 app.include_router(recommendation.router)
 app.include_router(reports_router)
 app.include_router(risk_assessment.router)
-
-
+app.include_router(admin_router)
+app.include_router(admin_analytics.router)
 # ============================================================
 # HOME
 # ============================================================
