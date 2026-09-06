@@ -77,3 +77,4 @@ venv/
 
 # Datasets
 datasets/*.csv
+backend/.env.docker

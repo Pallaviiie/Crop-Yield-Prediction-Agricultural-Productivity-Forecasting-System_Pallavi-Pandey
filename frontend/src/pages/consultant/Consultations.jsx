@@ -24,7 +24,7 @@ import {
   sendChatMessage,
 } from "../../services/api";
 
-import "../../styles/consultant/consultations.css";
+import "../../styles/consultant/Consultations.css";
 
 
 // =========================================================

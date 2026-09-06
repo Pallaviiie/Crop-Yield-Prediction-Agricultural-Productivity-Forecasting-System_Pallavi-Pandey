@@ -1,0 +1,23 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: yieldsense-backend
+    env_file:
+      - ./backend/.env.docker
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://127.0.0.1:8000
+        VITE_GOOGLE_CLIENT_ID: 717977649416-rg4a15qu123vcg7rk3pmo3p7auhsa35j.apps.googleusercontent.com
+    container_name: yieldsense-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
