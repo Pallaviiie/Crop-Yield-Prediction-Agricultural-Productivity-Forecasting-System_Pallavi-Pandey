@@ -306,54 +306,27 @@ const Dashboard = () => {
     dashboard?.dashboard ||
     dashboard ||
     {};
-
+  const metrics = data?.metrics || {};
+  const consultant = data?.consultant || {};
 
   /* =======================================================
      CONSULTANT NAME
      ======================================================= */
 
   const consultantName =
-    data?.consultant_name ||
-    data?.consultantName ||
-    data?.consultant?.name ||
-    data?.consultant?.full_name ||
-    data?.consultant?.fullName ||
-    data?.user?.name ||
-    data?.user?.full_name ||
-    data?.user?.fullName ||
-    "Consultant";
+    consultant?.name || "Consultant";
 
 
   /* =======================================================
      STATISTICS
      ======================================================= */
 
-  const totalFarmers = getValue(
-    data,
-    "total_farmers",
-    "totalFarmers",
-    "farmers_count",
-    "farmer_count"
-  );
+  const totalFarmers = Number(metrics.total_farmers || 0);
+
+  const activeConsultations = Number(metrics.active_consultations || 0);
 
 
-  const activeConsultations = getValue(
-    data,
-    "active_consultations",
-    "activeConsultations",
-    "pending_consultations_count",
-    "pendingConsultationsCount"
-  );
-
-
-  const predictionsReviewed = getValue(
-    data,
-    "predictions_reviewed",
-    "predictionsReviewed",
-    "reviewed_predictions",
-    "reviewedPredictions"
-  );
-
+  const predictionsReviewed = Number(metrics.total_predictions || 0);
 
   /*
    * Prefer the actual Alerts API count.
@@ -362,13 +335,7 @@ const Dashboard = () => {
    * active_alerts, it can still be used as fallback.
    */
 
-  const dashboardAlertCount = getValue(
-    data,
-    "active_alerts",
-    "activeAlerts",
-    "alerts_count",
-    "alert_count"
-  );
+  const dashboardAlertCount = Number(metrics.pending_messages || 0);
 
 
   const activeAlerts =
@@ -404,13 +371,9 @@ const Dashboard = () => {
      WEEKLY PREDICTIONS
      ======================================================= */
 
-  const weeklyPredictions = getArray(
-    data,
-    "weekly_predictions",
-    "weeklyPredictions",
-    "predictions_this_week",
-    "predictionsThisWeek"
-  );
+  const weeklyPredictions = Array.isArray(data?.weekly_predictions)
+    ? data.weekly_predictions
+    : [];
 
 
   /* =======================================================
