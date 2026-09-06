@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API = "http://127.0.0.1:8000/history";
-
+const API = `${import.meta.env.VITE_API_URL}/history`;
 
 // ===============================
 // Get All Prediction History
