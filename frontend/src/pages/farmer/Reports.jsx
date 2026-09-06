@@ -21,7 +21,7 @@ import * as XLSX from "xlsx";
 
 import "../../styles/farmer/Reports.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState("productivity");
