@@ -119,7 +119,7 @@ class User(Base):
     )
 
     experience = Column(
-        Integer,
+        String(100),
         nullable=True,
     )
 
