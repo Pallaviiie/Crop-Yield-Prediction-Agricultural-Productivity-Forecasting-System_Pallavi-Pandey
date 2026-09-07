@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import {
-  Leaf,
   User,
   Mail,
   Phone,
@@ -19,9 +18,88 @@ import {
 } from "lucide-react";
 
 import "./Register.css";
+
 import cropLogo from "../../assets/crop-logo.png";
+import registerHero from "../../assets/register-hero.mp4";
+
 const API_URL =
   import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+/* ============================================================
+   COUNTRIES + STATES / REGIONS
+   ============================================================ */
+
+const countryStates = {
+  India: [
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Delhi",
+    "Other",
+  ],
+
+  "United States": [
+    "California",
+    "Texas",
+    "New York",
+    "Other",
+  ],
+
+  Canada: [
+    "Ontario",
+    "British Columbia",
+    "Alberta",
+    "Other",
+  ],
+
+  "United Kingdom": [
+    "England",
+    "Scotland",
+    "Wales",
+    "Other",
+  ],
+
+  Australia: [
+    "New South Wales",
+    "Victoria",
+    "Queensland",
+    "Other",
+  ],
+
+  "United Arab Emirates": [
+    "Abu Dhabi",
+    "Dubai",
+    "Sharjah",
+    "Other",
+  ],
+};
+
+const countries = Object.keys(countryStates);
 
 function Register() {
   const navigate = useNavigate();
@@ -59,6 +137,16 @@ function Register() {
     license_number: "",
   });
 
+  /* ============================================================
+     AVAILABLE STATES FOR SELECTED COUNTRY
+     ============================================================ */
+
+  const availableStates = countryStates[formData.country] || [];
+
+  /* ============================================================
+     INPUT CHANGE
+     ============================================================ */
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -70,6 +158,26 @@ function Register() {
     setError("");
   };
 
+  /* ============================================================
+     COUNTRY CHANGE
+     ============================================================ */
+
+  const handleCountryChange = (e) => {
+    const selectedCountry = e.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      country: selectedCountry,
+      state: "",
+    }));
+
+    setError("");
+  };
+
+  /* ============================================================
+     ROLE
+     ============================================================ */
+
   const selectRole = (role) => {
     setFormData((prev) => ({
       ...prev,
@@ -79,9 +187,9 @@ function Register() {
     setError("");
   };
 
-  // ============================================================
-  // STEP 1 VALIDATION
-  // ============================================================
+  /* ============================================================
+     STEP 1 VALIDATION
+     ============================================================ */
 
   const validateStepOne = () => {
     if (!formData.full_name.trim()) {
@@ -120,16 +228,16 @@ function Register() {
     }
 
     if (!formData.state) {
-      setError("Please select your state.");
+      setError("Please select your state / region.");
       return false;
     }
 
     return true;
   };
 
-  // ============================================================
-  // NEXT STEP
-  // ============================================================
+  /* ============================================================
+     NEXT STEP
+     ============================================================ */
 
   const nextStep = () => {
     if (!validateStepOne()) {
@@ -145,9 +253,9 @@ function Register() {
     });
   };
 
-  // ============================================================
-  // PREVIOUS STEP
-  // ============================================================
+  /* ============================================================
+     PREVIOUS STEP
+     ============================================================ */
 
   const previousStep = () => {
     setError("");
@@ -159,9 +267,9 @@ function Register() {
     });
   };
 
-  // ============================================================
-  // STEP 2 VALIDATION
-  // ============================================================
+  /* ============================================================
+     STEP 2 VALIDATION
+     ============================================================ */
 
   const validateStepTwo = () => {
     if (formData.role === "farmer") {
@@ -216,9 +324,9 @@ function Register() {
     return true;
   };
 
-  // ============================================================
-  // SUBMIT
-  // ============================================================
+  /* ============================================================
+     SUBMIT
+     ============================================================ */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -255,7 +363,10 @@ function Register() {
         license_number: null,
       };
 
-      // Farmer data
+      /* ========================================================
+         FARMER
+         ======================================================== */
+
       if (formData.role === "farmer") {
         payload.farm_location = formData.farm_location.trim();
         payload.farm_size = Number(formData.farm_size);
@@ -263,7 +374,10 @@ function Register() {
         payload.primary_crop = formData.primary_crop;
       }
 
-      // Consultant data
+      /* ========================================================
+         CONSULTANT
+         ======================================================== */
+
       if (formData.role === "consultant") {
         payload.specialization = formData.specialization.trim();
         payload.experience = formData.experience;
@@ -284,16 +398,28 @@ function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.detail ||
-            data.message ||
-            "Registration failed."
-        );
+        let message = "Registration failed.";
+
+        if (Array.isArray(data.detail)) {
+          message = data.detail
+            .map((item) =>
+              typeof item === "string"
+                ? item
+                : item.msg || "Invalid input"
+            )
+            .join(", ");
+        } else if (typeof data.detail === "string") {
+          message = data.detail;
+        } else if (typeof data.message === "string") {
+          message = data.message;
+        }
+
+        throw new Error(message);
       }
 
       alert("Account created successfully! Please sign in.");
 
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       console.error("Registration error:", err);
 
@@ -309,26 +435,52 @@ function Register() {
     <div className="register-page">
 
       {/* =========================================================
-          LEFT PANEL
+          LEFT VIDEO PANEL
       ========================================================= */}
 
       <section className="register-left">
 
-        <div className="brand">
-  <img
-    src={cropLogo}
-    alt="YieldSense AI"
-    className="brand-logo-image"
-  />
+        {/* VIDEO BACKGROUND */}
 
-  <div className="brand-name">
-    YieldSense <span>AI</span>
-  </div>
-</div>
+        <video
+          className="register-hero-video"
+          src={registerHero}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        />
 
-        <div className="left-content">
+        {/* VIDEO OVERLAY */}
+
+        <div className="register-video-overlay" />
+
+        {/* BRAND */}
+
+        <Link to="/" className="register-brand">
+
+          <div className="register-brand-logo">
+            <img
+              src={cropLogo}
+              alt="YieldSense AI"
+            />
+          </div>
+
+          <div className="register-brand-name">
+            YieldSense <span>AI</span>
+          </div>
+
+        </Link>
+
+        {/* LEFT CONTENT */}
+
+        <div className="register-left-content">
+
+          {/* PROGRESS */}
 
           <div className="progress-lines">
+
             <div
               className={`progress-line ${
                 step >= 1 ? "active" : ""
@@ -340,7 +492,10 @@ function Register() {
                 step >= 2 ? "active" : ""
               }`}
             />
+
           </div>
+
+          {/* HEADING */}
 
           {step === 1 ? (
             <>
@@ -370,6 +525,8 @@ function Register() {
             </>
           )}
 
+          {/* BENEFITS */}
+
           <div className="benefits-list">
 
             <div className="benefit">
@@ -393,9 +550,12 @@ function Register() {
             </div>
 
           </div>
+
         </div>
 
-        <div className="left-footer">
+        {/* FOOTER */}
+
+        <div className="register-left-footer">
           © 2026 YieldSense AI · Privacy · Terms
         </div>
 
@@ -416,11 +576,13 @@ function Register() {
           {step === 1 ? (
             <>
               <div className="form-heading">
+
                 <h2>Create your account</h2>
 
                 <p>
                   Step 1 of 2 · Basic information
                 </p>
+
               </div>
 
               <form
@@ -431,11 +593,13 @@ function Register() {
                 {/* FULL NAME */}
 
                 <div className="form-group">
+
                   <label>
                     Full Name <span>*</span>
                   </label>
 
                   <div className="input-wrapper">
+
                     <User size={18} />
 
                     <input
@@ -446,17 +610,21 @@ function Register() {
                       placeholder="Full Name"
                       autoComplete="name"
                     />
+
                   </div>
+
                 </div>
 
                 {/* EMAIL */}
 
                 <div className="form-group">
+
                   <label>
                     Email Address <span>*</span>
                   </label>
 
                   <div className="input-wrapper">
+
                     <Mail size={18} />
 
                     <input
@@ -467,17 +635,21 @@ function Register() {
                       placeholder="email@example.com"
                       autoComplete="email"
                     />
+
                   </div>
+
                 </div>
 
                 {/* PHONE */}
 
                 <div className="form-group">
+
                   <label>
                     Phone Number <span>*</span>
                   </label>
 
                   <div className="input-wrapper">
+
                     <Phone size={18} />
 
                     <input
@@ -488,7 +660,9 @@ function Register() {
                       placeholder="+91 xxxx-xxxxxx"
                       autoComplete="tel"
                     />
+
                   </div>
+
                 </div>
 
                 {/* PASSWORDS */}
@@ -496,11 +670,13 @@ function Register() {
                 <div className="two-column">
 
                   <div className="form-group">
+
                     <label>
                       Password <span>*</span>
                     </label>
 
                     <div className="input-wrapper password-wrapper">
+
                       <Lock size={18} />
 
                       <input
@@ -536,15 +712,19 @@ function Register() {
                           <Eye size={17} />
                         )}
                       </button>
+
                     </div>
+
                   </div>
 
                   <div className="form-group">
+
                     <label>
                       Confirm Password <span>*</span>
                     </label>
 
                     <div className="input-wrapper password-wrapper">
+
                       <Lock size={18} />
 
                       <input
@@ -580,7 +760,9 @@ function Register() {
                           <Eye size={17} />
                         )}
                       </button>
+
                     </div>
+
                   </div>
 
                 </div>
@@ -610,10 +792,12 @@ function Register() {
 
                       <div>
                         <strong>Farmer</strong>
+
                         <small>
                           Manage your farm
                         </small>
                       </div>
+
                     </button>
 
                     <button
@@ -638,15 +822,19 @@ function Register() {
                           Advise farmers
                         </small>
                       </div>
+
                     </button>
 
                   </div>
 
                   <div className="admin-note">
+
                     <ShieldCheck size={14} />
+
                     <span>
                       Admin registration is restricted.
                     </span>
+
                   </div>
 
                 </div>
@@ -656,9 +844,11 @@ function Register() {
                 <div className="two-column">
 
                   <div className="form-group">
+
                     <label>City</label>
 
                     <div className="input-wrapper">
+
                       <MapPin size={18} />
 
                       <input
@@ -668,13 +858,17 @@ function Register() {
                         onChange={handleChange}
                         placeholder="City Name"
                       />
+
                     </div>
+
                   </div>
 
                   <div className="form-group">
+
                     <label>District</label>
 
                     <div className="input-wrapper">
+
                       <MapPin size={18} />
 
                       <input
@@ -684,58 +878,10 @@ function Register() {
                         onChange={handleChange}
                         placeholder="District Name"
                       />
+
                     </div>
+
                   </div>
-
-                </div>
-
-                {/* STATE */}
-
-                <div className="form-group">
-
-                  <label>
-                    State <span>*</span>
-                  </label>
-
-                  <select
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                  >
-                    <option value="">
-                      Select State
-                    </option>
-
-                    <option>Andhra Pradesh</option>
-                    <option>Arunachal Pradesh</option>
-                    <option>Assam</option>
-                    <option>Bihar</option>
-                    <option>Chhattisgarh</option>
-                    <option>Goa</option>
-                    <option>Gujarat</option>
-                    <option>Haryana</option>
-                    <option>Himachal Pradesh</option>
-                    <option>Jharkhand</option>
-                    <option>Karnataka</option>
-                    <option>Kerala</option>
-                    <option>Madhya Pradesh</option>
-                    <option>Maharashtra</option>
-                    <option>Manipur</option>
-                    <option>Meghalaya</option>
-                    <option>Mizoram</option>
-                    <option>Nagaland</option>
-                    <option>Odisha</option>
-                    <option>Punjab</option>
-                    <option>Rajasthan</option>
-                    <option>Sikkim</option>
-                    <option>Tamil Nadu</option>
-                    <option>Telangana</option>
-                    <option>Tripura</option>
-                    <option>Uttar Pradesh</option>
-                    <option>Uttarakhand</option>
-                    <option>West Bengal</option>
-                    <option>Delhi</option>
-                  </select>
 
                 </div>
 
@@ -743,14 +889,55 @@ function Register() {
 
                 <div className="form-group">
 
-                  <label>Country</label>
+                  <label>
+                    Country <span>*</span>
+                  </label>
 
-                  <input
-                    className="plain-input"
-                    type="text"
-                    value="India"
-                    readOnly
-                  />
+                  <select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleCountryChange}
+                  >
+                    {countries.map((country) => (
+                      <option
+                        key={country}
+                        value={country}
+                      >
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+
+                </div>
+
+                {/* STATE / REGION */}
+
+                <div className="form-group">
+
+                  <label>
+                    State / Region <span>*</span>
+                  </label>
+
+                  <select
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                  >
+
+                    <option value="">
+                      Select State / Region
+                    </option>
+
+                    {availableStates.map((state) => (
+                      <option
+                        key={state}
+                        value={state}
+                      >
+                        {state}
+                      </option>
+                    ))}
+
+                  </select>
 
                 </div>
 
@@ -769,13 +956,23 @@ function Register() {
                   className="primary-button"
                   onClick={nextStep}
                 >
-                  <span>Next: Role Details</span>
+                  <span>
+                    Next: Role Details
+                  </span>
+
                   <ArrowRight size={18} />
                 </button>
 
+                {/* LOGIN */}
+
                 <div className="login-link">
+
                   Already have an account?{" "}
-                  <Link to="/login">Sign in</Link>
+
+                  <Link to="/login">
+                    Sign in
+                  </Link>
+
                 </div>
 
               </form>
@@ -788,11 +985,15 @@ function Register() {
 
             <>
               <div className="form-heading">
-                <h2>Role-specific information</h2>
+
+                <h2>
+                  Role-specific information
+                </h2>
 
                 <p>
                   Step 2 of 2 · Professional details
                 </p>
+
               </div>
 
               <form
@@ -804,26 +1005,35 @@ function Register() {
 
                 {formData.role === "farmer" && (
                   <>
+
                     <div className="role-info">
+
                       <Sprout size={21} />
 
                       <div>
-                        <strong>Farmer Details</strong>
+
+                        <strong>
+                          Farmer Details
+                        </strong>
 
                         <p>
                           Provide your farm information
                           for accurate yield predictions.
                         </p>
+
                       </div>
+
                     </div>
 
                     <div className="form-group">
+
                       <label>
                         Farm Location / Village
                         <span>*</span>
                       </label>
 
                       <div className="input-wrapper">
+
                         <MapPin size={18} />
 
                         <input
@@ -835,18 +1045,22 @@ function Register() {
                           onChange={handleChange}
                           placeholder="Village Bhai Rupa, Ludhiana"
                         />
+
                       </div>
+
                     </div>
 
                     <div className="two-column">
 
                       <div className="form-group">
+
                         <label>
                           Farm Size (acres)
                           <span>*</span>
                         </label>
 
                         <div className="input-wrapper">
+
                           <Sprout size={18} />
 
                           <input
@@ -860,10 +1074,13 @@ function Register() {
                             min="0"
                             step="0.1"
                           />
+
                         </div>
+
                       </div>
 
                       <div className="form-group">
+
                         <label>
                           Soil Type <span>*</span>
                         </label>
@@ -903,11 +1120,13 @@ function Register() {
                             Mountain Soil
                           </option>
                         </select>
+
                       </div>
 
                     </div>
 
                     <div className="form-group">
+
                       <label>
                         Primary Crop <span>*</span>
                       </label>
@@ -932,7 +1151,9 @@ function Register() {
                         <option>Tomato</option>
                         <option>Other</option>
                       </select>
+
                     </div>
+
                   </>
                 )}
 
@@ -940,10 +1161,13 @@ function Register() {
 
                 {formData.role === "consultant" && (
                   <>
+
                     <div className="role-details-card">
+
                       <Award size={22} />
 
                       <div>
+
                         <strong>
                           Agricultural Consultant Details
                         </strong>
@@ -952,10 +1176,13 @@ function Register() {
                           Tell us about your professional
                           experience and expertise.
                         </p>
+
                       </div>
+
                     </div>
 
                     <div className="form-group">
+
                       <label>
                         Highest Qualification
                         <span>*</span>
@@ -971,9 +1198,11 @@ function Register() {
                         onChange={handleChange}
                         placeholder="M.Sc Agriculture / Ph.D"
                       />
+
                     </div>
 
                     <div className="form-group">
+
                       <label>
                         Area of Specialization
                         <span>*</span>
@@ -989,11 +1218,13 @@ function Register() {
                         onChange={handleChange}
                         placeholder="Soil Science, Crop Protection..."
                       />
+
                     </div>
 
                     <div className="two-column">
 
                       <div className="form-group">
+
                         <label>
                           Years of Experience
                           <span>*</span>
@@ -1025,10 +1256,13 @@ function Register() {
                           <option value="10+ years">
                             10+ years
                           </option>
+
                         </select>
+
                       </div>
 
                       <div className="form-group">
+
                         <label>
                           License / Registration No.
                           <span>*</span>
@@ -1044,9 +1278,11 @@ function Register() {
                           onChange={handleChange}
                           placeholder="AGR/KA/2019/1234"
                         />
+
                       </div>
 
                     </div>
+
                   </>
                 )}
 
@@ -1077,11 +1313,16 @@ function Register() {
                     disabled={loading}
                   >
                     {loading ? (
-                      <span>Creating Account...</span>
+                      <span>
+                        Creating Account...
+                      </span>
                     ) : (
                       <>
                         <CheckCircle2 size={18} />
-                        <span>Create Account</span>
+
+                        <span>
+                          Create Account
+                        </span>
                       </>
                     )}
                   </button>
@@ -1089,8 +1330,13 @@ function Register() {
                 </div>
 
                 <div className="login-link">
+
                   Already have an account?{" "}
-                  <Link to="/">Sign in</Link>
+
+                  <Link to="/login">
+                    Sign in
+                  </Link>
+
                 </div>
 
               </form>
@@ -1098,7 +1344,9 @@ function Register() {
           )}
 
         </div>
+
       </section>
+
     </div>
   );
 }

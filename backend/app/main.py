@@ -17,6 +17,7 @@ from app.models.message import Message
 from app.models.alert import Alert
 from app.models.admin_dataset import AdminDataset
 from app.models.activity_log import ActivityLog
+from app.models.password_reset import PasswordReset
 
 
 # ============================================================

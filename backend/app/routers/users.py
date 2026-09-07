@@ -1,7 +1,12 @@
 import os
 import uuid
+import random
 
 from datetime import datetime, timedelta, timezone
+from pydantic import BaseModel, EmailStr
+
+from app.models.password_reset import PasswordReset
+from app.utils.email import send_password_reset_otp
 
 from fastapi import (
     APIRouter,
@@ -43,7 +48,23 @@ router = APIRouter(
     prefix="/users",
     tags=["Users"],
 )
+# ============================================================
+# PASSWORD RESET SCHEMAS
+# ============================================================
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class VerifyResetOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
 
 # ============================================================
 # JWT CONFIGURATION
@@ -622,6 +643,331 @@ def login_user(
 
     }
 
+# ============================================================
+# FORGOT PASSWORD
+# ============================================================
+
+@router.post("/forgot-password")
+def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+
+    email = request.email.lower().strip()
+
+    # --------------------------------------------------------
+    # FIND USER
+    # --------------------------------------------------------
+
+    user = (
+        db.query(User)
+        .filter(
+            User.email == email
+        )
+        .first()
+    )
+
+    # --------------------------------------------------------
+    # GENERIC RESPONSE
+    # --------------------------------------------------------
+    # We don't reveal whether an email exists.
+
+    if user is None:
+
+        return {
+            "message": (
+                "If an account exists with this email, "
+                "a password reset OTP has been sent."
+            )
+        }
+
+    # --------------------------------------------------------
+    # DELETE OLD OTPs
+    # --------------------------------------------------------
+
+    db.query(PasswordReset).filter(
+        PasswordReset.email == email
+    ).delete(
+        synchronize_session=False
+    )
+
+    # --------------------------------------------------------
+    # GENERATE 6-DIGIT OTP
+    # --------------------------------------------------------
+
+    otp = str(
+        random.randint(
+            100000,
+            999999,
+        )
+    )
+
+    # --------------------------------------------------------
+    # OTP EXPIRATION
+    # --------------------------------------------------------
+
+    expires_at = (
+        datetime.utcnow()
+        + timedelta(minutes=10)
+    )
+
+    # --------------------------------------------------------
+    # SAVE OTP
+    # --------------------------------------------------------
+
+    reset_request = PasswordReset(
+        email=email,
+        otp=otp,
+        expires_at=expires_at,
+    )
+
+    db.add(reset_request)
+    db.commit()
+
+    # --------------------------------------------------------
+    # SEND EMAIL
+    # --------------------------------------------------------
+
+    try:
+
+        send_password_reset_otp(
+            email,
+            otp,
+        )
+
+    except Exception as exc:
+
+        print(
+            "PASSWORD RESET EMAIL ERROR:",
+            exc,
+        )
+
+        db.delete(reset_request)
+        db.commit()
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Unable to send password reset email. "
+                "Please try again later."
+            ),
+        )
+
+    # --------------------------------------------------------
+    # RESPONSE
+    # --------------------------------------------------------
+
+    return {
+        "message": (
+            "If an account exists with this email, "
+            "a password reset OTP has been sent."
+        )
+    }
+
+
+# ============================================================
+# VERIFY RESET OTP
+# ============================================================
+
+@router.post("/verify-reset-otp")
+def verify_reset_otp(
+    request: VerifyResetOTPRequest,
+    db: Session = Depends(get_db),
+):
+
+    email = request.email.lower().strip()
+
+    otp = request.otp.strip()
+
+    # --------------------------------------------------------
+    # OTP FORMAT
+    # --------------------------------------------------------
+
+    if not otp.isdigit() or len(otp) != 6:
+
+        raise HTTPException(
+            status_code=400,
+            detail="OTP must contain exactly 6 digits.",
+        )
+
+    # --------------------------------------------------------
+    # FIND OTP
+    # --------------------------------------------------------
+
+    reset_request = (
+        db.query(PasswordReset)
+        .filter(
+            PasswordReset.email == email,
+            PasswordReset.otp == otp,
+        )
+        .order_by(
+            PasswordReset.created_at.desc()
+        )
+        .first()
+    )
+
+    if reset_request is None:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid OTP.",
+        )
+
+    # --------------------------------------------------------
+    # CHECK EXPIRATION
+    # --------------------------------------------------------
+
+    if (
+        datetime.utcnow()
+        > reset_request.expires_at
+    ):
+
+        db.delete(reset_request)
+        db.commit()
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "OTP has expired. "
+                "Please request a new OTP."
+            ),
+        )
+
+    return {
+        "message": "OTP verified successfully."
+    }
+
+
+# ============================================================
+# RESET PASSWORD
+# ============================================================
+
+@router.post("/reset-password")
+def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+
+    email = request.email.lower().strip()
+
+    otp = request.otp.strip()
+
+    new_password = request.new_password
+
+    # --------------------------------------------------------
+    # PASSWORD VALIDATION
+    # --------------------------------------------------------
+
+    if len(new_password) < 8:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Password must contain at least 8 characters."
+            ),
+        )
+
+    # --------------------------------------------------------
+    # OTP FORMAT
+    # --------------------------------------------------------
+
+    if not otp.isdigit() or len(otp) != 6:
+
+        raise HTTPException(
+            status_code=400,
+            detail="OTP must contain exactly 6 digits.",
+        )
+
+    # --------------------------------------------------------
+    # FIND USER
+    # --------------------------------------------------------
+
+    user = (
+        db.query(User)
+        .filter(
+            User.email == email
+        )
+        .first()
+    )
+
+    if user is None:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Unable to reset password.",
+        )
+
+    # --------------------------------------------------------
+    # FIND OTP
+    # --------------------------------------------------------
+
+    reset_request = (
+        db.query(PasswordReset)
+        .filter(
+            PasswordReset.email == email,
+            PasswordReset.otp == otp,
+        )
+        .order_by(
+            PasswordReset.created_at.desc()
+        )
+        .first()
+    )
+
+    if reset_request is None:
+
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid OTP.",
+        )
+
+    # --------------------------------------------------------
+    # CHECK EXPIRATION
+    # --------------------------------------------------------
+
+    if (
+        datetime.utcnow()
+        > reset_request.expires_at
+    ):
+
+        db.delete(reset_request)
+        db.commit()
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "OTP has expired. "
+                "Please request a new OTP."
+            ),
+        )
+
+    # --------------------------------------------------------
+    # UPDATE PASSWORD
+    # --------------------------------------------------------
+
+    user.password_hash = hash_password(
+        new_password
+    )
+
+    # --------------------------------------------------------
+    # DELETE USED OTP
+    # --------------------------------------------------------
+
+    db.delete(reset_request)
+
+    db.commit()
+
+    db.refresh(user)
+
+    # --------------------------------------------------------
+    # ACTIVITY LOG
+    # --------------------------------------------------------
+
+    return {
+        "message": (
+            "Password reset successfully. "
+            "You can now sign in with your new password."
+        )
+    }
 
 # ============================================================
 # CURRENT USER

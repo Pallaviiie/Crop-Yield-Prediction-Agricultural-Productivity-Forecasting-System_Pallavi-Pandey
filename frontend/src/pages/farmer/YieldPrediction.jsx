@@ -283,12 +283,10 @@ const YieldPrediction = () => {
     "Argentina",
     "Australia",
     "Canada",
-    "China",
     "France",
     "Germany",
     "Indonesia",
     "Mexico",
-    "United States",
   ];
 
 

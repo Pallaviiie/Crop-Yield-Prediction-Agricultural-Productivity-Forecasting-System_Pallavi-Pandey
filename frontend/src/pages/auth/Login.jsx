@@ -16,11 +16,10 @@ import {
 } from "lucide-react";
 
 import cropLogo from "../../assets/crop-logo.png";
-import farmHero from "../../assets/farm-hero.png";
+import loginHeroVideo from "../../assets/login-hero.mp4";
 import googleLogo from "../../assets/google-logo.png";
 
 import "./Login.css";
-
 
 /* ============================================================
    API URL
@@ -36,36 +35,24 @@ const API_URL =
    ============================================================ */
 
 function Login() {
-
   const navigate = useNavigate();
-
 
   /* ==========================================================
      STATE
      ========================================================== */
 
-  const [role, setRole] = useState(
-    "farmer"
-  );
+  const [role, setRole] = useState("farmer");
 
-  const [showPassword, setShowPassword] =
-    useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [error, setError] =
-    useState("");
-
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
-
     email: "",
-
     password: "",
-
     remember: false,
-
   });
 
 
@@ -74,69 +61,31 @@ function Login() {
      ========================================================== */
 
   const getErrorMessage = (data) => {
-
     if (!data) {
-
-      return (
-        "Something went wrong. Please try again."
-      );
-
+      return "Something went wrong. Please try again.";
     }
 
-
-    if (
-      Array.isArray(
-        data.detail
-      )
-    ) {
-
+    if (Array.isArray(data.detail)) {
       return data.detail
         .map((item) => {
-
-          if (
-            typeof item ===
-            "string"
-          ) {
-
+          if (typeof item === "string") {
             return item;
-
           }
 
-          return (
-            item.msg ||
-            "Invalid input"
-          );
-
+          return item?.msg || "Invalid input";
         })
         .join(", ");
-
     }
 
-
-    if (
-      typeof data.detail ===
-      "string"
-    ) {
-
+    if (typeof data.detail === "string") {
       return data.detail;
-
     }
 
-
-    if (
-      typeof data.message ===
-      "string"
-    ) {
-
+    if (typeof data.message === "string") {
       return data.message;
-
     }
 
-
-    return (
-      "Unable to complete the request."
-    );
-
+    return "Unable to complete the request.";
   };
 
 
@@ -145,7 +94,6 @@ function Login() {
      ========================================================== */
 
   const handleChange = (e) => {
-
     const {
       name,
       value,
@@ -153,21 +101,16 @@ function Login() {
       checked,
     } = e.target;
 
-
     setFormData((previous) => ({
-
       ...previous,
 
       [name]:
         type === "checkbox"
           ? checked
           : value,
-
     }));
 
-
     setError("");
-
   };
 
 
@@ -175,86 +118,40 @@ function Login() {
      ROLE CHANGE
      ========================================================== */
 
-  const handleRoleChange = (
-    selectedRole
-  ) => {
-
-    setRole(
-      selectedRole
-    );
-
+  const handleRoleChange = (selectedRole) => {
+    setRole(selectedRole);
     setError("");
-
   };
 
 
   /* ==========================================================
-     REDIRECT
+     REDIRECT USER
      ========================================================== */
 
-  const redirectUser = (
-    userRole
-  ) => {
+  const redirectUser = (userRole) => {
+    const normalizedRole = String(userRole || "")
+      .toLowerCase()
+      .trim();
 
-    const normalizedRole =
-      String(
-        userRole || ""
-      )
-        .toLowerCase()
-        .trim();
-
-
-    if (
-      normalizedRole ===
-      "farmer"
-    ) {
-
-      navigate(
-        "/dashboard"
-      );
-
+    if (normalizedRole === "farmer") {
+      navigate("/dashboard");
       return;
-
     }
 
-
     if (
-
-      normalizedRole ===
-        "consultant" ||
-
-      normalizedRole ===
-        "agri_consultant"
-
+      normalizedRole === "consultant" ||
+      normalizedRole === "agri_consultant"
     ) {
-
-      navigate(
-        "/consultant-dashboard"
-      );
-
+      navigate("/consultant-dashboard");
       return;
-
     }
 
-
-    if (
-      normalizedRole ===
-      "admin"
-    ) {
-
-      navigate(
-        "/admin-dashboard"
-      );
-
+    if (normalizedRole === "admin") {
+      navigate("/admin-dashboard");
       return;
-
     }
 
-
-    navigate(
-      "/dashboard"
-    );
-
+    navigate("/dashboard");
   };
 
 
@@ -262,109 +159,67 @@ function Login() {
      NORMAL LOGIN
      ========================================================== */
 
-  const handleSubmit = async (
-    e
-  ) => {
-
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
 
-
-    const email =
-      formData.email.trim();
-
-    const password =
-      formData.password;
-
+    const email = formData.email.trim();
+    const password = formData.password;
 
     /* --------------------------------------------------------
        VALIDATION
        -------------------------------------------------------- */
 
     if (!email) {
-
-      setError(
-        "Please enter your email address."
-      );
-
+      setError("Please enter your email address.");
       return;
-
     }
-
 
     if (!password) {
-
-      setError(
-        "Please enter your password."
-      );
-
+      setError("Please enter your password.");
       return;
-
     }
-
 
     setLoading(true);
 
-
     try {
-
       /* ------------------------------------------------------
          REQUEST BODY
          ------------------------------------------------------ */
 
       const requestBody = {
-
-        email: email,
-
-        password: password,
-
+        email,
+        password,
       };
 
-
-      console.log(
-        "LOGIN REQUEST:",
-        requestBody
-      );
+      console.log("LOGIN REQUEST:", requestBody);
 
 
       /* ------------------------------------------------------
          API REQUEST
          ------------------------------------------------------ */
 
-      const response =
-        await fetch(
-          `${API_URL}/users/login`,
-          {
+      const response = await fetch(
+        `${API_URL}/users/login`,
+        {
+          method: "POST",
 
-            method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
 
-            headers: {
-
-              "Content-Type":
-                "application/json",
-
-              Accept:
-                "application/json",
-
-            },
-
-            body:
-              JSON.stringify(
-                requestBody
-              ),
-
-          }
-        );
+          body: JSON.stringify(requestBody),
+        }
+      );
 
 
       /* ------------------------------------------------------
          RESPONSE
          ------------------------------------------------------ */
 
-      const data =
-        await response.json();
-
+      const data = await response.json();
 
       console.log(
         "LOGIN STATUS:",
@@ -381,16 +236,10 @@ function Login() {
          ERROR
          ------------------------------------------------------ */
 
-      if (
-        !response.ok
-      ) {
-
+      if (!response.ok) {
         throw new Error(
-          getErrorMessage(
-            data
-          )
+          getErrorMessage(data)
         );
-
       }
 
 
@@ -398,14 +247,10 @@ function Login() {
          TOKEN CHECK
          ------------------------------------------------------ */
 
-      if (
-        !data.access_token
-      ) {
-
+      if (!data.access_token) {
         throw new Error(
           "Login succeeded, but the server did not return an access token."
         );
-
       }
 
 
@@ -413,14 +258,10 @@ function Login() {
          USER CHECK
          ------------------------------------------------------ */
 
-      if (
-        !data.user
-      ) {
-
+      if (!data.user) {
         throw new Error(
           "Login succeeded, but user information was not returned."
         );
-
       }
 
 
@@ -428,55 +269,51 @@ function Login() {
          STORAGE
          ------------------------------------------------------ */
 
-      const storage =
-        formData.remember
-          ? localStorage
-          : sessionStorage;
+      if (formData.remember) {
+        localStorage.setItem(
+          "access_token",
+          data.access_token
+        );
 
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
 
-      storage.setItem(
+        /* Remove old session data if present */
+        sessionStorage.removeItem("access_token");
+        sessionStorage.removeItem("user");
+      } else {
+        sessionStorage.setItem(
+          "access_token",
+          data.access_token
+        );
 
-        "access_token",
+        sessionStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
 
-        data.access_token
+        /*
+         * Keep localStorage compatible with the rest
+         * of the application if your API service reads
+         * the token from localStorage.
+         */
+        localStorage.setItem(
+          "access_token",
+          data.access_token
+        );
 
-      );
-
-
-      storage.setItem(
-
-        "user",
-
-        JSON.stringify(
-          data.user
-        )
-
-      );
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+      }
 
 
       /* ------------------------------------------------------
-         COMPATIBILITY STORAGE
+         SUCCESS
          ------------------------------------------------------ */
-
-      localStorage.setItem(
-
-        "access_token",
-
-        data.access_token
-
-      );
-
-
-      localStorage.setItem(
-
-        "user",
-
-        JSON.stringify(
-          data.user
-        )
-
-      );
-
 
       console.log(
         "LOGIN SUCCESS:",
@@ -488,34 +325,21 @@ function Login() {
          REDIRECT
          ------------------------------------------------------ */
 
-      redirectUser(
-        data.user.role
-      );
-
+      redirectUser(data.user.role);
 
     } catch (err) {
-
       console.error(
         "LOGIN ERROR:",
         err
       );
 
-
       setError(
-
         err.message ||
-
         "Unable to sign in. Please try again."
-
       );
-
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
 
@@ -523,183 +347,141 @@ function Login() {
      GOOGLE LOGIN
      ========================================================== */
 
-  const handleGoogleLogin =
-    useGoogleLogin({
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setError("");
+      setLoading(true);
 
-      onSuccess:
-        async (
-          tokenResponse
-        ) => {
-
-          setError("");
-
-          setLoading(true);
-
-
-          try {
-
-            if (
-              !tokenResponse?.access_token
-            ) {
-
-              throw new Error(
-                "Google did not return an access token."
-              );
-
-            }
+      try {
+        if (!tokenResponse?.access_token) {
+          throw new Error(
+            "Google did not return an access token."
+          );
+        }
 
 
-            const response =
-              await fetch(
-                `${API_URL}/auth/google`,
-                {
+        /* ----------------------------------------------------
+           GOOGLE API REQUEST
+           ---------------------------------------------------- */
 
-                  method: "POST",
+        const response = await fetch(
+          `${API_URL}/auth/google`,
+          {
+            method: "POST",
 
-                  headers: {
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
 
-                    "Content-Type":
-                      "application/json",
+            body: JSON.stringify({
+              access_token:
+                tokenResponse.access_token,
 
-                    Accept:
-                      "application/json",
-
-                  },
-
-                  body:
-                    JSON.stringify({
-
-                      access_token:
-                        tokenResponse.access_token,
-
-                      role:
-                        role,
-
-                    }),
-
-                }
-              );
-
-
-            const data =
-              await response.json();
-
-
-            console.log(
-              "GOOGLE LOGIN STATUS:",
-              response.status
-            );
-
-
-            console.log(
-              "GOOGLE LOGIN RESPONSE:",
-              data
-            );
-
-
-            if (
-              !response.ok
-            ) {
-
-              throw new Error(
-                getErrorMessage(
-                  data
-                )
-              );
-
-            }
-
-
-            if (
-              !data.access_token
-            ) {
-
-              throw new Error(
-                "Google authentication succeeded, but no JWT was returned."
-              );
-
-            }
-
-
-            if (
-              !data.user
-            ) {
-
-              throw new Error(
-                "Google authentication succeeded, but user information was not returned."
-              );
-
-            }
-
-
-            localStorage.setItem(
-
-              "access_token",
-
-              data.access_token
-
-            );
-
-
-            localStorage.setItem(
-
-              "user",
-
-              JSON.stringify(
-                data.user
-              )
-
-            );
-
-
-            redirectUser(
-              data.user.role
-            );
-
-
-          } catch (err) {
-
-            console.error(
-              "GOOGLE LOGIN ERROR:",
-              err
-            );
-
-
-            setError(
-
-              err.message ||
-
-              "Google sign-in failed. Please try again."
-
-            );
-
-
-          } finally {
-
-            setLoading(false);
-
+              role,
+            }),
           }
-
-        },
-
-
-      onError: () => {
-
-        console.error(
-          "Google Login Failed"
         );
 
+
+        /* ----------------------------------------------------
+           RESPONSE
+           ---------------------------------------------------- */
+
+        const data = await response.json();
+
+        console.log(
+          "GOOGLE LOGIN STATUS:",
+          response.status
+        );
+
+        console.log(
+          "GOOGLE LOGIN RESPONSE:",
+          data
+        );
+
+
+        /* ----------------------------------------------------
+           ERROR
+           ---------------------------------------------------- */
+
+        if (!response.ok) {
+          throw new Error(
+            getErrorMessage(data)
+          );
+        }
+
+
+        /* ----------------------------------------------------
+           TOKEN CHECK
+           ---------------------------------------------------- */
+
+        if (!data.access_token) {
+          throw new Error(
+            "Google authentication succeeded, but no JWT was returned."
+          );
+        }
+
+
+        /* ----------------------------------------------------
+           USER CHECK
+           ---------------------------------------------------- */
+
+        if (!data.user) {
+          throw new Error(
+            "Google authentication succeeded, but user information was not returned."
+          );
+        }
+
+
+        /* ----------------------------------------------------
+           STORAGE
+           ---------------------------------------------------- */
+
+        localStorage.setItem(
+          "access_token",
+          data.access_token
+        );
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+
+
+        /* ----------------------------------------------------
+           REDIRECT
+           ---------------------------------------------------- */
+
+        redirectUser(data.user.role);
+
+      } catch (err) {
+        console.error(
+          "GOOGLE LOGIN ERROR:",
+          err
+        );
 
         setError(
-          "Google sign-in was cancelled or failed. Please try again."
+          err.message ||
+          "Google sign-in failed. Please try again."
         );
-
-
+      } finally {
         setLoading(false);
+      }
+    },
 
-      },
+    onError: () => {
+      console.error(
+        "Google Login Failed"
+      );
 
-    });
+      setError(
+        "Google sign-in was cancelled or failed. Please try again."
+      );
+
+      setLoading(false);
+    },
+  });
 
 
   /* ==========================================================
@@ -707,106 +489,91 @@ function Login() {
      ========================================================== */
 
   return (
-
     <div className="login-page">
-
 
       {/* ======================================================
           LEFT SIDE
           ====================================================== */}
 
-      <section
+      <section className="login-left">
 
-        className="login-left"
+        {/* BACKGROUND VIDEO */}
 
-        style={{
+        <video
+          className="login-background-video"
+          src={loginHeroVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        />
 
-          backgroundImage:
-            `url(${farmHero})`,
-
-        }}
-
-      >
+        {/* VIDEO OVERLAY */}
 
         <div className="login-overlay" />
 
 
-        {/* BRAND */}
+        {/* ====================================================
+            BRAND
+            ==================================================== */}
 
         <Link
-
           to="/"
-
           className="login-brand"
-
         >
-
           <div className="login-logo-circle">
-
             <img
-
               src={cropLogo}
-
               alt="YieldSense AI"
-
             />
-
           </div>
 
-
           <span>
-
             YieldSense{" "}
-
             <b>AI</b>
-
           </span>
-
         </Link>
 
 
-        {/* LEFT CONTENT */}
+        {/* ====================================================
+            LEFT CONTENT
+            ==================================================== */}
 
         <div className="login-left-content">
 
           <h1>
-
             Grow with intelligence,
-
             <br />
-
             <span>
               harvest with confidence.
             </span>
-
           </h1>
 
 
           <p>
-
             Access real-time crop yield
             predictions, weather insights,
             and AI-powered farming
             recommendations.
-
           </p>
 
 
-          {/* FEATURES */}
+          {/* ==================================================
+              FEATURES
+              ================================================== */}
 
           <div className="feature-grid">
 
+            {/* Accuracy */}
 
             <div className="login-feature-card">
 
               <div className="feature-icon">
-
                 <Gauge size={20} />
-
               </div>
 
               <div>
-
                 <strong>
                   94% Accuracy
                 </strong>
@@ -814,22 +581,20 @@ function Login() {
                 <span>
                   Yield predictions
                 </span>
-
               </div>
 
             </div>
 
 
+            {/* Weather */}
+
             <div className="login-feature-card">
 
               <div className="feature-icon">
-
                 <CloudSun size={20} />
-
               </div>
 
               <div>
-
                 <strong>
                   Live Weather
                 </strong>
@@ -837,22 +602,20 @@ function Login() {
                 <span>
                   Real-time data
                 </span>
-
               </div>
 
             </div>
 
 
+            {/* Soil */}
+
             <div className="login-feature-card">
 
               <div className="feature-icon">
-
                 <Gauge size={20} />
-
               </div>
 
               <div>
-
                 <strong>
                   Soil Health
                 </strong>
@@ -860,22 +623,20 @@ function Login() {
                 <span>
                   NPK monitoring
                 </span>
-
               </div>
 
             </div>
 
 
+            {/* Analytics */}
+
             <div className="login-feature-card">
 
               <div className="feature-icon">
-
                 <TrendingUp size={20} />
-
               </div>
 
               <div>
-
                 <strong>
                   Analytics
                 </strong>
@@ -883,49 +644,34 @@ function Login() {
                 <span>
                   Smart insights
                 </span>
-
               </div>
 
             </div>
-
 
           </div>
 
         </div>
 
 
-        {/* TRUST */}
+        {/* ====================================================
+            TRUST
+            ==================================================== */}
 
         <div className="login-trust">
 
           <span>
-
-            <ShieldCheck
-              size={16}
-            />
-
+            <ShieldCheck size={16} />
             Secure
-
           </span>
 
-
-          <span
-            className="trust-divider"
-          />
-
+          <span className="trust-divider" />
 
           <span>
-
-            <Globe2
-              size={16}
-            />
-
+            <Globe2 size={16} />
             Trusted by 2,400+ farmers
-
           </span>
 
         </div>
-
 
       </section>
 
@@ -939,7 +685,9 @@ function Login() {
         <div className="login-form-container">
 
 
-          {/* HEADING */}
+          {/* ==================================================
+              HEADING
+              ================================================== */}
 
           <div className="login-heading">
 
@@ -954,134 +702,89 @@ function Login() {
           </div>
 
 
-          {/* ROLE TABS */}
+          {/* ==================================================
+              ROLE TABS
+              ================================================== */}
 
           <div className="role-tabs">
 
-
             <button
-
               type="button"
-
               className={
                 role === "farmer"
                   ? "active"
                   : ""
               }
-
               onClick={() =>
-                handleRoleChange(
-                  "farmer"
-                )
+                handleRoleChange("farmer")
               }
-
             >
-
               Farmer
-
             </button>
 
 
             <button
-
               type="button"
-
               className={
                 role === "consultant"
                   ? "active"
                   : ""
               }
-
               onClick={() =>
-                handleRoleChange(
-                  "consultant"
-                )
+                handleRoleChange("consultant")
               }
-
             >
-
               Consultant
-
             </button>
 
 
             <button
-
               type="button"
-
               className={
                 role === "admin"
                   ? "active"
                   : ""
               }
-
               onClick={() =>
-                handleRoleChange(
-                  "admin"
-                )
+                handleRoleChange("admin")
               }
-
             >
-
               Admin
-
             </button>
-
 
           </div>
 
 
-          {/* FORM */}
+          {/* ==================================================
+              FORM
+              ================================================== */}
 
-          <form
-            onSubmit={
-              handleSubmit
-            }
-          >
+          <form onSubmit={handleSubmit}>
 
 
-            {/* EMAIL */}
+            {/* =================================================
+                EMAIL
+                ================================================= */}
 
-            <div
-              className="login-form-group"
-            >
+            <div className="login-form-group">
 
               <label>
-
                 Email Address{" "}
-
                 <span>*</span>
-
               </label>
 
-
-              <div
-                className="login-input"
-              >
+              <div className="login-input">
 
                 <Mail size={18} />
 
-
                 <input
-
                   type="email"
-
                   name="email"
-
-                  value={
-                    formData.email
-                  }
-
-                  onChange={
-                    handleChange
-                  }
-
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="you@example.com"
-
                   autoComplete="email"
-
                   required
-
                 />
 
               </div>
@@ -1089,85 +792,54 @@ function Login() {
             </div>
 
 
-            {/* PASSWORD */}
+            {/* =================================================
+                PASSWORD
+                ================================================= */}
 
-            <div
-              className="login-form-group"
-            >
+            <div className="login-form-group">
 
               <label>
-
                 Password{" "}
-
                 <span>*</span>
-
               </label>
 
-
-              <div
-                className="login-input"
-              >
+              <div className="login-input">
 
                 <Lock size={18} />
 
-
                 <input
-
                   type={
                     showPassword
                       ? "text"
                       : "password"
                   }
-
                   name="password"
-
-                  value={
-                    formData.password
-                  }
-
-                  onChange={
-                    handleChange
-                  }
-
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="Enter your password"
-
                   autoComplete="current-password"
-
                   required
-
                 />
 
-
                 <button
-
                   type="button"
-
                   className="password-toggle"
-
                   onClick={() =>
                     setShowPassword(
                       !showPassword
                     )
                   }
-
                   aria-label={
                     showPassword
                       ? "Hide password"
                       : "Show password"
                   }
-
                 >
-
                   {showPassword ? (
-
                     <EyeOff size={18} />
-
                   ) : (
-
                     <Eye size={18} />
-
                   )}
-
                 </button>
 
               </div>
@@ -1175,30 +847,19 @@ function Login() {
             </div>
 
 
-            {/* OPTIONS */}
+            {/* =================================================
+                OPTIONS
+                ================================================= */}
 
-            <div
-              className="login-options"
-            >
+            <div className="login-options">
 
-              <label
-                className="remember-me"
-              >
+              <label className="remember-me">
 
                 <input
-
                   type="checkbox"
-
                   name="remember"
-
-                  checked={
-                    formData.remember
-                  }
-
-                  onChange={
-                    handleChange
-                  }
-
+                  checked={formData.remember}
+                  onChange={handleChange}
                 />
 
                 <span>
@@ -1208,82 +869,62 @@ function Login() {
               </label>
 
 
-              <button
-
-                type="button"
-
+              <Link
+                to="/forgot-password"
                 className="forgot-password"
-
-                onClick={() =>
-                  alert(
-                    "Forgot password feature coming soon."
-                  )
-                }
-
               >
-
                 Forgot password?
-
-              </button>
+              </Link>
 
             </div>
 
 
-            {/* ERROR */}
+            {/* =================================================
+                ERROR
+                ================================================= */}
 
             {error && (
-
               <div
                 className="login-error"
+                role="alert"
               >
-
                 {error}
-
               </div>
-
             )}
 
 
-            {/* SIGN IN */}
+            {/* =================================================
+                SIGN IN
+                ================================================= */}
 
             <button
-
               type="submit"
-
               className="sign-in-button"
-
               disabled={loading}
-
             >
-
               {loading ? (
-
-                "Signing in..."
-
+                <span>
+                  Signing in...
+                </span>
               ) : (
-
                 <>
-
                   <LogIn size={19} />
-
-                  Sign In
-
+                  <span>
+                    Sign In
+                  </span>
                 </>
-
               )}
-
             </button>
 
 
-            {/* GOOGLE */}
+            {/* =================================================
+                GOOGLE LOGIN
+                ================================================= */}
 
             {role !== "admin" && (
-
               <>
 
-                <div
-                  className="or-divider"
-                >
+                <div className="or-divider">
 
                   <span />
 
@@ -1297,29 +938,19 @@ function Login() {
 
 
                 <button
-
                   type="button"
-
                   className="google-button"
-
                   onClick={() =>
                     handleGoogleLogin()
                   }
-
                   disabled={loading}
-
                 >
 
                   <img
-
                     src={googleLogo}
-
                     alt="Google"
-
                     className="google-icon"
-
                   />
-
 
                   <span>
                     Continue with Google
@@ -1328,44 +959,33 @@ function Login() {
                 </button>
 
               </>
-
             )}
 
           </form>
 
 
-          {/* REGISTER */}
+          {/* ==================================================
+              REGISTER
+              ================================================== */}
 
           {role !== "admin" && (
-
-            <p
-              className="register-text"
-            >
+            <p className="register-text">
 
               Don't have an account?{" "}
 
-              <Link
-                to="/register"
-              >
-
+              <Link to="/register">
                 Create one free
-
               </Link>
 
             </p>
-
           )}
-
 
         </div>
 
       </section>
 
-
     </div>
-
   );
-
 }
 
 

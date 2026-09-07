@@ -1,96 +1,85 @@
 /* ============================================================
-   GLOBAL
-============================================================ */
-
-* {
-  box-sizing: border-box;
-}
+   REGISTER PAGE
+   ============================================================ */
 
 .register-page {
   min-height: 100vh;
   width: 100%;
   display: flex;
-  background: #f8faf8;
-  color: #17351f;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-  overflow: hidden;
+  background: #f8faf5;
+  overflow-x: hidden;
+  color: #19321d;
 }
 
+
 /* ============================================================
-   LEFT PANEL
-============================================================ */
+   LEFT VIDEO PANEL
+   ============================================================ */
 
 .register-left {
   position: relative;
-  width: 38%;
-  min-width: 420px;
+  width: 43%;
   min-height: 100vh;
-  padding: 34px 48px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-
-  background:
-    radial-gradient(
-      circle at -5% 40%,
-      rgba(151, 194, 92, 0.16) 0,
-      rgba(151, 194, 92, 0.16) 120px,
-      transparent 121px
-    ),
-    radial-gradient(
-      circle at 100% 90%,
-      rgba(179, 210, 103, 0.18) 0,
-      rgba(179, 210, 103, 0.18) 130px,
-      transparent 131px
-    ),
-    linear-gradient(
-      145deg,
-      #1d5128 0%,
-      #2b6c32 55%,
-      #3f7f32 100%
-    );
-
+  justify-content: space-between;
   color: white;
-  overflow: hidden;
+  isolation: isolate;
 }
 
-.register-left::before {
-  content: "";
-  position: absolute;
-  width: 300px;
-  height: 300px;
-  left: -175px;
-  top: 250px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.register-left::after {
-  content: "";
-  position: absolute;
-  width: 230px;
-  height: 230px;
-  right: -100px;
-  bottom: -100px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
 
 /* ============================================================
-   BRAND LOGO
+   VIDEO
    ============================================================ */
 
-.brand-logo-image {
-  width: 42px;
-  height: 42px;
-  border-radius: 100%;
-  object-fit: contain;
-  display: block;
-  flex-shrink: 0;
+.register-hero-video {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center center;
+
+  z-index: -3;
+}
+
+
+/* ============================================================
+   VIDEO OVERLAY
+   ============================================================ */
+
+.register-video-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.18) 38%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+
+  z-index: -2;
+}
+
+
+/* Slight green tint only at bottom */
+
+.register-video-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent 50%,
+      rgba(22, 60, 28, 0.28) 100%
+    );
 }
 
 
@@ -98,419 +87,574 @@
    BRAND
    ============================================================ */
 
-.brand {
+.register-brand {
+  position: relative;
+  z-index: 5;
+
   display: flex;
   align-items: center;
-  gap: 11px;
+
+  gap: 12px;
+
+  margin: 28px 32px;
+
+  color: white;
+  text-decoration: none;
+
+  width: fit-content;
 }
 
-.brand-name {
-  font-size: 20px;
-  font-weight: 700;
+
+.register-brand-logo {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.95);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 5px 20px rgba(0, 0, 0, 0.18);
 }
 
-.brand-name span {
-  font-weight: 700;
+
+.register-brand-logo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
 }
+
+
+.register-brand-name {
+  font-size: 25px;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+}
+
+
+.register-brand-name span {
+  color: #d7ed55;
+}
+
+
 /* ============================================================
    LEFT CONTENT
-============================================================ */
+   ============================================================ */
 
-.left-content {
+.register-left-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 
-  margin-top: auto;
-  margin-bottom: auto;
+  max-width: 620px;
 
-  max-width: 390px;
+  padding: 40px 55px 70px;
 }
+
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
 
 .progress-lines {
   display: flex;
-  gap: 7px;
-  margin-bottom: 26px;
+
+  width: 170px;
+
+  gap: 8px;
+
+  margin-bottom: 30px;
 }
+
 
 .progress-line {
-  width: 47px;
-  height: 3px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.25);
+  height: 4px;
+
+  flex: 1;
+
+  border-radius: 50px;
+
+  background: rgba(255, 255, 255, 0.32);
+
+  transition: 0.3s ease;
 }
+
 
 .progress-line.active {
-  background: #d9ef73;
+  background: #d7ed55;
+
+  box-shadow:
+    0 0 12px rgba(215, 237, 85, 0.4);
 }
 
-.left-content h1 {
+
+/* ============================================================
+   LEFT HEADING
+   ============================================================ */
+
+.register-left-content h1 {
   margin: 0;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-size: clamp(42px, 4vw, 68px);
 
-  font-size: clamp(42px, 4vw, 58px);
-  line-height: 1.03;
-  letter-spacing: -2px;
-  font-weight: 700;
+  line-height: 1.02;
+
+  font-weight: 800;
+
+  letter-spacing: -2.5px;
+
+  color: white;
+
+  text-shadow:
+    0 3px 20px rgba(0, 0, 0, 0.22);
 }
+
 
 .left-description {
-  max-width: 350px;
+  max-width: 500px;
+
   margin: 22px 0 32px;
 
-  font-size: 15px;
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.82);
+  font-size: 17px;
+
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.9);
+
+  text-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.2);
 }
+
 
 /* ============================================================
    BENEFITS
-============================================================ */
+   ============================================================ */
 
 .benefits-list {
   display: flex;
+
   flex-direction: column;
+
   gap: 15px;
 }
 
+
 .benefit {
   display: flex;
-  align-items: center;
-  gap: 11px;
 
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.92);
+  align-items: center;
+
+  gap: 12px;
+
+  font-size: 15px;
+
+  color: white;
 }
+
 
 .benefit svg {
   flex-shrink: 0;
-  color: #d9ef73;
-  stroke-width: 2;
+
+  color: #d7ed55;
+
+  filter:
+    drop-shadow(
+      0 2px 6px rgba(0, 0, 0, 0.25)
+    );
 }
 
-/* ============================================================
-   FOOTER
-============================================================ */
 
-.left-footer {
+/* ============================================================
+   LEFT FOOTER
+   ============================================================ */
+
+.register-left-footer {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.62);
+  padding: 0 55px 28px;
+
+  font-size: 12px;
+
+  color: rgba(255, 255, 255, 0.72);
 }
 
+
 /* ============================================================
-   RIGHT PANEL
-============================================================ */
+   RIGHT SIDE
+   ============================================================ */
 
 .register-right {
-  width: 62%;
+  width: 57%;
+
   min-height: 100vh;
 
-  background: #fbfcfa;
+  display: flex;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f8faf5 0%,
+      #ffffff 50%,
+      #f4f8ef 100%
+    );
 
   overflow-y: auto;
-  overflow-x: hidden;
-
-  display: flex;
-  justify-content: center;
 }
+
+
+/* ============================================================
+   FORM CONTAINER
+   ============================================================ */
 
 .register-container {
-  width: min(100%, 650px);
+  width: 100%;
 
-  padding: 42px 42px 55px;
+  max-width: 760px;
+
+  padding: 58px 70px 70px;
+
+  margin: auto;
 }
+
 
 /* ============================================================
    FORM HEADING
-============================================================ */
+   ============================================================ */
 
 .form-heading {
-  margin-bottom: 27px;
+  margin-bottom: 28px;
 }
+
 
 .form-heading h2 {
   margin: 0 0 7px;
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-size: 31px;
 
-  color: #17351f;
+  line-height: 1.15;
 
-  font-size: 30px;
-  line-height: 1.2;
-  font-weight: 700;
+  font-weight: 800;
 
-  letter-spacing: -0.8px;
+  letter-spacing: -1px;
+
+  color: #19351d;
 }
+
 
 .form-heading p {
   margin: 0;
 
-  color: #718078;
-  font-size: 12px;
+  font-size: 14px;
+
+  color: #718071;
 }
+
 
 /* ============================================================
    FORM
-============================================================ */
+   ============================================================ */
 
 .register-form {
-  width: 100%;
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 18px;
 }
+
+
+/* ============================================================
+   FORM GROUP
+   ============================================================ */
 
 .form-group {
-  width: 100%;
-  margin-bottom: 17px;
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  min-width: 0;
 }
+
 
 .form-group label {
-  display: block;
-  margin-bottom: 7px;
+  font-size: 13px;
 
-  color: #17351f;
-
-  font-size: 12px;
   font-weight: 700;
+
+  color: #203623;
 }
+
 
 .form-group label span {
-  color: #dc4c4c;
-  margin-left: 2px;
+  color: #70983f;
 }
+
 
 /* ============================================================
    TWO COLUMNS
-============================================================ */
+   ============================================================ */
 
 .two-column {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  width: 100%;
+
+  gap: 15px;
 }
+
 
 /* ============================================================
    INPUT WRAPPER
-============================================================ */
+   ============================================================ */
 
 .input-wrapper {
-  position: relative;
-
   width: 100%;
-  height: 46px;
+
+  height: 48px;
 
   display: flex;
+
   align-items: center;
 
-  border: 1px solid #b7e4cb;
-  border-radius: 9px;
+  gap: 10px;
 
-  background: #f1faf5;
+  padding: 0 14px;
+
+  border: 1px solid #d8e0d4;
+
+  border-radius: 10px;
+
+  background: white;
 
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
     background 0.2s ease;
+
+  box-sizing: border-box;
 }
+
+
+.input-wrapper:focus-within {
+  border-color: #638c3e;
+
+  box-shadow:
+    0 0 0 3px rgba(99, 140, 62, 0.1);
+}
+
 
 .input-wrapper svg {
   flex-shrink: 0;
-  margin-left: 13px;
 
-  color: #789084;
-
-  stroke-width: 1.8;
+  color: #8b9a87;
 }
 
-.input-wrapper:focus-within {
-  border-color: #4f8e35;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 3px rgba(79, 142, 53, 0.09);
-}
 
 .input-wrapper input {
   width: 100%;
+
+  min-width: 0;
+
   height: 100%;
 
-  border: 0;
-  outline: none;
+  border: none;
 
-  padding: 0 13px 0 9px;
+  outline: none;
 
   background: transparent;
 
-  color: #183c24;
+  color: #26372a;
 
-  font-size: 13px;
+  font-size: 14px;
+
   font-family: inherit;
 }
 
+
 .input-wrapper input::placeholder {
-  color: #9ba9a1;
+  color: #a4afa2;
 }
+
+
+/* ============================================================
+   PLAIN INPUT
+   ============================================================ */
+
+.plain-input {
+  width: 100%;
+
+  height: 48px;
+
+  padding: 0 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d8e0d4;
+
+  border-radius: 10px;
+
+  background: white;
+
+  color: #26372a;
+
+  outline: none;
+
+  font-size: 14px;
+
+  font-family: inherit;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.plain-input:focus {
+  border-color: #638c3e;
+
+  box-shadow:
+    0 0 0 3px rgba(99, 140, 62, 0.1);
+}
+
+
+/* ============================================================
+   SELECT
+   ============================================================ */
+
+.register-form select {
+  width: 100%;
+
+  height: 48px;
+
+  padding: 0 14px;
+
+  border: 1px solid #d8e0d4;
+
+  border-radius: 10px;
+
+  background: white;
+
+  color: #26372a;
+
+  outline: none;
+
+  font-size: 14px;
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.register-form select:focus {
+  border-color: #638c3e;
+
+  box-shadow:
+    0 0 0 3px rgba(99, 140, 62, 0.1);
+}
+
 
 /* ============================================================
    PASSWORD
-============================================================ */
+   ============================================================ */
+
+.password-wrapper {
+  position: relative;
+}
+
 
 .password-wrapper input {
-  padding-right: 42px;
+  padding-right: 38px;
 }
+
 
 .eye-button {
   position: absolute;
 
-  right: 7px;
-  top: 50%;
+  right: 9px;
 
-  width: 30px;
-  height: 30px;
+  top: 50%;
 
   transform: translateY(-50%);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 32px;
 
-  padding: 0;
+  height: 32px;
 
-  border: 0;
-  border-radius: 6px;
+  border: none;
 
   background: transparent;
 
-  color: #7f8e86;
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #7d8c7a;
 
   cursor: pointer;
 
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
+  border-radius: 7px;
 }
+
 
 .eye-button:hover {
-  color: #3f7e31;
-  background: rgba(79, 142, 53, 0.08);
+  background: #f0f4ed;
+
+  color: #4d7038;
 }
 
-.eye-button:focus-visible {
-  outline: 2px solid rgba(79, 142, 53, 0.35);
-}
-
-/* ============================================================
-   SELECT
-============================================================ */
-
-.form-group select {
-  width: 100%;
-  height: 46px;
-
-  border: 1px solid #b7e4cb;
-  border-radius: 9px;
-
-  padding: 0 39px 0 13px;
-
-  background-color: #f1faf5;
-  color: #587064;
-
-  font-family: inherit;
-  font-size: 13px;
-
-  outline: none;
-
-  cursor: pointer;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-}
-
-.form-group select:focus {
-  border-color: #4f8e35;
-
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 3px rgba(79, 142, 53, 0.09);
-}
-
-/* ============================================================
-   PLAIN INPUT
-============================================================ */
-
-.plain-input {
-  width: 100%;
-  height: 46px;
-
-  border: 1px solid #b7e4cb;
-  border-radius: 9px;
-
-  padding: 0 13px;
-
-  background: #f1faf5;
-
-  color: #183c24;
-
-  font-family: inherit;
-  font-size: 13px;
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-}
-
-.plain-input::placeholder {
-  color: #9ba9a1;
-}
-
-.plain-input:focus {
-  border-color: #4f8e35;
-  background: white;
-
-  box-shadow:
-    0 0 0 3px rgba(79, 142, 53, 0.09);
-}
 
 /* ============================================================
    ROLE OPTIONS
-============================================================ */
+   ============================================================ */
 
 .role-options {
   display: grid;
+
   grid-template-columns: 1fr 1fr;
+
   gap: 12px;
 }
 
+
 .role-card {
-  min-height: 72px;
+  min-height: 76px;
 
   display: flex;
+
   align-items: center;
-  gap: 12px;
 
-  padding: 13px 14px;
+  gap: 13px;
 
-  border: 1px solid #d7e1da;
-  border-radius: 10px;
+  padding: 13px 15px;
 
-  background: #ffffff;
+  border: 1px solid #dce3d9;
 
-  color: #31503b;
+  border-radius: 11px;
+
+  background: white;
+
+  color: #314532;
 
   text-align: left;
 
@@ -520,240 +664,257 @@
     border-color 0.2s ease,
     background 0.2s ease,
     box-shadow 0.2s ease,
-    transform 0.15s ease;
+    transform 0.2s ease;
 }
 
+
 .role-card:hover {
-  border-color: #9fc792;
+  border-color: #9db88c;
+
   transform: translateY(-1px);
 }
 
+
+.role-card svg {
+  flex-shrink: 0;
+
+  color: #719448;
+}
+
+
 .role-card.selected {
-  border-color: #4f8e35;
-  background: #f3f8ec;
+  border-color: #60883d;
+
+  background: #f2f7ed;
 
   box-shadow:
-    0 0 0 1px rgba(79, 142, 53, 0.12);
+    0 0 0 2px rgba(96, 136, 61, 0.08);
 }
 
-.role-card > svg {
-  flex-shrink: 0;
-  color: #4f8e35;
-}
-
-.role-card div {
-  min-width: 0;
-}
 
 .role-card strong {
   display: block;
 
-  color: #23452b;
+  margin-bottom: 3px;
 
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 13px;
 
-  line-height: 1.35;
+  color: #233b27;
 }
+
 
 .role-card small {
   display: block;
 
-  margin-top: 3px;
+  font-size: 11px;
 
-  color: #829087;
-
-  font-size: 10px;
-  line-height: 1.4;
+  color: #819080;
 }
+
 
 /* ============================================================
    ADMIN NOTE
-============================================================ */
+   ============================================================ */
 
 .admin-note {
   display: flex;
+
   align-items: center;
-  gap: 5px;
 
-  margin-top: 7px;
+  gap: 7px;
 
-  color: #8a9690;
+  margin-top: 8px;
 
-  font-size: 10px;
+  font-size: 11px;
+
+  color: #7d8879;
 }
+
 
 .admin-note svg {
-  color: #89968e;
+  color: #789252;
 }
 
+
 /* ============================================================
-   STEP 2 INFO CARDS
-============================================================ */
+   ROLE INFO
+   ============================================================ */
 
 .role-info,
 .role-details-card {
   display: flex;
+
   align-items: flex-start;
-  gap: 12px;
 
-  width: 100%;
+  gap: 13px;
 
-  margin-bottom: 22px;
-  padding: 15px;
+  padding: 15px 16px;
 
-  border: 1px solid #d5e6d5;
+  border: 1px solid #dce7d5;
+
   border-radius: 11px;
 
-  background: #f1f8ed;
+  background: #f3f8ef;
 
-  color: #3d7532;
+  color: #5b7f3c;
 }
+
 
 .role-info svg,
 .role-details-card svg {
   flex-shrink: 0;
+
   margin-top: 1px;
 }
+
 
 .role-info strong,
 .role-details-card strong {
   display: block;
 
-  color: #2d5729;
+  font-size: 14px;
 
-  font-size: 13px;
+  color: #35502f;
+
+  margin-bottom: 3px;
 }
+
 
 .role-info p,
 .role-details-card p {
-  margin: 5px 0 0;
+  margin: 0;
 
-  color: #718174;
+  font-size: 12px;
 
-  font-size: 11px;
   line-height: 1.5;
+
+  color: #74816f;
 }
+
 
 /* ============================================================
    ERROR
-============================================================ */
+   ============================================================ */
 
 .error-message {
-  width: 100%;
-
-  margin: 4px 0 15px;
-
   padding: 11px 13px;
 
-  border: 1px solid #f0caca;
-  border-radius: 8px;
+  border-radius: 9px;
 
-  background: #fff3f3;
+  border: 1px solid #efcaca;
 
-  color: #b33b3b;
+  background: #fff4f4;
+
+  color: #b54444;
 
   font-size: 12px;
-  line-height: 1.4;
+
+  line-height: 1.5;
 }
 
+
 /* ============================================================
-   PRIMARY BUTTON
-============================================================ */
+   BUTTONS
+   ============================================================ */
 
 .primary-button {
   width: 100%;
-  min-height: 46px;
+
+  min-height: 48px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
-  gap: 8px;
 
-  padding: 0 18px;
+  gap: 9px;
 
-  border: 0;
-  border-radius: 8px;
+  border: none;
 
-  background: linear-gradient(
-    135deg,
-    #4c8c34,
-    #5c963d
-  );
+  border-radius: 10px;
+
+  background: #5c813b;
 
   color: white;
 
-  font-family: inherit;
-  font-size: 12px;
+  font-size: 14px;
+
   font-weight: 700;
+
+  font-family: inherit;
 
   cursor: pointer;
 
   box-shadow:
-    0 7px 16px rgba(69, 126, 49, 0.16);
+    0 7px 18px rgba(74, 112, 46, 0.16);
 
   transition:
-    transform 0.15s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+
 .primary-button:hover:not(:disabled) {
-  background: linear-gradient(
-    135deg,
-    #427c2d,
-    #548d36
-  );
+  background: #4d7130;
 
   transform: translateY(-1px);
 
   box-shadow:
-    0 9px 20px rgba(69, 126, 49, 0.22);
+    0 9px 22px rgba(74, 112, 46, 0.2);
 }
 
-.primary-button:active:not(:disabled) {
-  transform: translateY(0);
-}
 
 .primary-button:disabled {
   opacity: 0.65;
+
   cursor: not-allowed;
 }
 
+
 /* ============================================================
    BUTTON ROW
-============================================================ */
+   ============================================================ */
 
 .button-row {
   display: grid;
-  grid-template-columns: 130px 1fr;
-  gap: 12px;
 
+  grid-template-columns: 120px 1fr;
+
+  gap: 12px;
+}
+
+
+.button-row .primary-button {
   width: 100%;
 }
 
-/* ============================================================
-   SECONDARY BUTTON
-============================================================ */
 
 .secondary-button {
-  min-height: 46px;
+  min-height: 48px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 7px;
 
-  border: 1px solid #cfdad3;
-  border-radius: 8px;
+  border: 1px solid #d5ded1;
+
+  border-radius: 10px;
 
   background: white;
 
-  color: #4e6558;
+  color: #536652;
+
+  font-size: 14px;
+
+  font-weight: 600;
 
   font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
 
   cursor: pointer;
 
@@ -762,159 +923,157 @@
     background 0.2s ease;
 }
 
+
 .secondary-button:hover {
-  border-color: #8fb48b;
-  background: #f5f8f4;
+  background: #f4f7f1;
+
+  border-color: #b9c9b3;
 }
+
 
 /* ============================================================
    LOGIN LINK
-============================================================ */
+   ============================================================ */
 
 .login-link {
-  margin-top: 18px;
-
   text-align: center;
 
-  color: #8a9690;
+  font-size: 12px;
 
-  font-size: 11px;
+  color: #7b8879;
+
+  margin-top: 2px;
 }
 
+
 .login-link a {
-  color: #477e32;
+  color: #527737;
 
   font-weight: 700;
 
   text-decoration: none;
 }
 
+
 .login-link a:hover {
   text-decoration: underline;
 }
 
+
 /* ============================================================
    SCROLLBAR
-============================================================ */
+   ============================================================ */
 
 .register-right::-webkit-scrollbar {
   width: 7px;
 }
 
+
 .register-right::-webkit-scrollbar-track {
-  background: #f5f7f4;
+  background: #f3f6f1;
 }
+
 
 .register-right::-webkit-scrollbar-thumb {
+  background: #c7d3c2;
+
   border-radius: 20px;
-  background: #c6d5c9;
 }
+
 
 .register-right::-webkit-scrollbar-thumb:hover {
-  background: #aabfac;
+  background: #aabda3;
 }
 
-/* ============================================================
-   RESPONSIVE - LAPTOP
-============================================================ */
 
-@media (max-width: 1200px) {
+/* ============================================================
+   RESPONSIVE — TABLET
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
   .register-left {
-    width: 36%;
-    min-width: 350px;
-    padding: 30px 35px;
+    width: 40%;
   }
 
   .register-right {
-    width: 64%;
+    width: 60%;
   }
 
   .register-container {
-    max-width: 630px;
-    padding: 38px 32px 50px;
+    padding: 45px 38px 55px;
   }
 
-  .left-content h1 {
-    font-size: 44px;
+  .register-left-content {
+    padding: 30px 35px 55px;
   }
+
+  .register-left-footer {
+    padding-left: 35px;
+    padding-right: 35px;
+  }
+
+  .register-left-content h1 {
+    font-size: 45px;
+  }
+
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .role-options {
+    grid-template-columns: 1fr;
+  }
+
 }
 
+
 /* ============================================================
-   RESPONSIVE - TABLET
-============================================================ */
+   RESPONSIVE — MOBILE
+   ============================================================ */
 
-@media (max-width: 900px) {
-  .register-page {
-    overflow: auto;
-  }
-
-  .register-left {
-    width: 100%;
-    min-width: 0;
-    min-height: 330px;
-
-    padding: 28px 30px;
-  }
-
-  .register-right {
-    width: 100%;
-    min-height: auto;
-    overflow: visible;
-  }
+@media (max-width: 800px) {
 
   .register-page {
     display: block;
   }
 
-  .left-content {
-    margin-top: 55px;
-    margin-bottom: 25px;
-  }
-
-  .left-content h1 {
-    font-size: 40px;
-  }
-
-  .left-footer {
-    margin-top: 10px;
-  }
-
-  .register-container {
-    width: 100%;
-    max-width: 680px;
-
-    margin: 0 auto;
-
-    padding: 38px 28px 50px;
-  }
-}
-
-/* ============================================================
-   RESPONSIVE - MOBILE
-============================================================ */
-
-@media (max-width: 600px) {
   .register-left {
-    min-height: 300px;
-    padding: 22px 20px;
+    width: 100%;
+
+    min-height: 380px;
+
+    height: 380px;
   }
 
-  .brand-name {
-    font-size: 17px;
+  .register-hero-video {
+    object-position: center center;
   }
 
-  .left-content {
-    margin-top: 42px;
+  .register-brand {
+    margin: 20px 22px;
   }
 
-  .left-content h1 {
-    font-size: 35px;
-    letter-spacing: -1.2px;
+  .register-brand-name {
+    font-size: 22px;
+  }
+
+  .register-left-content {
+    padding: 20px 25px 35px;
+  }
+
+  .register-left-content h1 {
+    font-size: 39px;
+
+    letter-spacing: -1.5px;
   }
 
   .left-description {
-    margin: 15px 0 22px;
-    font-size: 13px;
+    margin: 14px 0 20px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
   }
 
   .benefits-list {
@@ -925,12 +1084,20 @@
     font-size: 12px;
   }
 
-  .left-footer {
-    font-size: 9px;
+  .register-left-footer {
+    display: none;
+  }
+
+  .register-right {
+    width: 100%;
+
+    min-height: auto;
+
+    overflow: visible;
   }
 
   .register-container {
-    padding: 30px 18px 40px;
+    padding: 38px 22px 50px;
   }
 
   .form-heading h2 {
@@ -939,7 +1106,6 @@
 
   .two-column {
     grid-template-columns: 1fr;
-    gap: 0;
   }
 
   .role-options {
@@ -950,31 +1116,47 @@
     grid-template-columns: 1fr;
   }
 
-  .secondary-button {
-    order: 2;
-  }
-
-  .primary-button {
-    order: 1;
-  }
 }
 
-/* ============================================================
-   VERY SMALL MOBILE
-============================================================ */
 
-@media (max-width: 380px) {
-  .register-container {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 480px) {
 
   .register-left {
-    padding-left: 17px;
-    padding-right: 17px;
+    min-height: 340px;
+
+    height: 340px;
   }
 
-  .left-content h1 {
-    font-size: 31px;
+  .register-left-content {
+    padding: 10px 20px 30px;
   }
+
+  .register-left-content h1 {
+    font-size: 34px;
+  }
+
+  .left-description {
+    max-width: 330px;
+  }
+
+  .benefit {
+    font-size: 11px;
+  }
+
+  .register-container {
+    padding: 30px 17px 40px;
+  }
+
+  .form-heading h2 {
+    font-size: 24px;
+  }
+
+  .role-card {
+    min-height: 70px;
+  }
+
 }

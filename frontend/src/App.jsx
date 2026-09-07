@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 // ================= AUTHENTICATION =================
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-
+import ForgotPassword from "./pages/auth/ForgotPassword";
 // ================= HOME =================
 import Home from "./pages/Home";
 
@@ -25,11 +25,7 @@ function App() {
 
         {/* ================= HOME ================= */}
 
-        <Route
-          path="/"
-          element={<Home />}
-        />
-
+        <Route path="/" element={<Home />} />
 
         {/* ================= AUTHENTICATION ================= */}
 
@@ -42,7 +38,11 @@ function App() {
           path="/register"
           element={<Register />}
         />
-
+        
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
 
         {/* ================= FARMER ================= */}
 
