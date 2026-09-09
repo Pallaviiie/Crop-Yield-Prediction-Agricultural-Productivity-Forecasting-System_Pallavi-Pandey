@@ -1,40 +1,38 @@
 import os
-import smtplib
-from email.message import EmailMessage
-
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
 def send_password_reset_otp(recipient_email: str, otp: str):
-    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
-    smtp_port = int(os.getenv("SMTP_PORT", "587"))
-
-    smtp_username = os.getenv("SMTP_USERNAME")
-    smtp_password = os.getenv("SMTP_PASSWORD")
-
+    api_key = os.getenv("BREVO_API_KEY")
     sender_email = os.getenv(
-        "SMTP_FROM_EMAIL",
-        smtp_username
+        "BREVO_FROM_EMAIL",
+        "yieldsenseai.support2026@gmail.com"
+    )
+    sender_name = os.getenv(
+        "BREVO_FROM_NAME",
+        "YieldSense AI"
     )
 
-    if not smtp_username or not smtp_password:
-        raise RuntimeError(
-            "SMTP email configuration is missing."
-        )
+    if not api_key:
+        raise RuntimeError("BREVO_API_KEY is missing.")
 
-    # Gmail App Password may be displayed with spaces.
-    smtp_password = smtp_password.replace(" ", "")
+    url = "https://api.brevo.com/v3/smtp/email"
 
-    message = EmailMessage()
-
-    message["Subject"] = "YieldSense AI - Password Reset OTP"
-    message["From"] = sender_email
-    message["To"] = recipient_email
-
-    message.set_content(
-        f"""Hello,
+    payload = {
+        "sender": {
+            "name": sender_name,
+            "email": sender_email
+        },
+        "to": [
+            {
+                "email": recipient_email
+            }
+        ],
+        "subject": "YieldSense AI - Password Reset OTP",
+        "textContent": f"""Hello,
 
 We received a request to reset your YieldSense AI password.
 
@@ -49,41 +47,35 @@ If you did not request a password reset, you can safely ignore this email.
 Regards,
 YieldSense AI Team
 """
-    )
+    }
+
+    headers = {
+        "accept": "application/json",
+        "api-key": api_key,
+        "content-type": "application/json"
+    }
 
     try:
-        with smtplib.SMTP(
-            smtp_host,
-            smtp_port,
+        response = requests.post(
+            url,
+            json=payload,
+            headers=headers,
             timeout=30
-        ) as server:
+        )
 
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
+        if not response.ok:
+            print("BREVO HTTP ERROR:", response.status_code)
+            print("BREVO RESPONSE:", response.text)
 
-            server.login(
-                smtp_username,
-                smtp_password
+            raise RuntimeError(
+                f"Brevo email API failed with status "
+                f"{response.status_code}: {response.text}"
             )
 
-            server.send_message(message)
+        print(f"PASSWORD RESET EMAIL SENT TO: {recipient_email}")
 
-            print(
-                f"PASSWORD RESET EMAIL SENT TO: {recipient_email}"
-            )
-
-    except smtplib.SMTPAuthenticationError as e:
-
-        print("SMTP AUTHENTICATION ERROR:", e)
-
+    except requests.RequestException as e:
+        print("BREVO NETWORK ERROR:", e)
         raise RuntimeError(
-            "Gmail SMTP authentication failed. "
-            "Check SMTP_USERNAME and Gmail App Password."
+            f"Unable to connect to Brevo email service: {e}"
         ) from e
-
-    except Exception as e:
-
-        print("SMTP EMAIL ERROR:", e)
-
-        raise
