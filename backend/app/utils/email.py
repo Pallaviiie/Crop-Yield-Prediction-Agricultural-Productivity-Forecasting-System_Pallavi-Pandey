@@ -1,7 +1,6 @@
-import json
 import os
-import urllib.error
-import urllib.request
+import smtplib
+from email.message import EmailMessage
 
 from dotenv import load_dotenv
 
@@ -9,20 +8,33 @@ load_dotenv()
 
 
 def send_password_reset_otp(recipient_email: str, otp: str):
-    api_key = os.getenv("RESEND_API_KEY")
-    from_email = os.getenv(
-        "RESEND_FROM_EMAIL",
-        "onboarding@resend.dev"
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+
+    smtp_username = os.getenv("SMTP_USERNAME")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+
+    sender_email = os.getenv(
+        "SMTP_FROM_EMAIL",
+        smtp_username
     )
 
-    if not api_key:
-        raise RuntimeError("RESEND_API_KEY is not configured.")
+    if not smtp_username or not smtp_password:
+        raise RuntimeError(
+            "SMTP email configuration is missing."
+        )
 
-    payload = {
-        "from": from_email,
-        "to": [recipient_email],
-        "subject": "YieldSense AI - Password Reset OTP",
-        "text": f"""Hello,
+    # Gmail App Password may be displayed with spaces.
+    smtp_password = smtp_password.replace(" ", "")
+
+    message = EmailMessage()
+
+    message["Subject"] = "YieldSense AI - Password Reset OTP"
+    message["From"] = sender_email
+    message["To"] = recipient_email
+
+    message.set_content(
+        f"""Hello,
 
 We received a request to reset your YieldSense AI password.
 
@@ -36,50 +48,42 @@ If you did not request a password reset, you can safely ignore this email.
 
 Regards,
 YieldSense AI Team
-""",
-    }
-
-    data = json.dumps(payload).encode("utf-8")
-
-    request = urllib.request.Request(
-        "https://api.resend.com/emails",
-        data=data,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
+"""
     )
 
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
-            response_body = response.read().decode("utf-8")
+        with smtplib.SMTP(
+            smtp_host,
+            smtp_port,
+            timeout=30
+        ) as server:
 
-            if response.status not in (200, 201):
-                raise RuntimeError(
-                    f"Resend API returned status {response.status}: "
-                    f"{response_body}"
-                )
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
 
-            print("PASSWORD RESET EMAIL SENT:", response_body)
+            server.login(
+                smtp_username,
+                smtp_password
+            )
 
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8", errors="replace")
+            server.send_message(message)
 
-        print("RESEND HTTP ERROR:", e.code)
-        print("RESEND RESPONSE:", error_body)
+            print(
+                f"PASSWORD RESET EMAIL SENT TO: {recipient_email}"
+            )
+
+    except smtplib.SMTPAuthenticationError as e:
+
+        print("SMTP AUTHENTICATION ERROR:", e)
 
         raise RuntimeError(
-            f"Resend email API failed with status {e.code}: {error_body}"
-        ) from e
-
-    except urllib.error.URLError as e:
-        print("RESEND NETWORK ERROR:", e)
-
-        raise RuntimeError(
-            f"Unable to connect to Resend API: {e}"
+            "Gmail SMTP authentication failed. "
+            "Check SMTP_USERNAME and Gmail App Password."
         ) from e
 
     except Exception as e:
-        print("RESEND EMAIL ERROR:", e)
+
+        print("SMTP EMAIL ERROR:", e)
+
         raise
