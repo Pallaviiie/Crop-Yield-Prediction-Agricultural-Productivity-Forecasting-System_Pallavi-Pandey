@@ -41,7 +41,7 @@ class User(Base):
 
     password_hash = Column(
         String(255),
-        nullable=False,
+        nullable=True,
     )
 
     role = Column(
