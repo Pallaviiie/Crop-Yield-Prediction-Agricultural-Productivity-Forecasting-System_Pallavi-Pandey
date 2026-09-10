@@ -37,7 +37,6 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     full_name: "",
     phone: "",
-    location: "",
     state: "",
     country: "",
     farm_location: "",
@@ -64,7 +63,6 @@ const Profile = () => {
       setFormData({
         full_name: data.full_name || "",
         phone: data.phone || "",
-        location: data.location || "",
         state: data.state || "",
         country: data.country || "",
         farm_location: data.farm_location || "",
@@ -126,7 +124,6 @@ const Profile = () => {
       setFormData({
         full_name: updatedProfile.full_name || "",
         phone: updatedProfile.phone || "",
-        location: updatedProfile.location || "",
         state: updatedProfile.state || "",
         country: updatedProfile.country || "",
         farm_location:
@@ -169,7 +166,6 @@ const Profile = () => {
     setFormData({
       full_name: profile?.full_name || "",
       phone: profile?.phone || "",
-      location: profile?.location || "",
       state: profile?.state || "",
       country: profile?.country || "",
       farm_location:
@@ -713,31 +709,6 @@ const Profile = () => {
                     )
                   : "Not available"}
               </strong>
-            </div>
-
-          </div>
-
-          {/* LOCATION */}
-
-          <div className="profile-info-item">
-
-            <MapPin size={19} />
-
-            <div>
-              <span>Location</span>
-
-              {editMode ? (
-                <input
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                />
-              ) : (
-                <strong>
-                  {profile.location ||
-                    "Not provided"}
-                </strong>
-              )}
             </div>
 
           </div>

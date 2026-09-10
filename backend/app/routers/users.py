@@ -37,6 +37,7 @@ from app.models.user import User
 
 from app.schemas.user import (
     UserLogin,
+    UserRegister,
 )
 from app.utils.activity_logger import log_activity
 
@@ -341,7 +342,7 @@ def user_response(user: User):
     status_code=status.HTTP_201_CREATED,
 )
 def register_user(
-    user_data: dict,
+    user_data: UserRegister,
     db: Session = Depends(get_db),
 ):
 

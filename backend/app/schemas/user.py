@@ -34,7 +34,6 @@ class UserRegister(BaseModel):
     role: Literal[
         "farmer",
         "consultant",
-        "admin",
     ] = "farmer"
 
     city: Optional[str] = None

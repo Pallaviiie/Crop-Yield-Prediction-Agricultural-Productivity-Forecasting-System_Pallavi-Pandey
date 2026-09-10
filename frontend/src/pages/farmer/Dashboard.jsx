@@ -25,6 +25,7 @@ import {
 } from "recharts";
 
 import {
+  getCurrentUser,
   getDatasetSummary,
   getCropAnalytics,
   getSoilAnalytics,
@@ -44,6 +45,7 @@ const Dashboard = ({ setActivePage }) => {
   // ============================================================
 
   const [summary, setSummary] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [cropAnalytics, setCropAnalytics] = useState(null);
 
@@ -80,6 +82,7 @@ const Dashboard = ({ setActivePage }) => {
         setError("");
 
         const [
+          userData,
           summaryData,
           cropData,
           soilData,
@@ -88,6 +91,8 @@ const Dashboard = ({ setActivePage }) => {
           pesticideData,
           historyData,
         ] = await Promise.all([
+
+          getCurrentUser(),
 
           getDatasetSummary(),
 
@@ -105,7 +110,7 @@ const Dashboard = ({ setActivePage }) => {
 
         ]);
 
-
+        setCurrentUser(userData || null);
         setSummary(summaryData || null);
 
         setCropAnalytics(cropData || null);
@@ -385,7 +390,7 @@ const Dashboard = ({ setActivePage }) => {
         <div>
 
           <h1>
-            Welcome back, Farmer!
+            Welcome back, {currentUser?.full_name || "Farmer"}!
           </h1>
 
           <p>
@@ -489,23 +494,27 @@ const Dashboard = ({ setActivePage }) => {
 
           <h2>
 
-            {latestPrediction?.crop ||
-              topCrop ||
-              "—"}
+            {currentUser?.primary_crops ||
+              latestPrediction?.crop ||
+                topCrop ||
+                "—"}
 
           </h2>
 
 
           <p>
-            Current Crop
+            Primary Crop
           </p>
 
 
           <small>
 
-            {latestPrediction
-              ? "From latest prediction"
-              : `${totalCrops} crops in dataset`}
+            {currentUser?.primary_crops
+              ? "From your farmer profile"
+            
+              : latestPrediction
+                ? "From latest prediction"
+                : `${totalCrops} crops in dataset`}
 
           </small>
 
