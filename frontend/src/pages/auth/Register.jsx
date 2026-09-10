@@ -128,7 +128,7 @@ function Register() {
     farm_location: "",
     farm_size: "",
     soil_type: "",
-    primary_crop: "",
+    primary_crops: "",
 
     // Consultant
     specialization: "",
@@ -293,7 +293,7 @@ function Register() {
         return false;
       }
 
-      if (!formData.primary_crop) {
+      if (!formData.primary_crops) {
         setError("Please select your primary crop.");
         return false;
       }
@@ -355,7 +355,7 @@ function Register() {
         farm_location: null,
         farm_size: null,
         soil_type: null,
-        primary_crop: null,
+        primary_crops: null,
 
         specialization: null,
         experience: null,
@@ -371,7 +371,7 @@ function Register() {
         payload.farm_location = formData.farm_location.trim();
         payload.farm_size = Number(formData.farm_size);
         payload.soil_type = formData.soil_type;
-        payload.primary_crop = formData.primary_crop;
+        payload.primary_crops = formData.primary_crops;
       }
 
       /* ========================================================
@@ -1132,9 +1132,9 @@ function Register() {
                       </label>
 
                       <select
-                        name="primary_crop"
+                        name="primary_crops"
                         value={
-                          formData.primary_crop
+                          formData.primary_crops
                         }
                         onChange={handleChange}
                       >

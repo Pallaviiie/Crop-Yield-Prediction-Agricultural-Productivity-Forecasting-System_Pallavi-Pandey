@@ -393,7 +393,6 @@ def register_user(
     if role not in [
         "farmer",
         "consultant",
-        "admin",
     ]:
 
         raise HTTPException(

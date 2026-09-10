@@ -52,7 +52,7 @@ class UserRegister(BaseModel):
 
     soil_type: Optional[str] = None
 
-    primary_crop: Optional[str] = None
+    primary_crops: Optional[str] = None
 
     specialization: Optional[str] = None
     experience: Optional[str] = None
@@ -123,7 +123,7 @@ class UserProfileUpdate(BaseModel):
 
     farm_size_unit: Optional[str] = None
 
-    primary_crop: Optional[str] = None
+    primary_crops: Optional[str] = None
 
     soil_type: Optional[str] = None
 
@@ -172,8 +172,6 @@ class UserProfileResponse(BaseModel):
     farm_size: Optional[float] = None
 
     farm_size_unit: Optional[str] = None
-
-    primary_crop: Optional[str] = None
 
     primary_crops: Optional[str] = None
 
