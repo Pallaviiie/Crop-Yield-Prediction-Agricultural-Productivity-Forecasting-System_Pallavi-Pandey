@@ -4,9 +4,9 @@
 
 .profile-page {
   width: 100%;
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 4px 0 40px;
+  max-width: none;
+  margin: 0;
+  padding: 4px 28px 40px;
   box-sizing: border-box;
 }
 
@@ -15,11 +15,15 @@
    ========================================================= */
 
 .profile-page-header {
+  width: 100%;
+  margin: 0 0 22px;
+  padding: 0;
+
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 
-  margin-bottom: 22px;
+  box-sizing: border-box;
 }
 
 .profile-eyebrow {
@@ -58,14 +62,15 @@
    ========================================================= */
 
 .profile-alert {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
   width: 100%;
   box-sizing: border-box;
 
-  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin: 0 0 15px;
   padding: 11px 14px;
 
   border-radius: 9px;
@@ -87,11 +92,15 @@
 }
 
 /* =========================================================
-   MAIN PROFILE CARD
+   MAIN CARD
    ========================================================= */
 
 .profile-card {
   width: 100%;
+  max-width: none;
+
+  margin: 0;
+  padding: 0;
 
   overflow: hidden;
 
@@ -102,17 +111,32 @@
 
   box-shadow:
     0 4px 18px rgba(28, 62, 38, 0.045);
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
    PROFILE INTRO
    ========================================================= */
 
+/*
+   Explicit grid layout prevents the avatar/name from
+   becoming separated by global flex/grid styles.
+*/
+
 .profile-intro {
-  display: flex;
+  width: 100%;
+  min-height: 142px;
+
+  display: grid;
+
+  grid-template-columns: 78px minmax(0, 1fr);
+
   align-items: center;
 
-  gap: 17px;
+  column-gap: 18px;
+
+  box-sizing: border-box;
 
   padding: 25px 28px;
 
@@ -135,10 +159,13 @@
   height: 68px;
 
   min-width: 68px;
+  max-width: 68px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  margin: 0;
 
   border-radius: 50%;
 
@@ -151,8 +178,12 @@
   font-size: 26px;
   font-weight: 800;
 
+  line-height: 1;
+
   box-shadow:
     0 3px 12px rgba(35, 120, 60, 0.13);
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -160,15 +191,35 @@
    ========================================================= */
 
 .profile-intro-content {
+  width: 100%;
   min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
 }
 
+/* =========================================================
+   TITLE LINE
+   ========================================================= */
+
 .profile-title-line {
+  width: 100%;
+
   display: flex;
   align-items: center;
+
   flex-wrap: wrap;
 
   gap: 9px;
+
+  margin: 0;
+  padding: 0;
 }
 
 .profile-title-line h2 {
@@ -184,6 +235,7 @@
 .profile-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 
   padding: 4px 9px;
 
@@ -194,7 +246,10 @@
   color: #26853c;
 
   font-size: 9px;
+  line-height: 1;
   font-weight: 800;
+
+  white-space: nowrap;
 }
 
 .profile-specialization {
@@ -203,19 +258,25 @@
   color: #657269;
 
   font-size: 12px;
+  line-height: 1.4;
 }
 
 .profile-email {
   display: flex;
   align-items: center;
+
   gap: 6px;
+
+  margin: 0;
 
   color: #7a867e;
 
   font-size: 11px;
+  line-height: 1.4;
 }
 
 .profile-email svg {
+  flex-shrink: 0;
   color: #738078;
 }
 
@@ -224,7 +285,12 @@
    ========================================================= */
 
 .profile-section {
+  width: 100%;
+
+  margin: 0;
   padding: 26px 28px;
+
+  box-sizing: border-box;
 
   border-bottom: 1px solid #e8edea;
 }
@@ -238,12 +304,15 @@
    ========================================================= */
 
 .profile-section-header {
+  width: 100%;
+
   display: flex;
   align-items: center;
 
   gap: 11px;
 
-  margin-bottom: 20px;
+  margin: 0 0 20px;
+  padding: 0;
 }
 
 .profile-section-icon {
@@ -286,6 +355,8 @@
    ========================================================= */
 
 .profile-form-grid {
+  width: 100%;
+
   display: grid;
 
   grid-template-columns:
@@ -293,10 +364,13 @@
 
   column-gap: 22px;
   row-gap: 17px;
+
+  box-sizing: border-box;
 }
 
 .profile-field {
   min-width: 0;
+  width: 100%;
 }
 
 .profile-field-full {
@@ -310,7 +384,7 @@
 .profile-field label {
   display: block;
 
-  margin-bottom: 6px;
+  margin: 0 0 6px;
 
   color: #344039;
 
@@ -365,6 +439,7 @@
 
   min-width: 0;
 
+  margin: 0;
   padding: 0;
 
   border: none;
@@ -394,6 +469,7 @@
 
 .profile-disabled input {
   color: #7f8983 !important;
+
   cursor: not-allowed;
 }
 
@@ -411,6 +487,7 @@
 
   box-sizing: border-box;
 
+  margin: 0;
   padding: 0 11px;
 
   border: 1px solid #d9e2dc;
@@ -448,11 +525,12 @@
 .profile-help {
   display: block;
 
-  margin-top: 5px;
+  margin: 5px 0 0;
 
   color: #929c96;
 
   font-size: 9px;
+  line-height: 1.3;
 }
 
 /* =========================================================
@@ -467,6 +545,7 @@
 
   box-sizing: border-box;
 
+  margin: 0;
   padding: 11px;
 
   resize: vertical;
@@ -505,12 +584,17 @@
    ========================================================= */
 
 .profile-footer {
+  width: 100%;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   gap: 20px;
 
+  box-sizing: border-box;
+
+  margin: 0;
   padding: 15px 28px;
 
   background: #fafcfb;
@@ -534,6 +618,7 @@
 }
 
 .profile-security svg {
+  flex-shrink: 0;
   color: #3d9950;
 }
 
@@ -638,9 +723,8 @@
    ========================================================= */
 
 @media (max-width: 900px) {
-
   .profile-page {
-    padding: 4px 0 30px;
+    padding: 4px 22px 30px;
   }
 
   .profile-intro,
@@ -660,6 +744,10 @@
    ========================================================= */
 
 @media (max-width: 680px) {
+  .profile-page {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 
   .profile-page-header h1 {
     font-size: 24px;
@@ -674,13 +762,20 @@
   }
 
   .profile-intro {
-    align-items: flex-start;
+    grid-template-columns: 60px minmax(0, 1fr);
+
+    column-gap: 14px;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
   }
 
   .profile-avatar {
-    width: 58px;
-    height: 58px;
-    min-width: 58px;
+    width: 56px;
+    height: 56px;
+
+    min-width: 56px;
+    max-width: 56px;
 
     font-size: 22px;
   }
@@ -691,6 +786,7 @@
 
   .profile-footer {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -708,6 +804,10 @@
    ========================================================= */
 
 @media (max-width: 420px) {
+  .profile-page {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 
   .profile-intro,
   .profile-section {
@@ -727,55 +827,29 @@
   .profile-section-header {
     align-items: flex-start;
   }
+
+  .profile-intro {
+    grid-template-columns: 1fr;
+    row-gap: 13px;
+  }
+
+  .profile-avatar {
+    margin: 0;
+  }
 }
+
 /* =========================================================
-   PROFILE PAGE - FULL AVAILABLE WIDTH
+   CONSULTANT CONTENT - PROFILE FULL WIDTH
    ========================================================= */
 
-/* Remove the max-width restriction from the consultant
-   content ONLY when Profile page is active */
 .consultant-main .consultant-content:has(.profile-page) {
   width: 100% !important;
   max-width: none !important;
+
   margin: 0 !important;
 
   padding-left: 0 !important;
   padding-right: 0 !important;
 
   box-sizing: border-box;
-}
-
-/* Profile itself should occupy all available width */
-.profile-page {
-  width: 100% !important;
-  max-width: none !important;
-
-  margin: 0 !important;
-
-  padding: 4px 28px 40px !important;
-
-  box-sizing: border-box;
-}
-
-/* Make the profile card full width */
-.profile-card {
-  width: 100% !important;
-  max-width: none !important;
-
-  margin: 0 !important;
-}
-
-/* Header also full width */
-.profile-page-header {
-  width: 100% !important;
-  max-width: none !important;
-
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-/* Alerts full width */
-.profile-alert {
-  width: 100% !important;
-  max-width: none !important;
 }
